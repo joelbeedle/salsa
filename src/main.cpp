@@ -80,7 +80,7 @@ public:
 
     // Set the position and color of the triangle
     b2Vec2 position = body->GetPosition();
-    triangle.setPosition(position.x, position.y);
+    triangle.setPosition({position.x, position.y});
     triangle.setFillColor(sf::Color::White);
 
     // Draw the triangle
@@ -249,7 +249,8 @@ int main() {
 
   srand(time(NULL));
   // Create SFML window
-  sf::RenderWindow window(sf::VideoMode(800, 600), "Drone Swarm Simulation");
+  sf::RenderWindow window(sf::VideoMode({800u, 600u}),
+                          "Drone Swarm Simulation");
 
   // Setup Box2d world
   b2Vec2 gravity(0.0f, 0.0f);
