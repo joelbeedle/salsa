@@ -1,0 +1,3 @@
+/Users/joelbeedle/swarm-box2d/build/CMakeFiles/swarm-box2d.dir
+/Users/joelbeedle/swarm-box2d/build/CMakeFiles/edit_cache.dir
+/Users/joelbeedle/swarm-box2d/build/CMakeFiles/rebuild_cache.dir
