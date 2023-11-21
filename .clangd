@@ -1,5 +1,0 @@
-CompileFlags:
-  Add: 
-    - "-I/opt/homebrew/Cellar/box2d/2.4.1/include"
-    - "-I/Users/joelbeedle/vcpkg/installed/arm64-osx/include"
-    - "-L//Users/joelbeedle/vcpkg/installed/arm64-osx/lib"
