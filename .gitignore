@@ -31,6 +31,8 @@
 *.out
 *.app
 
+.vscode/
+.vscode
 .DS_Store
 .vscode/*
 !.vscode/settings.json
