@@ -5,7 +5,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
-
 # Add SFML submodule
 add_subdirectory(lib/SFML)
 include_directories(lib/SFML/include)
@@ -13,14 +12,6 @@ include_directories(lib/SFML/include)
 # Add Box2D submodule
 add_subdirectory(lib/Box2D)
 include_directories(lib/Box2D)
-
-# External Packages
-#find_package(box2D CONFIG REQUIRED)
-
-#find_package(SFML COMPONENTS system window graphics REQUIRED)
-
-# Include directories
-#include_directories(${Box2D_INCLUDE_DIR})
 
 # Source files
 set(SOURCES src/main.cpp)
