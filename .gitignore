@@ -86,3 +86,4 @@ Temporary Items
 
 build/**
 build
+.clangd
