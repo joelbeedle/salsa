@@ -25,6 +25,10 @@ jobs:
     - name: Checkout submodules
       # Initialise submodules
       run: git submodule update --init --recursive
+      
+    - name: Install dependencies
+      # Install dependencies for SFML
+      run: sudo apt-get install libx11-dev libxrandr-dev libxcursor-dev
 
 
     - name: Configure CMake
