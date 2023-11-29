@@ -25,6 +25,6 @@ class RayCastCallback : public b2RayCastCallback {
     }
 
     // Return the fraction to continue the ray cast through all fixtures
-    return -1.0f;
+    return fraction;
   }
 };

@@ -16,7 +16,7 @@ Drone::Drone(b2World *world, const b2Vec2 &position, SwarmBehaviour *behaviour)
 
   // Create Box2D fixture
   b2CircleShape circleShape;
-  circleShape.m_radius = 5.0f;  // TODO: use constant or parameter for radius
+  circleShape.m_radius = 1.0f;  // TODO: use constant or parameter for radius
 
   b2FixtureDef fixtureDef;
   fixtureDef.shape = &circleShape;
@@ -44,56 +44,13 @@ void Drone::update(std::vector<Drone *> &drones) {
   }
 
   b2Vec2 position = body->GetPosition();
-  b2Vec2 velocity = body->GetLinearVelocity();
-
-  float velocityMagnitude = velocity.Length();
-  if (velocityMagnitude > maxSpeed) {
-    if (velocityMagnitude > 0.0f) {
-      velocity *= (1.0f / velocityMagnitude);  // Normalize by multiplying with
-                                               // the inverse of the magnitude
-    }
-
-    velocity *= maxSpeed;
-  }
-
-  body->SetLinearVelocity(velocity);
 
   body->SetTransform(position, body->GetAngle());
 
   // acceleration.SetZero(); needs to be in execute()
 }
 
-// void Drone::render(sf::RenderWindow &window) {
-//   // Calculate the angle of the velocity
-//   b2Vec2 velocity = body->GetLinearVelocity();
-//   float angle = std::atan2(velocity.y, velocity.x);
-
-//   // Create a triangle shape
-//   sf::ConvexShape triangle;
-//   triangle.setPointCount(3);
-
-//   // Define the points of the triangle
-//   triangle.setPoint(
-//       0, sf::Vector2f(radius * std::cos(angle), radius * std::sin(angle)));
-//   triangle.setPoint(1, sf::Vector2f(radius * std::cos(angle + 2.5f),
-//                                     radius * std::sin(angle + 2.5f)));
-//   triangle.setPoint(2, sf::Vector2f(radius * std::cos(angle - 2.5f),
-//                                     radius * std::sin(angle - 2.5f)));
-
-//   // Set the position and color of the triangle
-//   b2Vec2 position = body->GetPosition();
-//   triangle.setPosition({position.x, position.y});
-//   triangle.setFillColor(sf::Color::White);
-
-//   // Draw the triangle
-//   window.draw(triangle);
-// }
-
 void Drone::setBehaviour(SwarmBehaviour *newBehaviour) {
-  if (behaviour) {
-    delete behaviour;
-  }
-
   behaviour = newBehaviour;
 }
 

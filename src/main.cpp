@@ -118,9 +118,19 @@ int main() {
     currentBody = currentBody->GetNext();
   }
 
-  // Create behaviour instances
-  FlockingBehaviour flockingBehaviour(20.0f, 5.0f, 1.0f, 1.0f, 1.0f, 10.0f,
-                                      0.3f);
+  float separationDistance = 50.0f;
+  float alignmentWeight = 1.0f;
+  float viewRange = 100.0f;
+  float cohesionWeight = 1.0f;
+  float separationWeight = 1.0f;
+  float obstacleAvoidanceWeight = 1.0f;
+  float maxSpeed = 10.0f;
+  float maxForce = 0.3f;
+
+  // Create Behaviour instances
+  FlockingBehaviour flockingBehaviour(
+      viewRange, separationDistance, alignmentWeight, cohesionWeight,
+      separationWeight, obstacleAvoidanceWeight, maxSpeed, maxForce);
 
   // Create drones
   std::vector<Drone *> drones;
