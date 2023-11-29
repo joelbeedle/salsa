@@ -23,7 +23,7 @@ jobs:
       
     - name: Install SFML and dependencies
       run: |
-        sudo apt-get install -y libx11-dev libxrandr-dev libxcursor-dev libudev-dev libopenal-dev libflac-dev libogg-dev libvorbis-dev libopenal-dev libpthread-stubs0-dev
+        sudo apt-get install -y libx11-dev libxrandr-dev libxcursor-dev libudev-dev libopenal-dev libflac-dev libogg-dev libvorbis-dev libopenal-dev libpthread-stubs0-dev libxinerama-dev
         sudo apt-get install -y libsfml-dev
         
     - name: Configure CMake
