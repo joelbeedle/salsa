@@ -16,7 +16,7 @@ Drone::Drone(b2World *world, const b2Vec2 &position, SwarmBehaviour *behaviour)
 
   // Create Box2D fixture
   b2CircleShape circleShape;
-  circleShape.m_radius = 5.0f;  // TODO: use constant or parameter for radius
+  circleShape.m_radius = 1.0f;  // TODO: use constant or parameter for radius
 
   b2FixtureDef fixtureDef;
   fixtureDef.shape = &circleShape;
@@ -44,19 +44,6 @@ void Drone::update(std::vector<Drone *> &drones) {
   }
 
   b2Vec2 position = body->GetPosition();
-  b2Vec2 velocity = body->GetLinearVelocity();
-
-  float velocityMagnitude = velocity.Length();
-  if (velocityMagnitude > maxSpeed) {
-    if (velocityMagnitude > 0.0f) {
-      velocity *= (1.0f / velocityMagnitude);  // Normalize by multiplying with
-                                               // the inverse of the magnitude
-    }
-
-    velocity *= maxSpeed;
-  }
-
-  body->SetLinearVelocity(velocity);
 
   body->SetTransform(position, body->GetAngle());
 

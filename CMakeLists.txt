@@ -4,6 +4,7 @@ project(swarm-box2d)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
+option(BUILD_TESTBED "Build the Box2D testbed" ON)
 
 # Add SFML submodule
 add_subdirectory(lib/SFML)
@@ -29,3 +30,13 @@ target_link_libraries(swarm-box2d PRIVATE sfml-system sfml-network sfml-graphics
 target_include_directories(swarm-box2d PRIVATE ${PROJECT_SOURCE_DIR}/include)
 target_compile_features(swarm-box2d PRIVATE cxx_std_17)
 
+# Add TestBed
+if(BUILD_TESTBED)
+    add_subdirectory(testbed)
+
+    if (MSVC)
+        set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT testbed)
+        set_property(TARGET testbed PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/testbed")
+    endif()
+
+endif()

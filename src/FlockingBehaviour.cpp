@@ -1,5 +1,7 @@
 #include "FlockingBehaviour.h"
 
+#include <valarray>
+
 #include "Drone.h"
 #include "RayCastCallback.h"
 
@@ -26,14 +28,14 @@ void FlockingBehaviour::execute(std::vector<Drone *> &drones,
   b2Vec2 position = currentDrone->getPosition();
 
   velocity += acceleration;
-  float speed = 0.01f + velocity.Length();
+  float speed = 0.001f + velocity.Length();
   b2Vec2 dir(velocity.x / speed, velocity.y / speed);
 
   // Clamp speed
   if (speed > maxSpeed) {
     speed = maxSpeed;
   } else if (speed < 0) {
-    speed = 0.01f;
+    speed = 0.001f;
   }
   velocity = b2Vec2(dir.x * speed, dir.y * speed);
 
@@ -68,7 +70,7 @@ b2Vec2 FlockingBehaviour::avoidObstacles(std::vector<b2Vec2> &obstaclePoints,
     if (distance < viewRange && distance > 0) {
       // Make sure it's weighted by the inverse distance
       diff.Normalize();
-      diff *= (1.0f / distance);
+      diff *= (distance);
       steering += diff;
       count++;
     }
@@ -147,7 +149,7 @@ b2Vec2 FlockingBehaviour::separate(std::vector<b2Body *> &drones,
     float distance = diff.Length();
     if (distance < separationDistance) {
       diff.Normalize();
-      diff *= (1.0f / distance);
+      diff *= (distance);
       avgVec += diff;
       neighbours++;
     }
@@ -161,15 +163,18 @@ b2Vec2 FlockingBehaviour::separate(std::vector<b2Body *> &drones,
     avgVec *= maxSpeed;
 
     steering = avgVec - currentDrone->getVelocity();
+    printf("steering before: %f, %f\n", steering.x, steering.y);
     clampMagnitude(steering, maxForce);
+    printf("steering after: %f, %f\n", steering.x, steering.y);
   }
 
   return steering;
 }
 
 void FlockingBehaviour::clampMagnitude(b2Vec2 &vector, float maxMagnitude) {
-  float length = vector.Length();
-  if (length > maxMagnitude && length > 0.0f) {
+  float lengthSquared = vector.LengthSquared();
+  if (lengthSquared > maxMagnitude * maxMagnitude && lengthSquared > 0) {
+    float length = std::sqrt(lengthSquared);
     vector.x /= length;
     vector.y /= length;
     vector *= maxMagnitude;
