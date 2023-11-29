@@ -6,6 +6,8 @@
 #include "imgui/imgui.h"
 #include "test.h"
 
+#define DRONE_COUNT 50
+
 void createBounds(b2World *world, float screenWidth, float screenHeight) {
   // Define the ground body.
   b2BodyDef groundBodyDef;
@@ -73,8 +75,8 @@ class DroneSwarmTest : public Test {
           viewRange, separationDistance, alignmentWeight, cohesionWeight,
           separationWeight, obstacleAvoidanceWeight, maxSpeed, maxForce);
 
-      for (int i = 0; i < 50; i++) {
-        drones.push_back(new Drone(m_world, b2Vec2(rand() % 100, rand() % 100),
+      for (int i = 0; i < DRONE_COUNT; i++) {
+        drones.push_back(new Drone(m_world, b2Vec2(rand() % static_cast<int>(screenWidth), rand() % static_cast<int>(screenHeight)),
                                    flockingBehaviour));
       }
     }
