@@ -15,22 +15,25 @@ class FlockingBehaviour : public SwarmBehaviour {
  private:
   float viewRange;
   float separationDistance;
-  float maxAlignment;
-  float maxCohesion;
-  float maxSeparation;
+  float alignmentWeight;
+  float cohesionWeight;
+  float separationWeight;
+  float obstacleAvoidanceWeight;
   float maxSpeed;
   float maxForce;
   std::vector<b2Body *> obstacles;
 
  public:
   FlockingBehaviour(float viewRange, float separationDistance,
-                    float maxAlignment, float maxCohesion, float maxSeparation,
+                    float alignmentWeight, float cohesionWeight,
+                    float separationWeight, float obstacleAvoidanceWeight,
                     float maxSpeed, float maxForce)
       : viewRange(viewRange),
         separationDistance(separationDistance),
-        maxAlignment(maxAlignment),
-        maxCohesion(maxCohesion),
-        maxSeparation(maxSeparation),
+        alignmentWeight(alignmentWeight),
+        cohesionWeight(cohesionWeight),
+        separationWeight(separationWeight),
+        obstacleAvoidanceWeight(obstacleAvoidanceWeight),
         maxForce(maxForce),
         maxSpeed(maxSpeed) {}
 
@@ -43,4 +46,5 @@ class FlockingBehaviour : public SwarmBehaviour {
   b2Vec2 avoidObstacles(std::vector<b2Vec2> &obstaclePoints,
                         Drone *currentDrone);
   void performRayCasting(Drone *currentDrone, RayCastCallback &callback);
+  void clampMagnitude(b2Vec2 &vector, float maxMagnitude);
 };
