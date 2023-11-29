@@ -63,37 +63,7 @@ void Drone::update(std::vector<Drone *> &drones) {
   // acceleration.SetZero(); needs to be in execute()
 }
 
-// void Drone::render(sf::RenderWindow &window) {
-//   // Calculate the angle of the velocity
-//   b2Vec2 velocity = body->GetLinearVelocity();
-//   float angle = std::atan2(velocity.y, velocity.x);
-
-//   // Create a triangle shape
-//   sf::ConvexShape triangle;
-//   triangle.setPointCount(3);
-
-//   // Define the points of the triangle
-//   triangle.setPoint(
-//       0, sf::Vector2f(radius * std::cos(angle), radius * std::sin(angle)));
-//   triangle.setPoint(1, sf::Vector2f(radius * std::cos(angle + 2.5f),
-//                                     radius * std::sin(angle + 2.5f)));
-//   triangle.setPoint(2, sf::Vector2f(radius * std::cos(angle - 2.5f),
-//                                     radius * std::sin(angle - 2.5f)));
-
-//   // Set the position and color of the triangle
-//   b2Vec2 position = body->GetPosition();
-//   triangle.setPosition({position.x, position.y});
-//   triangle.setFillColor(sf::Color::White);
-
-//   // Draw the triangle
-//   window.draw(triangle);
-// }
-
 void Drone::setBehaviour(SwarmBehaviour *newBehaviour) {
-  if (behaviour) {
-    delete behaviour;
-  }
-
   behaviour = newBehaviour;
 }
 
