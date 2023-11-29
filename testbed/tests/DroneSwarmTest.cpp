@@ -93,7 +93,7 @@ class DroneSwarmTest : public Test {
 
   void UpdateUI() override {
     ImGui::SetNextWindowPos(ImVec2(10.0f, 100.0f));
-    ImGui::SetNextWindowSize(ImVec2(210.0f, 285.0f));
+    ImGui::SetNextWindowSize(ImVec2(285.0f, 285.0f));
     ImGui::Begin("Swarm Controls", nullptr,
                  ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 
