@@ -23,6 +23,7 @@ jobs:
       
     - name: Install SFML dependencies
       run: |
+        sudo apt-get install libsfml-dev
         sudo apt-get update
         sudo apt-get install -y libfreetype6-dev libx11-dev libxrandr-dev libudev-dev libopengl0-mesa-dev libflac-dev libogg-dev libvorbis-dev libopenal-dev libpthread-stubs0-dev
 
