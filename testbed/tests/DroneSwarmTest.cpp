@@ -69,7 +69,7 @@ class DroneSwarmTest : public Test {
         printf("Obstacle: %f, %f\n", obstacle->GetPosition().x,
                obstacle->GetPosition().y);
       }
-      viewRange = 100.0f;
+      viewRange = 20.0f;
       separationDistance = 50.0f;
       alignmentWeight = 1.0f;
       cohesionWeight = 1.0f;
