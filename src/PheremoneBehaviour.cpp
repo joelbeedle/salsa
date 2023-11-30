@@ -43,7 +43,7 @@ void PheremoneBehaviour::layPheremone(const b2Vec2 &position) {
 
 void PheremoneBehaviour::updatePheremones() {
   for (auto it = pheremones.begin(); it != pheremones.end();) {
-    it->second.intensity -= decayRate;
+    it->second.intensity -= params.decayRate;
     if (it->second.intensity <= 0) {
       it = pheremones.erase(it);
     } else {

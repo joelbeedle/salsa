@@ -20,10 +20,10 @@ void FlockingBehaviour::execute(std::vector<Drone *> &drones,
   b2Vec2 cohesion = cohere(neighbours, currentDrone);
   b2Vec2 obstacleAvoidance = avoidObstacles(obstaclePoints, currentDrone);
 
-  b2Vec2 acceleration = (alignmentWeight * alignment) +
-                        (separationWeight * separation) +
-                        (cohesionWeight * cohesion) +
-                        (obstacleAvoidanceWeight * obstacleAvoidance);
+  b2Vec2 acceleration = (params.alignmentWeight * alignment) +
+                        (params.separationWeight * separation) +
+                        (params.cohesionWeight * cohesion) +
+                        (params.obstacleAvoidanceWeight * obstacleAvoidance);
   b2Vec2 velocity = currentDrone->getVelocity();
   b2Vec2 position = currentDrone->getPosition();
 
@@ -152,7 +152,7 @@ b2Vec2 FlockingBehaviour::separate(std::vector<b2Body *> &drones,
   for (auto &drone : drones) {
     float distance =
         b2Distance(currentDrone->getPosition(), drone->GetPosition());
-    if (distance < separationDistance && distance > 0) {
+    if (distance < params.separationDistance && distance > 0) {
       b2Vec2 diff = currentDrone->getPosition() - drone->GetPosition();
       diff.Normalize();
       diff.x /= distance;

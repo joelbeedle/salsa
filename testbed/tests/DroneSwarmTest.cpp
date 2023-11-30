@@ -7,6 +7,8 @@
 #include <variant>
 #include <vector>
 
+#include "BehaviourFactory.h"
+#include "BehaviourTypes.h"
 #include "Drone.h"
 #include "FlockingBehaviour.h"
 #include "PheremoneBehaviour.h"
@@ -16,43 +18,6 @@
 #define DRONE_COUNT 50
 #define BORDER_WIDTH 100.0f
 #define BORDER_HEIGHT 100.0f
-
-// TODO: add numBehaviours at end to ensure it is updated throughout
-enum class BehaviourType { Flocking, Pheremone };
-
-struct BehaviourTypeInfo {
-  BehaviourType type;
-  std::string displayName;
-};
-
-class BehaviourFactory {
- public:
-  using BehaviourParams = std::variant<FlockingParameters, PheremoneParameters>;
-
-  static SwarmBehaviour *createBehaviour(BehaviourType type,
-                                         BehaviourParams params) {
-    switch (type) {
-      case BehaviourType::Flocking:
-        return new FlockingBehaviour(
-            extractParameters<FlockingParameters>(params));
-      case BehaviourType::Pheremone:
-        return new PheremoneBehaviour(
-            extractParameters<PheremoneParameters>(params));
-      default:
-        throw std::runtime_error("Unknown behaviour type");
-    }
-  }
-
- private:
-  template <typename T>
-  static T extractParameters(const BehaviourParams &params) {
-    if (auto p = std::get_if<T>(&params)) {
-      return *p;
-    } else {
-      throw std::runtime_error("Incorrect parameters for behaviour");
-    }
-  }
-};
 
 void createBounds(b2World *world) {
   // Define the ground body.

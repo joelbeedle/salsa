@@ -21,11 +21,12 @@ class PheremoneBehaviour : public SwarmBehaviour {
 
   std::map<int, Pheremone> pheremones;
   int pheremoneCount = 0;
-  float decayRate;
+
+  PheremoneParameters params;
 
  public:
-  PheremoneBehaviour(const PheremoneParameters &params)
-      : decayRate(params.decayRate) {}
+  PheremoneBehaviour(const PheremoneParameters &parameters)
+      : params(parameters) {}
 
   void execute(std::vector<Drone *> &drones, Drone *currentDrone) override;
 

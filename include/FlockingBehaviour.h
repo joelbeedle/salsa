@@ -21,20 +21,11 @@ struct FlockingParameters {
 
 class FlockingBehaviour : public SwarmBehaviour {
  private:
-  float separationDistance;
-  float alignmentWeight;
-  float cohesionWeight;
-  float separationWeight;
-  float obstacleAvoidanceWeight;
+  FlockingParameters params;
   std::vector<b2Body *> obstacles;
 
  public:
-  FlockingBehaviour(const FlockingParameters &params)
-      : separationDistance(params.separationDistance),
-        alignmentWeight(params.alignmentWeight),
-        cohesionWeight(params.cohesionWeight),
-        separationWeight(params.separationWeight),
-        obstacleAvoidanceWeight(params.obstacleAvoidanceWeight) {}
+  FlockingBehaviour(const FlockingParameters &parameters) : params(params) {}
 
   void execute(std::vector<Drone *> &drones, Drone *currentDrone) override;
 

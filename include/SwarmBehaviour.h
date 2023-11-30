@@ -2,6 +2,8 @@
 #pragma once
 #include <vector>
 
+#include "BehaviourTypes.h"
+
 class Drone;
 
 class SwarmBehaviour {
