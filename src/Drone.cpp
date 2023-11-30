@@ -6,8 +6,13 @@
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
 
-Drone::Drone(b2World *world, const b2Vec2 &position, SwarmBehaviour *behaviour)
-    : behaviour(behaviour), perception(100.0f), maxSpeed(5.0f) {
+Drone::Drone(b2World *world, const b2Vec2 &position, SwarmBehaviour *behaviour,
+             float viewRange, float maxSpeed, float maxForce, float radius)
+    : behaviour(behaviour),
+      viewRange(viewRange),
+      maxSpeed(maxSpeed),
+      maxForce(maxForce),
+      radius(radius) {
   // Create Box2D body
   b2BodyDef bodyDef;
   bodyDef.type = b2_dynamicBody;
@@ -16,7 +21,7 @@ Drone::Drone(b2World *world, const b2Vec2 &position, SwarmBehaviour *behaviour)
 
   // Create Box2D fixture
   b2CircleShape circleShape;
-  circleShape.m_radius = 1.0f;  // TODO: use constant or parameter for radius
+  circleShape.m_radius = radius;
 
   b2FixtureDef fixtureDef;
   fixtureDef.shape = &circleShape;
@@ -46,16 +51,4 @@ void Drone::update(std::vector<Drone *> &drones) {
   b2Vec2 position = body->GetPosition();
 
   body->SetTransform(position, body->GetAngle());
-
-  // acceleration.SetZero(); needs to be in execute()
 }
-
-void Drone::setBehaviour(SwarmBehaviour *newBehaviour) {
-  behaviour = newBehaviour;
-}
-
-b2Body *Drone::getBody() { return body; }
-
-b2Vec2 Drone::getVelocity() { return body->GetLinearVelocity(); }
-
-b2Vec2 Drone::getPosition() { return body->GetPosition(); }

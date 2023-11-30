@@ -15,7 +15,7 @@ add_subdirectory(lib/Box2D)
 include_directories(lib/Box2D)
 
 # Source files
-set(SOURCES src/main.cpp src/Drone.cpp src/FlockingBehaviour.cpp)
+set(SOURCES src/main.cpp src/Drone.cpp src/FlockingBehaviour.cpp src/PheremoneBehaviour.cpp)
 
 # Executable
 add_executable(swarm-box2d ${SOURCES})

@@ -20,10 +20,10 @@ void FlockingBehaviour::execute(std::vector<Drone *> &drones,
   b2Vec2 cohesion = cohere(neighbours, currentDrone);
   b2Vec2 obstacleAvoidance = avoidObstacles(obstaclePoints, currentDrone);
 
-  b2Vec2 acceleration = (alignmentWeight * alignment) +
-                        (separationWeight * separation) +
-                        (cohesionWeight * cohesion) +
-                        (obstacleAvoidanceWeight * obstacleAvoidance);
+  b2Vec2 acceleration = (params.alignmentWeight * alignment) +
+                        (params.separationWeight * separation) +
+                        (params.cohesionWeight * cohesion) +
+                        (params.obstacleAvoidanceWeight * obstacleAvoidance);
   b2Vec2 velocity = currentDrone->getVelocity();
   b2Vec2 position = currentDrone->getPosition();
 
@@ -32,8 +32,9 @@ void FlockingBehaviour::execute(std::vector<Drone *> &drones,
   b2Vec2 dir(velocity.x / speed, velocity.y / speed);
 
   // Clamp speed
-  if (speed > maxSpeed) {
-    speed = maxSpeed;
+  if (speed > currentDrone->getMaxSpeed()) {
+    speed = currentDrone->getMaxSpeed();
+    ;
   } else if (speed < 0) {
     speed = 0.001f;
   }
@@ -47,7 +48,8 @@ void FlockingBehaviour::execute(std::vector<Drone *> &drones,
 void FlockingBehaviour::performRayCasting(Drone *currentDrone,
                                           RayCastCallback &callback) {
   // Define the ray casting range and angle
-  float rayRange = viewRange;
+  float rayRange = currentDrone->getViewRange();
+  ;
   float deltaAngle = 15.0f;  // dividing the circle into segments
 
   for (float angle = 0; angle < 360; angle += deltaAngle) {
@@ -66,7 +68,7 @@ b2Vec2 FlockingBehaviour::avoidObstacles(std::vector<b2Vec2> &obstaclePoints,
 
   for (auto &point : obstaclePoints) {
     float distance = b2Distance(currentDrone->getPosition(), point);
-    if (distance < viewRange && distance > 0) {
+    if (distance < currentDrone->getViewRange() && distance > 0) {
       b2Vec2 diff = currentDrone->getPosition() - point;
       // Make sure it's weighted by the inverse distance
       diff.Normalize();
@@ -81,10 +83,11 @@ b2Vec2 FlockingBehaviour::avoidObstacles(std::vector<b2Vec2> &obstaclePoints,
     steering.x /= count;
     steering.y /= count;
     steering.Normalize();
-    steering *= maxSpeed;
+    steering *= currentDrone->getMaxSpeed();
+    ;
 
     steering -= currentDrone->getVelocity();
-    clampMagnitude(steering, maxForce);
+    clampMagnitude(steering, currentDrone->getMaxForce());
   }
 
   return steering;
@@ -105,10 +108,11 @@ b2Vec2 FlockingBehaviour::align(std::vector<b2Body *> &drones,
     avgVec.x /= neighbours;
     avgVec.y /= neighbours;
     avgVec.Normalize();
-    avgVec *= maxSpeed;
+    avgVec *= currentDrone->getMaxSpeed();
+    ;
 
     steering = avgVec - currentDrone->getVelocity();
-    clampMagnitude(steering, maxForce);
+    clampMagnitude(steering, currentDrone->getMaxForce());
   }
   return steering;
 }
@@ -130,10 +134,11 @@ b2Vec2 FlockingBehaviour::cohere(std::vector<b2Body *> &drones,
     b2Vec2 vecToCom = centreOfMass - currentDrone->getPosition();
 
     vecToCom.Normalize();
-    vecToCom *= maxSpeed;
+    vecToCom *= currentDrone->getMaxSpeed();
+    ;
 
     steering = vecToCom - currentDrone->getVelocity();
-    clampMagnitude(steering, maxForce);
+    clampMagnitude(steering, currentDrone->getMaxForce());
   }
   return steering;
 }
@@ -147,7 +152,7 @@ b2Vec2 FlockingBehaviour::separate(std::vector<b2Body *> &drones,
   for (auto &drone : drones) {
     float distance =
         b2Distance(currentDrone->getPosition(), drone->GetPosition());
-    if (distance < separationDistance && distance > 0) {
+    if (distance < params.separationDistance && distance > 0) {
       b2Vec2 diff = currentDrone->getPosition() - drone->GetPosition();
       diff.Normalize();
       diff.x /= distance;
@@ -163,19 +168,12 @@ b2Vec2 FlockingBehaviour::separate(std::vector<b2Body *> &drones,
   }
   if (avgVec.Length() > 0) {
     avgVec.Normalize();
-    avgVec *= maxSpeed;
+    avgVec *= currentDrone->getMaxSpeed();
+    ;
 
     steering = avgVec - currentDrone->getVelocity();
-    clampMagnitude(steering, maxForce);
+    clampMagnitude(steering, currentDrone->getMaxForce());
   }
 
   return steering;
-}
-
-void FlockingBehaviour::clampMagnitude(b2Vec2 &vector, float maxMagnitude) {
-  float lengthSquared = vector.LengthSquared();
-  if (lengthSquared > maxMagnitude * maxMagnitude && lengthSquared > 0) {
-    vector.Normalize();
-    vector *= maxMagnitude;
-  }
 }
