@@ -128,9 +128,9 @@ int main() {
   float maxForce = 0.3f;
 
   // Create Behaviour instances
-  FlockingBehaviour flockingBehaviour(
-      viewRange, separationDistance, alignmentWeight, cohesionWeight,
-      separationWeight, obstacleAvoidanceWeight, maxSpeed, maxForce);
+  FlockingBehaviour flockingBehaviour(separationDistance, alignmentWeight,
+                                      cohesionWeight, separationWeight,
+                                      obstacleAvoidanceWeight);
 
   // Create drones
   std::vector<Drone *> drones;

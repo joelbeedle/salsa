@@ -13,29 +13,22 @@ class Drone;  // Forward declaration for Drone
 
 class FlockingBehaviour : public SwarmBehaviour {
  private:
-  float viewRange;
   float separationDistance;
   float alignmentWeight;
   float cohesionWeight;
   float separationWeight;
   float obstacleAvoidanceWeight;
-  float maxSpeed;
-  float maxForce;
   std::vector<b2Body *> obstacles;
 
  public:
-  FlockingBehaviour(float viewRange, float separationDistance,
-                    float alignmentWeight, float cohesionWeight,
-                    float separationWeight, float obstacleAvoidanceWeight,
-                    float maxSpeed, float maxForce)
-      : viewRange(viewRange),
-        separationDistance(separationDistance),
+  FlockingBehaviour(float separationDistance, float alignmentWeight,
+                    float cohesionWeight, float separationWeight,
+                    float obstacleAvoidanceWeight)
+      : separationDistance(separationDistance),
         alignmentWeight(alignmentWeight),
         cohesionWeight(cohesionWeight),
         separationWeight(separationWeight),
-        obstacleAvoidanceWeight(obstacleAvoidanceWeight),
-        maxForce(maxForce),
-        maxSpeed(maxSpeed) {}
+        obstacleAvoidanceWeight(obstacleAvoidanceWeight) {}
 
   void execute(std::vector<Drone *> &drones, Drone *currentDrone) override;
 
@@ -46,5 +39,4 @@ class FlockingBehaviour : public SwarmBehaviour {
   b2Vec2 avoidObstacles(std::vector<b2Vec2> &obstaclePoints,
                         Drone *currentDrone);
   void performRayCasting(Drone *currentDrone, RayCastCallback &callback);
-  void clampMagnitude(b2Vec2 &vector, float maxMagnitude);
 };

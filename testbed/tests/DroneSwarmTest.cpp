@@ -3,6 +3,7 @@
 
 #include "Drone.h"
 #include "FlockingBehaviour.h"
+#include "PheremoneBehaviour.h"
 #include "imgui/imgui.h"
 #include "test.h"
 
@@ -38,14 +39,27 @@ void createBounds(b2World *world, float screenWidth, float screenHeight) {
 
 class DroneSwarmTest : public Test {
  public:
+  SwarmBehaviour *behaviour;
   FlockingBehaviour *flockingBehaviour;
+  PheremoneBehaviour *pheremoneBehaviour;
+
   std::vector<Drone *> drones;
   const float screenWidth = 100.0f;
   const float screenHeight = 100.0f;
 
+  // Floats for Drones
+  float viewRange, maxSpeed, maxForce;
+
   // Floats for FlockingBehaviour
-  float viewRange, separationDistance, alignmentWeight, cohesionWeight,
-      separationWeight, obstacleAvoidanceWeight, maxSpeed, maxForce;
+  float separationDistance, alignmentWeight, cohesionWeight, separationWeight,
+      obstacleAvoidanceWeight;
+
+  // Floats for PheremoneBehaviour
+  float decayRate;
+
+  // Imgui
+  const char *behaviours[2] = {"flockingBehaviour", "pheremoneBehaviour"};
+  int currentBehaviour;  // Index of the currently selected behaviour
 
   DroneSwarmTest() {
     {
@@ -53,6 +67,8 @@ class DroneSwarmTest : public Test {
       createBounds(m_world, screenWidth, screenHeight);
     }
     {
+      // Set initial behaviour
+      currentBehaviour = 0;  // flockingBehaviour TODO: enum?
       // Initialise world and drones
       b2Vec2 gravity(0.0f, 0.0f);
       m_world->SetGravity(gravity);
@@ -71,23 +87,92 @@ class DroneSwarmTest : public Test {
       obstacleAvoidanceWeight = 1.0f;
       maxSpeed = 10.0f;
       maxForce = 0.3f;
+
       flockingBehaviour = new FlockingBehaviour(
-          viewRange, separationDistance, alignmentWeight, cohesionWeight,
-          separationWeight, obstacleAvoidanceWeight, maxSpeed, maxForce);
+          separationDistance, alignmentWeight, cohesionWeight, separationWeight,
+          obstacleAvoidanceWeight);
+
+      decayRate = 0.1f;
+      pheremoneBehaviour = new PheremoneBehaviour(decayRate);
 
       for (int i = 0; i < DRONE_COUNT; i++) {
-        drones.push_back(new Drone(m_world, b2Vec2(rand() % static_cast<int>(screenWidth), rand() % static_cast<int>(screenHeight)),
-                                   flockingBehaviour));
+        drones.push_back(
+            new Drone(m_world,
+                      b2Vec2(rand() % static_cast<int>(screenWidth),
+                             rand() % static_cast<int>(screenHeight)),
+                      getSelectedBehaviour(currentBehaviour)));
       }
     }
   }
 
-  void ResetBehaviour() {
-    FlockingBehaviour *newFlockingBehaviour = new FlockingBehaviour(
-        viewRange, separationDistance, alignmentWeight, cohesionWeight,
-        separationWeight, obstacleAvoidanceWeight, maxSpeed, maxForce);
+  void CreateDrones() {
+    flockingBehaviour = new FlockingBehaviour(
+        separationDistance, alignmentWeight, cohesionWeight, separationWeight,
+        obstacleAvoidanceWeight);
+
+    for (int i = 0; i < DRONE_COUNT; i++) {
+      drones.push_back(
+          new Drone(m_world,
+                    b2Vec2(rand() % static_cast<int>(screenWidth),
+                           rand() % static_cast<int>(screenHeight)),
+                    flockingBehaviour, viewRange, maxSpeed, maxForce));
+    }
+  }
+
+  void DestroyDrones() {
     for (auto &drone : drones) {
-      drone->setBehaviour(newFlockingBehaviour);
+      m_world->DestroyBody(drone->getBody());
+    }
+    drones.clear();
+  }
+
+  SwarmBehaviour *getSelectedBehaviour(int behaviourIndex) {
+    switch (behaviourIndex) {
+      case (0):
+        // FlockingBehaviour
+        return flockingBehaviour;
+      case (1):
+        // PheremoneBehaviour
+        return pheremoneBehaviour;
+      default:
+        return nullptr;
+    }
+    return nullptr;
+  }
+
+  void SetBehaviour(int behaviourIndex) {
+    SwarmBehaviour *newBehaviour = getSelectedBehaviour(behaviourIndex);
+    for (auto &drone : drones) {
+      drone->setBehaviour(newBehaviour);
+    }
+  }
+
+  void UpdateDroneSettings() {
+    // Update drone settings:
+    for (auto &drone : drones) {
+      drone->setMaxForce(maxForce);
+      drone->setMaxSpeed(maxSpeed);
+      drone->setViewRange(viewRange);
+    }
+  }
+
+  void UpdateBehaviourSettings(int behaviourIndex) {
+    SwarmBehaviour *newBehaviour;
+    switch (behaviourIndex) {
+      case (0):
+        // FlockingBehaviour
+        newBehaviour = new FlockingBehaviour(
+            separationDistance, alignmentWeight, cohesionWeight,
+            separationWeight, obstacleAvoidanceWeight);
+        break;
+      case (1):
+        // PheremoneBehaviour
+        newBehaviour = new PheremoneBehaviour(decayRate);
+        break;
+    }
+    // Update the drones with the new behaviour
+    for (auto &drone : drones) {
+      drone->setBehaviour(newBehaviour);
     }
   }
 
@@ -97,19 +182,51 @@ class DroneSwarmTest : public Test {
     ImGui::Begin("Swarm Controls", nullptr,
                  ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 
-    if (ImGui::Button("Reset Behaviour")) {
-      ResetBehaviour();
+    // Dropdown to select the behaviour
+    if (ImGui::Combo("Behaviour", &currentBehaviour, behaviours,
+                     IM_ARRAYSIZE(behaviours))) {
+      SetBehaviour(currentBehaviour);
     }
 
-    ImGui::SliderFloat("viewRange", &viewRange, 0.0f, 100.0f);
-    ImGui::SliderFloat("separationDistance", &separationDistance, 0.0f, 100.0f);
-    ImGui::SliderFloat("maxSpeed", &maxSpeed, 0.0f, 50.0f);
-    ImGui::SliderFloat("maxForce", &maxForce, 0.0f, 10.0f);
-    ImGui::SliderFloat("alignmentWeight", &alignmentWeight, 0.0f, 2.0f);
-    ImGui::SliderFloat("cohesionWeight", &cohesionWeight, 0.0f, 2.0f);
-    ImGui::SliderFloat("separationWeight", &separationWeight, 0.0f, 2.0f);
-    ImGui::SliderFloat("obstacleAvoidanceWeight", &obstacleAvoidanceWeight,
-                       0.0f, 2.0f);
+    // Drone settings
+    ImGui::Text("Drone Settings");
+    bool speedChanged = ImGui::SliderFloat("maxSpeed", &maxSpeed, 0.0f, 50.0f);
+    bool forceChanged = ImGui::SliderFloat("maxForce", &maxForce, 0.0f, 10.0f);
+    bool viewChanged =
+        ImGui::SliderFloat("viewRange", &viewRange, 0.0f, 100.0f);
+
+    if (speedChanged || forceChanged || viewChanged) {
+      UpdateDroneSettings();
+    }
+
+    // Display different behaviour settings depending on the behaviour selected
+    ImGui::Text("Behaviour Settings");
+    bool distance, alignment, cohesion, separation, avoidance, decay;
+    switch (currentBehaviour) {
+      case 0:
+        // FlockingBehaviour
+        distance = ImGui::SliderFloat("separationDistance", &separationDistance,
+                                      0.0f, 100.0f);
+        alignment =
+            ImGui::SliderFloat("alignmentWeight", &alignmentWeight, 0.0f, 2.0f);
+        cohesion =
+            ImGui::SliderFloat("cohesionWeight", &cohesionWeight, 0.0f, 2.0f);
+        separation = ImGui::SliderFloat("separationWeight", &separationWeight,
+                                        0.0f, 2.0f);
+        avoidance = ImGui::SliderFloat("obstacleAvoidanceWeight",
+                                       &obstacleAvoidanceWeight, 0.0f, 2.0f);
+        if (distance || alignment || cohesion || separation || avoidance) {
+          UpdateBehaviourSettings(currentBehaviour);
+        }
+        break;
+      case 1:
+        // Pheremone Behaviour
+        decay = ImGui::SliderFloat("decayRate", &decayRate, 0.0f, 1.0f);
+        if (decay) {
+          UpdateBehaviourSettings(currentBehaviour);
+        }
+        break;
+    }
 
     if (ImGui::Button("Reset Simulation")) {
       DestroyDrones();
@@ -117,24 +234,6 @@ class DroneSwarmTest : public Test {
     }
 
     ImGui::End();
-  }
-
-  void CreateDrones() {
-    flockingBehaviour = new FlockingBehaviour(
-        viewRange, separationDistance, alignmentWeight, cohesionWeight,
-        separationWeight, obstacleAvoidanceWeight, maxSpeed, maxForce);
-
-    for (int i = 0; i < 50; i++) {
-      drones.push_back(new Drone(m_world, b2Vec2(rand() % 100, rand() % 100),
-                                 flockingBehaviour));
-    }
-  }
-
-  void DestroyDrones() {
-    for (auto &drone : drones) {
-      m_world->DestroyBody(drone->getBody());
-    }
-    drones.clear();
   }
 
   static Test *Create() { return new DroneSwarmTest; }
