@@ -8,6 +8,10 @@
 
 class Drone;  // Forward declaration
 
+struct PheremoneParameters {
+  float decayRate;
+};
+
 class PheremoneBehaviour : public SwarmBehaviour {
  private:
   struct Pheremone {
@@ -20,7 +24,8 @@ class PheremoneBehaviour : public SwarmBehaviour {
   float decayRate;
 
  public:
-  PheremoneBehaviour(float decayRate) : decayRate(decayRate) {}
+  PheremoneBehaviour(const PheremoneParameters &params)
+      : decayRate(params.decayRate) {}
 
   void execute(std::vector<Drone *> &drones, Drone *currentDrone) override;
 

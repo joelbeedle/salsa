@@ -127,10 +127,10 @@ int main() {
   float maxSpeed = 10.0f;
   float maxForce = 0.3f;
 
+  FlockingParameters params = {50.0f, 1.0f, 1.0f, 1.0f, 1.0f};
+
   // Create Behaviour instances
-  FlockingBehaviour flockingBehaviour(separationDistance, alignmentWeight,
-                                      cohesionWeight, separationWeight,
-                                      obstacleAvoidanceWeight);
+  FlockingBehaviour flockingBehaviour(params);
 
   // Create drones
   std::vector<Drone *> drones;

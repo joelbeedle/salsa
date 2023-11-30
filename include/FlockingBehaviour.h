@@ -11,6 +11,14 @@
 
 class Drone;  // Forward declaration for Drone
 
+struct FlockingParameters {
+  float separationDistance;
+  float alignmentWeight;
+  float cohesionWeight;
+  float separationWeight;
+  float obstacleAvoidanceWeight;
+};
+
 class FlockingBehaviour : public SwarmBehaviour {
  private:
   float separationDistance;
@@ -21,14 +29,12 @@ class FlockingBehaviour : public SwarmBehaviour {
   std::vector<b2Body *> obstacles;
 
  public:
-  FlockingBehaviour(float separationDistance, float alignmentWeight,
-                    float cohesionWeight, float separationWeight,
-                    float obstacleAvoidanceWeight)
-      : separationDistance(separationDistance),
-        alignmentWeight(alignmentWeight),
-        cohesionWeight(cohesionWeight),
-        separationWeight(separationWeight),
-        obstacleAvoidanceWeight(obstacleAvoidanceWeight) {}
+  FlockingBehaviour(const FlockingParameters &params)
+      : separationDistance(params.separationDistance),
+        alignmentWeight(params.alignmentWeight),
+        cohesionWeight(params.cohesionWeight),
+        separationWeight(params.separationWeight),
+        obstacleAvoidanceWeight(params.obstacleAvoidanceWeight) {}
 
   void execute(std::vector<Drone *> &drones, Drone *currentDrone) override;
 
