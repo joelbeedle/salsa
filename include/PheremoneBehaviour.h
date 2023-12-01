@@ -24,11 +24,20 @@ class PheremoneBehaviour : public SwarmBehaviour {
   int pheremoneCount = 0;
 
   PheremoneParameters params;
+  // Define the parameter names and their expected min and max values
+  // (for the UI)
+  std::unordered_map<std::string, ParameterDefinition> cleanParams = {
+      {"Decay Rate", {&params.decayRate, 0.0f, 1.0f}}};
 
  public:
   PheremoneBehaviour(const PheremoneParameters &params) : params(params) {}
 
   void execute(std::vector<Drone *> &drones, Drone *currentDrone) override;
+
+  std::unordered_map<std::string, ParameterDefinition> getParameters()
+      override {
+    return cleanParams;
+  }
 
  private:
   void updatePheremones();

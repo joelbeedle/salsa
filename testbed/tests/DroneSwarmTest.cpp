@@ -198,32 +198,14 @@ class DroneSwarmTest : public Test {
 
     // Display different behaviour settings depending on the behaviour selected
     ImGui::Text("Behaviour Settings");
-    bool bevChanged = false;
-    switch (currentBehaviourIndex) {
-      case 0:
-        // FlockingBehaviour
-        bevChanged |= ImGui::SliderFloat("separationDistance",
-                                         &flockingParams.separationDistance,
-                                         0.0f, 100.0f);
-        bevChanged |= ImGui::SliderFloat(
-            "alignmentWeight", &flockingParams.alignmentWeight, 0.0f, 2.0f);
-        bevChanged |= ImGui::SliderFloat(
-            "cohesionWeight", &flockingParams.cohesionWeight, 0.0f, 2.0f);
-        bevChanged |= ImGui::SliderFloat(
-            "separationWeight", &flockingParams.separationWeight, 0.0f, 2.0f);
-        bevChanged |= ImGui::SliderFloat(
-            "obstacleAvoidanceWeight", &flockingParams.obstacleAvoidanceWeight,
-            0.0f, 2.0f);
-        break;
-      case 1:
-        // Pheremone Behaviour
-        bevChanged |= ImGui::SliderFloat(
-            "decayRate", &pheremoneParams.decayRate, 0.0f, 1.0f);
-        break;
+    bool changed = false;
+    for (auto &[name, parameter] : behaviour->getParameters()) {
+      changed |= ImGui::SliderFloat(name.c_str(), parameter.value,
+                                    parameter.minSetting, parameter.maxSetting);
     }
 
-    if (bevChanged) {
-      UpdateBehaviour();
+    if (changed) {
+      // UpdateBehaviour();
       SetBehaviour();
     }
 
