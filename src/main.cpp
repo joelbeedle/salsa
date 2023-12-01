@@ -137,7 +137,7 @@ int main() {
   for (int i = 0; i < 50; i++) {
     drones.push_back(
         new Drone(&world, b2Vec2(rand() % SCREEN_WIDTH, rand() % SCREEN_HEIGHT),
-                  &flockingBehaviour));
+                  &flockingBehaviour, 5.0f, 10.0f, 0.3f, 1.0f));
   }
   int32 counter = 0;
   while (window.isOpen()) {

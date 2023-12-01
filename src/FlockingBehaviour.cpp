@@ -21,7 +21,6 @@ void FlockingBehaviour::execute(std::vector<Drone *> &drones,
   b2Vec2 cohesion = cohere(neighbours, currentDrone);
   b2Vec2 obstacleAvoidance = avoidObstacles(obstaclePoints, currentDrone);
 
-  std::cout << params.alignmentWeight << std::endl;
   b2Vec2 acceleration = (params.alignmentWeight * alignment) +
                         (params.separationWeight * separation) +
                         (params.cohesionWeight * cohesion) +
@@ -86,7 +85,6 @@ b2Vec2 FlockingBehaviour::avoidObstacles(std::vector<b2Vec2> &obstaclePoints,
     steering.y /= count;
     steering.Normalize();
     steering *= currentDrone->getMaxSpeed();
-    ;
 
     steering -= currentDrone->getVelocity();
     clampMagnitude(steering, currentDrone->getMaxForce());
