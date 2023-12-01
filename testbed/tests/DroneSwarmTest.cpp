@@ -187,47 +187,44 @@ class DroneSwarmTest : public Test {
 
     // Drone settings
     ImGui::Text("Drone Settings");
-    bool speedChanged = ImGui::SliderFloat("maxSpeed", &maxSpeed, 0.0f, 50.0f);
-    bool forceChanged = ImGui::SliderFloat("maxForce", &maxForce, 0.0f, 10.0f);
-    bool viewChanged =
-        ImGui::SliderFloat("viewRange", &viewRange, 0.0f, 100.0f);
+    bool droneChanged = false;
+    droneChanged |= ImGui::SliderFloat("maxSpeed", &maxSpeed, 0.0f, 50.0f);
+    droneChanged |= ImGui::SliderFloat("maxForce", &maxForce, 0.0f, 10.0f);
+    droneChanged |= ImGui::SliderFloat("viewRange", &viewRange, 0.0f, 100.0f);
 
-    if (speedChanged || forceChanged || viewChanged) {
+    if (droneChanged) {
       UpdateDroneSettings();
     }
 
     // Display different behaviour settings depending on the behaviour selected
     ImGui::Text("Behaviour Settings");
-    bool distance, alignment, cohesion, separation, avoidance, decay;
+    bool bevChanged = false;
     switch (currentBehaviourIndex) {
       case 0:
         // FlockingBehaviour
-        distance = ImGui::SliderFloat("separationDistance",
-                                      &flockingParams.separationDistance, 0.0f,
-                                      100.0f);
-        alignment = ImGui::SliderFloat(
+        bevChanged |= ImGui::SliderFloat("separationDistance",
+                                         &flockingParams.separationDistance,
+                                         0.0f, 100.0f);
+        bevChanged |= ImGui::SliderFloat(
             "alignmentWeight", &flockingParams.alignmentWeight, 0.0f, 2.0f);
-        cohesion = ImGui::SliderFloat(
+        bevChanged |= ImGui::SliderFloat(
             "cohesionWeight", &flockingParams.cohesionWeight, 0.0f, 2.0f);
-        separation = ImGui::SliderFloat(
+        bevChanged |= ImGui::SliderFloat(
             "separationWeight", &flockingParams.separationWeight, 0.0f, 2.0f);
-        avoidance = ImGui::SliderFloat("obstacleAvoidanceWeight",
-                                       &flockingParams.obstacleAvoidanceWeight,
-                                       0.0f, 2.0f);
-        if (distance || alignment || cohesion || separation || avoidance) {
-          UpdateBehaviour();
-          SetBehaviour();
-        }
+        bevChanged |= ImGui::SliderFloat(
+            "obstacleAvoidanceWeight", &flockingParams.obstacleAvoidanceWeight,
+            0.0f, 2.0f);
         break;
       case 1:
         // Pheremone Behaviour
-        decay = ImGui::SliderFloat("decayRate", &pheremoneParams.decayRate,
-                                   0.0f, 1.0f);
-        if (decay) {
-          UpdateBehaviour();
-          SetBehaviour();
-        }
+        bevChanged |= ImGui::SliderFloat(
+            "decayRate", &pheremoneParams.decayRate, 0.0f, 1.0f);
         break;
+    }
+
+    if (bevChanged) {
+      UpdateBehaviour();
+      SetBehaviour();
     }
 
     if (ImGui::Button("Reset Simulation")) {
