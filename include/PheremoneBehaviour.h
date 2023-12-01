@@ -26,8 +26,7 @@ class PheremoneBehaviour : public SwarmBehaviour {
   PheremoneParameters params;
 
  public:
-  PheremoneBehaviour(const PheremoneParameters &parameters)
-      : params(parameters) {}
+  PheremoneBehaviour(const PheremoneParameters &params) : params(params) {}
 
   void execute(std::vector<Drone *> &drones, Drone *currentDrone) override;
 

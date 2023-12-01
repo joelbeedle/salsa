@@ -25,7 +25,7 @@ class FlockingBehaviour : public SwarmBehaviour {
   std::vector<b2Body *> obstacles;
 
  public:
-  FlockingBehaviour(const FlockingParameters &parameters) : params(params) {}
+  FlockingBehaviour(const FlockingParameters &params) : params(params) {}
 
   void execute(std::vector<Drone *> &drones, Drone *currentDrone) override;
 

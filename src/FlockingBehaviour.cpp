@@ -1,5 +1,6 @@
 #include "FlockingBehaviour.h"
 
+#include <iostream>
 #include <valarray>
 
 #include "Drone.h"
@@ -20,6 +21,7 @@ void FlockingBehaviour::execute(std::vector<Drone *> &drones,
   b2Vec2 cohesion = cohere(neighbours, currentDrone);
   b2Vec2 obstacleAvoidance = avoidObstacles(obstaclePoints, currentDrone);
 
+  std::cout << params.alignmentWeight << std::endl;
   b2Vec2 acceleration = (params.alignmentWeight * alignment) +
                         (params.separationWeight * separation) +
                         (params.cohesionWeight * cohesion) +

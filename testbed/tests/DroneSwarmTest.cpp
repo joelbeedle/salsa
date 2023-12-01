@@ -1,6 +1,7 @@
 #include <box2d/box2d.h>
 #include <stdio.h>
 
+#include <iostream>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -54,7 +55,7 @@ class DroneSwarmTest : public Test {
   BehaviourType currentBehaviourType;
 
   // Parameters
-  FlockingParameters flockingParams = {50.0f, 1.0f, 1.0f, 1.0f};
+  FlockingParameters flockingParams = {50.0f, 1.0f, 1.0f, 1.0f, 1.0f};
   PheremoneParameters pheremoneParams = {0.1f};
 
   // Drone settings
@@ -89,7 +90,8 @@ class DroneSwarmTest : public Test {
 
       // Set behaviour to equal our current behaviour
       UpdateBehaviour();
-      // Create our drones with our selected behaviour
+      // std::cout << params.alignmentWeight << std::endl;
+      //  Create our drones with our selected behaviour
       createDrones(behaviour);
     }
   }
@@ -105,7 +107,7 @@ class DroneSwarmTest : public Test {
     maxSpeed = 10.0f;
     maxForce = 0.3f;
 
-    flockingParams = {50.0f, 1.0f, 1.0f, 1.0f};
+    flockingParams = {50.0f, 1.0f, 1.0f, 1.0f, 1.0f};
     pheremoneParams = {0.1f};
   }
 
@@ -154,6 +156,7 @@ class DroneSwarmTest : public Test {
             BehaviourType::Pheremone, pheremoneParams);
         break;
     }
+    // delete behaviour;
     behaviour = newBehaviour;
   }
 
@@ -172,9 +175,8 @@ class DroneSwarmTest : public Test {
         if (ImGui::Selectable(behaviourTypes[i].displayName.c_str(),
                               isSelected)) {
           currentBehaviourIndex = i;
-          UpdateBehaviour();  // Assuming this function handles the logic for
-                              // updating behaviour
-          SetBehaviour();  // Assuming this function applies the new behaviour
+          UpdateBehaviour();
+          SetBehaviour();
         }
         if (isSelected) {
           ImGui::SetItemDefaultFocus();
