@@ -28,6 +28,18 @@ Drone::Drone(b2World *world, const b2Vec2 &position, SwarmBehaviour *behaviour,
   fixtureDef.density = 1.0f;
   body->CreateFixture(&fixtureDef);
 
+  b2CircleShape sCircleShape;
+  sCircleShape.m_radius = viewRange;
+
+  b2FixtureDef sFixtureDef;
+  sFixtureDef.shape = &sCircleShape;
+  sFixtureDef.isSensor = true;
+  sFixtureDef.filter.categoryBits = 0x0001;
+  sFixtureDef.filter.maskBits = 0x0002;
+  sFixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(this);
+
+  viewSensor = body->CreateFixture(&sFixtureDef);
+
   std::vector<b2Body *> obstacles;
 }
 
@@ -41,6 +53,21 @@ Drone::~Drone() {
   if (behaviour) {
     delete behaviour;
   }
+}
+
+void Drone::updateSensorRange() {
+  b2CircleShape sCircleShape;
+  sCircleShape.m_radius = viewRange;
+
+  b2FixtureDef sFixtureDef;
+  sFixtureDef.shape = &sCircleShape;
+  sFixtureDef.isSensor = true;
+  sFixtureDef.filter.categoryBits = 0x0001;
+  sFixtureDef.filter.maskBits = 0x0002;
+  sFixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(this);
+
+  body->DestroyFixture(viewSensor);
+  viewSensor = body->CreateFixture(&sFixtureDef);
 }
 
 void Drone::update(std::vector<Drone *> &drones) {

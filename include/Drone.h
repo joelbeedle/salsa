@@ -9,6 +9,7 @@
 class Drone {
  private:
   b2Body *body;
+  b2Fixture *viewSensor;  // The view range sensor
   SwarmBehaviour *behaviour;
   float viewRange;
   float maxSpeed;
@@ -17,13 +18,13 @@ class Drone {
 
  public:
   Drone(b2World *world, const b2Vec2 &position, SwarmBehaviour *behaviour,
-        float viewRange = 20.0f, float maxSpeed = 10.0f, float maxForce = 0.3f,
-        float radius = 1.0f);
+        float viewRange, float maxSpeed, float maxForce, float radius);
   ~Drone();
 
   void update(std::vector<Drone *> &drones);
-  std::vector<b2Body *> updateObstacles(b2World *world);
+  void updateSensorRange();
 
+  // Accessors and Mutators
   void setBehaviour(SwarmBehaviour *newBehaviour) { behaviour = newBehaviour; }
 
   b2Body *getBody() { return body; }
