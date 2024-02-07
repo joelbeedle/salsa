@@ -47,6 +47,12 @@ Drone::Drone(b2World *world, const b2Vec2 &position, SwarmBehaviour *behaviour,
 
   viewSensor = body->CreateFixture(&sFixtureDef);
 
+  // Initialize random starting velocity
+  float angle = (rand() % 360) * (M_PI / 180.0);
+  float speed = (rand() % static_cast<int>(maxSpeed)) + 1;
+  b2Vec2 velocity(speed * cos(angle), speed * sin(angle));
+  body->SetLinearVelocity(velocity);
+
   std::vector<b2Body *> obstacles;
 }
 
