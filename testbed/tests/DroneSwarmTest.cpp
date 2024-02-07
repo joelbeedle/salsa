@@ -185,6 +185,9 @@ class DroneSwarmTest : public Test {
       {BehaviourType::Pheremone, "pheremoneBehaviour"}};
   const char *behaviours[2] = {"flockingBehaviour", "pheremoneBehaviour"};
 
+  // Visual settings
+  bool drawDroneVisualRange = false;
+
  public:
   DroneSwarmTest() {
     {
@@ -334,6 +337,10 @@ class DroneSwarmTest : public Test {
       SetBehaviour();
     }
 
+    // Visual settings
+    ImGui::Text("Visual Settings");
+    ImGui::Checkbox("Draw Drone visual range", &drawDroneVisualRange);
+
     if (ImGui::Button("Reset Simulation")) {
       DestroyDrones();
       initDefaultParameters();
@@ -354,7 +361,16 @@ class DroneSwarmTest : public Test {
         if (fixture->IsSensor()) {
           uint16 categoryBits = fixture->GetFilterData().categoryBits;
           if (categoryBits == 0x0001) {
-            // This is a drone sensor, don't draw
+            // This is a drone sensor, draw if wanted
+            if (drawDroneVisualRange) {
+              const b2CircleShape *circleShape =
+                  static_cast<const b2CircleShape *>(fixture->GetShape());
+              b2Vec2 position =
+                  transform.p + b2Mul(transform.q, circleShape->m_p);
+              debugDraw->DrawCircle(position, circleShape->m_radius,
+                                    b2Color(0.5f, 0.5f, 0.5f));
+            }
+            // skip this fixture as it's been dealt with
             continue;
           }
           if (categoryBits == 0x0002) {
