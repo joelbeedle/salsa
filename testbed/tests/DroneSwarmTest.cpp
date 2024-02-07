@@ -20,7 +20,7 @@
 #include "test.h"
 
 #define DRONE_COUNT 50
-#define TREE_COUNT 100
+#define TREE_COUNT 500
 #define BORDER_WIDTH 100.0f
 #define BORDER_HEIGHT 100.0f
 
@@ -470,6 +470,7 @@ class DroneSwarmTest : public Test {
             break;
           }
           default:
+            // Shouldn't reach here
             break;
         }
       }
