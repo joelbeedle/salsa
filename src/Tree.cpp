@@ -1,5 +1,7 @@
 #include "Tree.h"
 
+#include "ObjectTypes.h"
+
 Tree::Tree(b2World *world, const b2Vec2 &position, bool diseased, bool mapped,
            float radius)
     : diseased(diseased), mapped(mapped), radius(radius) {
@@ -21,7 +23,10 @@ Tree::Tree(b2World *world, const b2Vec2 &position, bool diseased, bool mapped,
   fixtureDef.isSensor = true;
   fixtureDef.filter.categoryBits = 0x0002;
   fixtureDef.filter.maskBits = 0x0001;
+  UserData *userData = new UserData();
+  userData->type = ObjectType::Tree;  // or ObjectType::Tree for a tree
+  userData->tree = this;              // or userData->tree = this for a tree
 
-  fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(this);
+  fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(userData);
   body->CreateFixture(&fixtureDef);
 }

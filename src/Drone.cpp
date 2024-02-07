@@ -3,6 +3,8 @@
 
 #include <valarray>
 
+#include "ObjectTypes.h"
+
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
 
@@ -26,6 +28,11 @@ Drone::Drone(b2World *world, const b2Vec2 &position, SwarmBehaviour *behaviour,
   b2FixtureDef fixtureDef;
   fixtureDef.shape = &circleShape;
   fixtureDef.density = 1.0f;
+  UserData *userData = new UserData();
+  userData->type = ObjectType::Drone;  // or ObjectType::Tree for a tree
+  userData->drone = this;              // or userData->tree = this for a tree
+
+  fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(userData);
   body->CreateFixture(&fixtureDef);
 
   b2CircleShape sCircleShape;

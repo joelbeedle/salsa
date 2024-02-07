@@ -12,6 +12,7 @@
 #include "BehaviourTypes.h"
 #include "Drone.h"
 #include "FlockingBehaviour.h"
+#include "ObjectTypes.h"
 #include "PheremoneBehaviour.h"
 #include "Tree.h"
 #include "draw.h"
@@ -19,6 +20,7 @@
 #include "test.h"
 
 #define DRONE_COUNT 50
+#define TREE_COUNT 100
 #define BORDER_WIDTH 100.0f
 #define BORDER_HEIGHT 100.0f
 
@@ -56,12 +58,16 @@ class DroneContactListener : public b2ContactListener {
     if (fixtureA->IsSensor() &&
         fixtureB->GetFilterData().categoryBits == 0x0002) {
       // fixtureA is the drone's sensor, fixtureB is the tree
-      Tree *tree = reinterpret_cast<Tree *>(fixtureB->GetUserData().pointer);
+      UserData *userData =
+          reinterpret_cast<UserData *>(fixtureB->GetUserData().pointer);
+      Tree *tree = userData->tree;
       tree->setMapped(true);
     } else if (fixtureB->IsSensor() &&
                fixtureA->GetFilterData().categoryBits == 0x0002) {
       // fixtureB is the drone's sensor, fixtureA is the tree
-      Tree *tree = reinterpret_cast<Tree *>(fixtureA->GetUserData().pointer);
+      UserData *userData =
+          reinterpret_cast<UserData *>(fixtureA->GetUserData().pointer);
+      Tree *tree = userData->tree;
       tree->setMapped(true);
     }
   }
@@ -73,6 +79,7 @@ class DroneContactListener : public b2ContactListener {
 class MyDraw : public b2Draw {
  private:
   std::vector<Tree *> allTrees;
+  std::vector<Drone *> allDrones;
 
  public:
   void setTrees(std::vector<Tree *> trees) { allTrees = trees; }
@@ -97,27 +104,6 @@ class MyDraw : public b2Draw {
 
   void DrawSolidCircle(const b2Vec2 &center, float radius, const b2Vec2 &axis,
                        const b2Color &color) override {
-    constexpr float epsilon = 0.01f;  // Tolerance for position comparison
-    std::cout << "Drawing SolidCircle at " << center.x << ", " << center.y
-              << std::endl;
-    for (const auto &tree : allTrees) {
-      b2Vec2 treePos = tree->getBody()->GetPosition();
-
-      // Use a tolerance value for comparing positions
-      if ((treePos - center).LengthSquared() <= epsilon * epsilon) {
-        if (tree->isMapped()) {
-          b2Color customColor =
-              b2Color(0.0f, 1.0f, 0.0f);  // Custom color for mapped trees
-          g_debugDraw.DrawSolidCircle(center, radius, axis, customColor);
-          return;
-        } else {
-          b2Color customColor =
-              b2Color(1.0f, 0.0f, 0.0f);  // Custom color for mapped trees
-          g_debugDraw.DrawSolidCircle(center, radius, axis, customColor);
-          return;
-        }
-      }
-    }
     g_debugDraw.DrawSolidCircle(center, radius, axis, color);
   }
 
@@ -238,21 +224,24 @@ class DroneSwarmTest : public Test {
   }
 
   void createDrones(SwarmBehaviour *b) {
+    const float margin = 2.0f;  // Define a margin to prevent spawning exactly
+                                // at the border or outside
     for (int i = 0; i < DRONE_COUNT; i++) {
-      drones.push_back(
-          new Drone(m_world,
-                    b2Vec2(rand() % static_cast<int>(BORDER_WIDTH),
-                           rand() % static_cast<int>(BORDER_HEIGHT)),
-                    behaviour, viewRange, maxSpeed, maxForce, 1.0f));
+      float x = (rand() % static_cast<int>(BORDER_WIDTH - 2 * margin)) + margin;
+      float y =
+          (rand() % static_cast<int>(BORDER_HEIGHT - 2 * margin)) + margin;
+      drones.push_back(new Drone(m_world, b2Vec2(x, y), behaviour, viewRange,
+                                 maxSpeed, maxForce, 1.0f));
     }
   }
 
   void createTrees() {
-    for (int i = 0; i < 100; i++) {
-      trees.push_back(new Tree(m_world,
-                               b2Vec2(rand() % static_cast<int>(BORDER_WIDTH),
-                                      rand() % static_cast<int>(BORDER_HEIGHT)),
-                               false, false, 1.0f));
+    const float margin = 2.0f;
+    for (int i = 0; i < TREE_COUNT; i++) {
+      float x = (rand() % static_cast<int>(BORDER_WIDTH - 2 * margin)) + margin;
+      float y =
+          (rand() % static_cast<int>(BORDER_HEIGHT - 2 * margin)) + margin;
+      trees.push_back(new Tree(m_world, b2Vec2(x, y), false, false, 1.0f));
     }
   }
 
@@ -356,18 +345,133 @@ class DroneSwarmTest : public Test {
 
   static Test *Create() { return new DroneSwarmTest; }
 
+  void ManualDebugDraw(b2World *world, MyDraw *debugDraw) {
+    for (b2Body *body = world->GetBodyList(); body; body = body->GetNext()) {
+      const b2Transform &transform = body->GetTransform();
+
+      for (b2Fixture *fixture = body->GetFixtureList(); fixture;
+           fixture = fixture->GetNext()) {
+        if (fixture->IsSensor()) {
+          uint16 categoryBits = fixture->GetFilterData().categoryBits;
+          if (categoryBits == 0x0001) {
+            // This is a drone sensor, don't draw
+            continue;
+          }
+          if (categoryBits == 0x0002) {
+            // This is fixture tree sensor, but we deal with trees individually
+            // later
+          }
+        }
+
+        // Check if the fixture has user data, if it does its a drone (non
+        // sensor) or tree (sensor) fixture
+        if (fixture->GetUserData().pointer != 0) {
+          UserData *userData =
+              reinterpret_cast<UserData *>(fixture->GetUserData().pointer);
+          if (userData == nullptr) {
+            std::cout << "User data is null" << std::endl;
+            continue;
+          }
+          // Depending on the type, draw the object
+          switch (userData->type) {
+            case ObjectType::Drone: {
+              Drone *drone = userData->drone;
+              // Draw drone
+              b2Vec2 position = body->GetPosition();
+              debugDraw->DrawSolidCircle(position, drone->getRadius(),
+                                         transform.q.GetXAxis(),
+                                         b2Color(0.7f, 0.5f, 0.5f));
+              break;
+            }
+            case ObjectType::Tree: {
+              Tree *tree = userData->tree;
+              b2Vec2 position = body->GetPosition();
+              const b2CircleShape *circleShape =
+                  static_cast<const b2CircleShape *>(fixture->GetShape());
+
+              if (tree->isMapped()) {
+                b2Color customColor =
+                    b2Color(0.0f, 1.0f, 0.0f);  // Custom color for mapped trees
+                g_debugDraw.DrawSolidCircle(position, circleShape->m_radius,
+                                            transform.q.GetXAxis(),
+                                            customColor);
+              } else {
+                b2Color customColor =
+                    b2Color(1.0f, 0.0f, 0.0f);  // Custom color for mapped trees
+                g_debugDraw.DrawSolidCircle(position, circleShape->m_radius,
+                                            transform.q.GetXAxis(),
+                                            customColor);
+              }
+              break;
+            }
+          }
+          continue;
+        }
+
+        // Draw everything else that's not anything above with default values
+        switch (fixture->GetType()) {
+          case b2Shape::e_circle: {
+            const b2CircleShape *circleShape =
+                static_cast<const b2CircleShape *>(fixture->GetShape());
+            b2Vec2 position =
+                transform.p + b2Mul(transform.q, circleShape->m_p);
+            debugDraw->DrawSolidCircle(position, circleShape->m_radius,
+                                       transform.q.GetXAxis(),
+                                       b2Color(1.0f, 0.5f, 0.5f));
+            break;
+          }
+          case b2Shape::e_polygon: {
+            const b2PolygonShape *polygonShape =
+                static_cast<const b2PolygonShape *>(fixture->GetShape());
+            b2Vec2 vertices[b2_maxPolygonVertices];
+            for (int i = 0; i < polygonShape->m_count; ++i) {
+              vertices[i] = b2Mul(transform, polygonShape->m_vertices[i]);
+            }
+            debugDraw->DrawSolidPolygon(vertices, polygonShape->m_count,
+                                        b2Color(0.5f, 0.5f, 0.5f));
+            break;
+          }
+          case b2Shape::e_edge: {
+            const b2EdgeShape *edgeShape =
+                static_cast<const b2EdgeShape *>(fixture->GetShape());
+            b2Vec2 v1 = b2Mul(transform, edgeShape->m_vertex1);
+            b2Vec2 v2 = b2Mul(transform, edgeShape->m_vertex2);
+            debugDraw->DrawSegment(v1, v2, b2Color(0.5f, 1.0f, 0.5f));
+            break;
+          }
+          case b2Shape::e_chain: {
+            const b2ChainShape *chainShape =
+                static_cast<const b2ChainShape *>(fixture->GetShape());
+            int32 count = chainShape->m_count;
+            const b2Vec2 *vertices = chainShape->m_vertices;
+            b2Vec2 v1 = b2Mul(transform, vertices[0]);
+            for (int32 i = 1; i < count; ++i) {
+              b2Vec2 v2 = b2Mul(transform, vertices[i]);
+              debugDraw->DrawSegment(v1, v2, b2Color(0.5f, 0.5f, 0.5f));
+              debugDraw->DrawCircle(v1, 0.05f, b2Color(0.5f, 0.5f, 0.5f));
+              v1 = v2;
+            }
+            break;
+          }
+          default:
+            break;
+        }
+      }
+    }
+  }
+
   void Step(Settings &settings) override {
     Test::Step(settings);
 
-    m_world->DebugDraw();
-
+    // m_world->DebugDraw();
+    ManualDebugDraw(m_world, &myDraw);
     // Update Drone position
     for (auto &drone : drones) {
       drone->update(drones);
     }
 
     int mappedTreeCount = tMappedTrees.size();
-    std::cout << mappedTreeCount << std::endl;
+    // std::cout << mappedTreeCount << std::endl;
   }
 };
 

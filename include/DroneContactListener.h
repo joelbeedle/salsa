@@ -17,9 +17,6 @@ class DroneContactListener : public b2ContactListener {
       return false;
     };
 
-    // b2Body* entityA = fixtureA->GetBody();
-    // b2Body* entityB = fixtureB->GetBody();
-
     if (sensorA) {  // fixtureB must be a done
       tree = fixtureA;
       drone = fixtureB;
