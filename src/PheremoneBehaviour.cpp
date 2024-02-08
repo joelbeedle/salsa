@@ -10,6 +10,7 @@ void PheremoneBehaviour::execute(std::vector<Drone *> &drones,
 
   // Separating drones and obstacles from callback results
   std::vector<b2Vec2> obstaclePoints = callback.obstaclePoints;
+  std::vector<b2Body *> neighbours = callback.detectedDrones;
 
   // Lay a pheremone at the Drone's current position
   layPheremone(currentDrone->getPosition());
@@ -38,7 +39,7 @@ void PheremoneBehaviour::execute(std::vector<Drone *> &drones,
       // Optionally, weight this vector by the inverse of distance or intensity
       // of the pheremone This makes the drone steer more strongly away from
       // closer or more intense pheremones
-      awayFromPheremone *= (1.0f / distance) * pheremone.intensity;
+      awayFromPheremone *= (1.0f / (distance)) * pheremone.intensity;
 
       avoidanceSteering += awayFromPheremone;
       count++;

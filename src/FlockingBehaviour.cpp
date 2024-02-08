@@ -36,7 +36,6 @@ void FlockingBehaviour::execute(std::vector<Drone *> &drones,
   // Clamp speed
   if (speed > currentDrone->getMaxSpeed()) {
     speed = currentDrone->getMaxSpeed();
-    ;
   } else if (speed < 0) {
     speed = 0.001f;
   }
@@ -110,7 +109,6 @@ b2Vec2 FlockingBehaviour::align(std::vector<b2Body *> &drones,
     avgVec.y /= neighbours;
     avgVec.Normalize();
     avgVec *= currentDrone->getMaxSpeed();
-    ;
 
     steering = avgVec - currentDrone->getVelocity();
     clampMagnitude(steering, currentDrone->getMaxForce());
@@ -136,7 +134,6 @@ b2Vec2 FlockingBehaviour::cohere(std::vector<b2Body *> &drones,
 
     vecToCom.Normalize();
     vecToCom *= currentDrone->getMaxSpeed();
-    ;
 
     steering = vecToCom - currentDrone->getVelocity();
     clampMagnitude(steering, currentDrone->getMaxForce());

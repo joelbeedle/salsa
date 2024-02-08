@@ -17,8 +17,10 @@
 #include "PheremoneBehaviour.h"
 #include "SwarmBehaviourRegistry.h"
 #include "Tree.h"
+#include "UniformRandomWalkBehaviour.h"
 #include "draw.h"
 #include "imgui/imgui.h"
+#include "settings.h"
 #include "test.h"
 
 #define DRONE_COUNT 50
@@ -44,6 +46,8 @@ class DroneSwarmTest : public Test {
   FlockingParameters flockingParams = {50.0f, 1.0f, 1.0f, 1.0f, 1.0f};
   PheremoneParameters pheremoneParams = {0.1f, 1.0f};
   PSOParameters psoParams = {0.5f, 0.5f, 0.9f};
+  UniformRandomWalkParameters uniformRandomWalkParams = {5.0f, 0.5f, 1.0f,
+                                                         1.0 / 60.0f};
 
   // Drone settings
   std::vector<Drone *> drones;
@@ -66,29 +70,7 @@ class DroneSwarmTest : public Test {
       m_world->SetContactListener(&droneContactListener);
 
       initDefaultParameters();
-      std::unique_ptr<FlockingBehaviour> flockBehaviour =
-          std::make_unique<FlockingBehaviour>(flockingParams);
-      std::unique_ptr<PheremoneBehaviour> pheremoneBehaviour =
-          std::make_unique<PheremoneBehaviour>(pheremoneParams);
-      std::unique_ptr<PSOBehaviour> psoBehaviour =
-          std::make_unique<PSOBehaviour>(psoParams);
-      SwarmBehaviourRegistry::getInstance().add("PheremoneBehaviour",
-                                                std::move(pheremoneBehaviour));
-
-      SwarmBehaviourRegistry::getInstance().add("PSOBehaviour",
-                                                std::move(psoBehaviour));
-
-      SwarmBehaviourRegistry::getInstance().add("FlockingBehaviour",
-                                                std::move(flockBehaviour));
-
-      auto &registry = SwarmBehaviourRegistry::getInstance();
-      auto behaviorNames = registry.getSwarmBehaviourNames();
-      // Set initial behaviour
-      if (!behaviorNames.empty()) {
-        // Select the first behavior as the default one
-        currentBehaviourName = behaviorNames[0];
-        behaviour = registry.getSwarmBehaviour(currentBehaviourName);
-      }
+      initDefaultBehaviours();
       createDrones(behaviour);
       createTrees();
     }
@@ -137,6 +119,38 @@ class DroneSwarmTest : public Test {
 
     flockingParams = {50.0f, 1.6f, 0.8f, 1.6f, 1.2f};
     pheremoneParams = {0.1f, 1.0f};
+    uniformRandomWalkParams = {5.0f, 0.5f, 1.0f, 1.0 / 60.0f};
+  }
+
+  void initDefaultBehaviours() {
+    std::unique_ptr<FlockingBehaviour> flockBehaviour =
+        std::make_unique<FlockingBehaviour>(flockingParams);
+    std::unique_ptr<PheremoneBehaviour> pheremoneBehaviour =
+        std::make_unique<PheremoneBehaviour>(pheremoneParams);
+    std::unique_ptr<PSOBehaviour> psoBehaviour =
+        std::make_unique<PSOBehaviour>(psoParams);
+    std::unique_ptr<UniformRandomWalkBehaviour> uniformRandomWalkBehaviour =
+        std::make_unique<UniformRandomWalkBehaviour>(uniformRandomWalkParams);
+
+    SwarmBehaviourRegistry::getInstance().add("PheremoneBehaviour",
+                                              std::move(pheremoneBehaviour));
+
+    SwarmBehaviourRegistry::getInstance().add("PSOBehaviour",
+                                              std::move(psoBehaviour));
+
+    SwarmBehaviourRegistry::getInstance().add("FlockingBehaviour",
+                                              std::move(flockBehaviour));
+    SwarmBehaviourRegistry::getInstance().add(
+        "UniformRandomWalkBehaviour", std::move(uniformRandomWalkBehaviour));
+
+    auto &registry = SwarmBehaviourRegistry::getInstance();
+    auto behaviorNames = registry.getSwarmBehaviourNames();
+    // Set initial behaviour
+    if (!behaviorNames.empty()) {
+      // Select the first behavior as the default one
+      currentBehaviourName = behaviorNames[0];
+      behaviour = registry.getSwarmBehaviour(currentBehaviourName);
+    }
   }
 
   void createDrones(SwarmBehaviour *b) {
@@ -427,7 +441,6 @@ class DroneSwarmTest : public Test {
 
   void Step(Settings &settings) override {
     Test::Step(settings);
-
     // m_world->DebugDraw();
     Draw(m_world, &g_debugDraw);
     // Update Drone position
