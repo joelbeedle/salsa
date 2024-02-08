@@ -241,7 +241,7 @@ class DroneSwarmTest : public Test {
     maxSpeed = 10.0f;
     maxForce = 0.3f;
 
-    flockingParams = {50.0f, 1.0f, 1.0f, 1.0f, 1.0f};
+    flockingParams = {50.0f, 1.6f, 0.8f, 1.6f, 1.2f};
     pheremoneParams = {0.1f, 1.0f};
   }
 
@@ -362,7 +362,9 @@ class DroneSwarmTest : public Test {
         break;
     }
     // delete behaviour;
+    SwarmBehaviour *oldBehaviour = behaviour;
     behaviour = newBehaviour;
+    delete oldBehaviour;
   }
 
   void UpdateUI() override {

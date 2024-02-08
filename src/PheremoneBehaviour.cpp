@@ -16,33 +16,68 @@ void PheremoneBehaviour::execute(std::vector<Drone *> &drones,
 
   // Update pheremones (decay)
   updatePheremones();
+  // Initial obstacle avoidance steering
   b2Vec2 steering = params.obstacleAvoidanceWeight *
                     avoidObstacles(obstaclePoints, currentDrone);
-  ;
-  // Find the strongest nearby pheremone
-  Pheremone *strongestNearby = nullptr;
-  float maxIntensity = 0.0f;
+
+  // Vector to accumulate avoidance forces from all nearby pheromones
+  b2Vec2 avoidanceSteering(0, 0);
+  int32 count = 0;
+
   for (auto &pair : pheremones) {
     Pheremone &pheremone = pair.second;
     float distance =
         b2Distance(currentDrone->getPosition(), pheremone.position);
-    if (distance < currentDrone->getViewRange() &&
-        pheremone.intensity > maxIntensity) {
-      strongestNearby = &pheremone;
-      maxIntensity = pheremone.intensity;
+
+    if (distance < currentDrone->getViewRange() && distance > 0) {
+      // Calculate a vector pointing away from the pheremone
+      b2Vec2 awayFromPheremone =
+          currentDrone->getPosition() - pheremone.position;
+      awayFromPheremone.Normalize();
+
+      // Optionally, weight this vector by the inverse of distance or intensity
+      // of the pheremone This makes the drone steer more strongly away from
+      // closer or more intense pheremones
+      awayFromPheremone *= (1.0f / distance) * pheremone.intensity;
+
+      avoidanceSteering += awayFromPheremone;
+      count++;
     }
   }
 
-  // Steer towards the strongest pheremone
-  if (strongestNearby != nullptr) {
-    b2Vec2 desired = strongestNearby->position - currentDrone->getPosition();
-    desired.Normalize();
-    desired *= 10.0f;  // change to maxSpeed
-    steering = desired - currentDrone->getVelocity();
-    clampMagnitude(steering, 0.3f);
+  // Average the avoidance steering if any pheremones were found
+  if (count > 0) {
+    avoidanceSteering.x /= count;
+    avoidanceSteering.y /= count;
+    avoidanceSteering.Normalize();
+    avoidanceSteering *= currentDrone->getMaxSpeed();
+
+    // Combine with the original steering vector
+    steering += avoidanceSteering - currentDrone->getVelocity();
+    clampMagnitude(steering, currentDrone->getMaxForce());
   }
 
-  currentDrone->getBody()->ApplyForceToCenter(steering, true);
+  b2Vec2 acceleration =
+      steering + (params.obstacleAvoidanceWeight *
+                  avoidObstacles(obstaclePoints, currentDrone));
+  b2Vec2 velocity = currentDrone->getVelocity();
+  b2Vec2 position = currentDrone->getPosition();
+
+  velocity += acceleration;
+  float speed = 0.001f + velocity.Length();
+  b2Vec2 dir(velocity.x / speed, velocity.y / speed);
+
+  // Clamp speed
+  if (speed > currentDrone->getMaxSpeed()) {
+    speed = currentDrone->getMaxSpeed();
+  } else if (speed < 0) {
+    speed = 0.001f;
+  }
+  velocity = b2Vec2(dir.x * speed, dir.y * speed);
+
+  currentDrone->getBody()->SetLinearVelocity(velocity);
+  acceleration.SetZero();  // TODO: Find out implications of acceleration not
+                           // being transient
 }
 
 void PheremoneBehaviour::performRayCasting(Drone *currentDrone,
