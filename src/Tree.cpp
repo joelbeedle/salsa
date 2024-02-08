@@ -29,4 +29,9 @@ Tree::Tree(b2World *world, const b2Vec2 &position, bool diseased, bool mapped,
 
   fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(userData);
   body->CreateFixture(&fixtureDef);
+
+  // Set diseased status of dree
+  float infectionChance = 0.05f;
+  float randomValue = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+  this->diseased = randomValue < infectionChance ? true : diseased;
 }

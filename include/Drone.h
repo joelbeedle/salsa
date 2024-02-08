@@ -5,9 +5,12 @@
 // #include <SFML/Graphics.hpp>
 
 #include "SwarmBehaviour.h"
+#include "Tree.h"
 
 class Drone {
  private:
+  std::vector<Tree *> foundDiseasedTrees;
+  std::vector<b2Vec2 *> foundDiseasedTreePositions;
   b2Body *body;
   b2Fixture *viewSensor;  // The view range sensor
   SwarmBehaviour *behaviour;
@@ -23,6 +26,8 @@ class Drone {
 
   void update(std::vector<Drone *> &drones);
   void updateSensorRange();
+
+  void foundDiseasedTree(Tree *tree);
 
   // Accessors and Mutators
   void setBehaviour(SwarmBehaviour *newBehaviour) { behaviour = newBehaviour; }
@@ -41,4 +46,9 @@ class Drone {
   void setMaxForce(float newForce) { maxForce = newForce; }
 
   float getRadius() { return radius; }
+
+  std::vector<Tree *> getFoundDiseasedTrees() { return foundDiseasedTrees; }
+  std::vector<b2Vec2 *> getFoundDiseasedTreePositions() {
+    return foundDiseasedTreePositions;
+  }
 };

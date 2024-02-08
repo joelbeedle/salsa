@@ -43,7 +43,8 @@ Drone::Drone(b2World *world, const b2Vec2 &position, SwarmBehaviour *behaviour,
   sFixtureDef.isSensor = true;
   sFixtureDef.filter.categoryBits = 0x0001;
   sFixtureDef.filter.maskBits = 0x0002;
-  sFixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(this);
+  userData->drone = this;
+  sFixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(userData);
 
   viewSensor = body->CreateFixture(&sFixtureDef);
 
@@ -77,7 +78,10 @@ void Drone::updateSensorRange() {
   sFixtureDef.isSensor = true;
   sFixtureDef.filter.categoryBits = 0x0001;
   sFixtureDef.filter.maskBits = 0x0002;
-  sFixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(this);
+  UserData *userData = new UserData();
+  userData->type = ObjectType::Drone;  // or ObjectType::Tree for a tree
+  userData->drone = this;
+  sFixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(userData);
 
   body->DestroyFixture(viewSensor);
   viewSensor = body->CreateFixture(&sFixtureDef);
@@ -91,4 +95,10 @@ void Drone::update(std::vector<Drone *> &drones) {
   b2Vec2 position = body->GetPosition();
 
   body->SetTransform(position, body->GetAngle());
+}
+
+void Drone::foundDiseasedTree(Tree *tree) {
+  foundDiseasedTrees.push_back(tree);
+  b2Vec2 *position = new b2Vec2(tree->getBody()->GetPosition());
+  foundDiseasedTreePositions.push_back(position);
 }

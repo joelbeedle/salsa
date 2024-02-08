@@ -13,7 +13,8 @@ class RayCastCallback : public b2RayCastCallback {
 
   float ReportFixture(b2Fixture* fixture, const b2Vec2& point,
                       const b2Vec2& normal, float fraction) override {
-    // Keep raycasting if the fixture is a sensor, as this is just another drone's sensor
+    // Keep raycasting if the fixture is a sensor, as this is just another
+    // drone's sensor
     if (fixture->IsSensor()) {
       return -1;
     }

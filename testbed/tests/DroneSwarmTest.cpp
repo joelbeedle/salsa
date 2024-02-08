@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <memory>
+#include <set>
 #include <stdexcept>
 #include <string>
 #include <variant>
@@ -24,7 +25,6 @@
 #define BORDER_WIDTH 100.0f
 #define BORDER_HEIGHT 100.0f
 
-std::vector<Tree *> tMappedTrees;
 class DroneContactListener : public b2ContactListener {
   bool getDroneAndTree(b2Contact *contact, b2Fixture *&drone,
                        b2Fixture *&tree) {
@@ -36,9 +36,6 @@ class DroneContactListener : public b2ContactListener {
     if (!(sensorA ^ sensorB)) {
       return false;
     };
-
-    // b2Body* entityA = fixtureA->GetBody();
-    // b2Body* entityB = fixtureB->GetBody();
 
     if (sensorB) {  // fixtureB must be a done
       tree = fixtureA;
@@ -53,6 +50,8 @@ class DroneContactListener : public b2ContactListener {
   void BeginContact(b2Contact *contact) override {
     b2Fixture *fixtureA = contact->GetFixtureA();
     b2Fixture *fixtureB = contact->GetFixtureB();
+    Tree *tree;
+    Drone *drone;
 
     // Check if one of the fixtures is a sensor and the other is a tree
     if (fixtureA->IsSensor() &&
@@ -60,14 +59,23 @@ class DroneContactListener : public b2ContactListener {
       // fixtureA is the drone's sensor, fixtureB is the tree
       UserData *userData =
           reinterpret_cast<UserData *>(fixtureB->GetUserData().pointer);
-      Tree *tree = userData->tree;
+      tree = userData->tree;
+      UserData *droneData =
+          reinterpret_cast<UserData *>(fixtureA->GetUserData().pointer);
+      drone = droneData->drone;
+      drone->foundDiseasedTree(tree);
       tree->setMapped(true);
+
     } else if (fixtureB->IsSensor() &&
                fixtureA->GetFilterData().categoryBits == 0x0002) {
       // fixtureB is the drone's sensor, fixtureA is the tree
       UserData *userData =
           reinterpret_cast<UserData *>(fixtureA->GetUserData().pointer);
-      Tree *tree = userData->tree;
+      tree = userData->tree;
+      UserData *droneData =
+          reinterpret_cast<UserData *>(fixtureB->GetUserData().pointer);
+      drone = droneData->drone;
+      drone->foundDiseasedTree(tree);
       tree->setMapped(true);
     }
   }
@@ -151,6 +159,12 @@ void createBounds(b2World *world) {
 
 class DroneSwarmTest : public Test {
  public:
+  // Lists
+  std::vector<Tree *> foundDiseasedTrees;
+  std::vector<Tree *> actualDiseasedTrees;
+  std::vector<b2Vec2 *> foundDiseasedTreePositions;
+  std::set<b2Vec2 *> foundDiseaseadTreePositionsSet;
+  std::vector<b2Vec2 *> actualDiseasedTreePositions;
   // Behaviours
   SwarmBehaviour *behaviour;
   BehaviourType currentBehaviourType;
@@ -238,6 +252,53 @@ class DroneSwarmTest : public Test {
     }
   }
 
+  std::vector<Tree *> getTreesInRadius(const b2Vec2 &position, float radius,
+                                       const std::vector<Tree *> &allTrees) {
+    std::vector<Tree *> nearbyTrees;
+    for (Tree *tree : allTrees) {
+      if (b2Distance(position, tree->getBody()->GetPosition()) <= radius) {
+        nearbyTrees.push_back(tree);
+      }
+    }
+    return nearbyTrees;
+  }
+
+  // Function to update disease spread
+  void updateDiseaseSpread(std::vector<Tree *> &allTrees,
+                           float infectionRadius) {
+    std::vector<Tree *> treesToInfect;
+
+    for (Tree *tree : allTrees) {
+      if (tree->isDiseased()) {
+        // Get all nearby trees within the infection radius
+        std::vector<Tree *> nearbyTrees = getTreesInRadius(
+            tree->getBody()->GetPosition(), infectionRadius, allTrees);
+
+        for (Tree *nearbyTree : nearbyTrees) {
+          if (!nearbyTree->isDiseased()) {
+            // Calculate infection probability based on distance
+            float distance = b2Distance(tree->getBody()->GetPosition(),
+                                        nearbyTree->getBody()->GetPosition());
+            float probabilityOfInfection =
+                1.0f - (distance / infectionRadius);  // Example calculation
+
+            // Random chance to infect based on calculated probability
+            float randomChance =
+                static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+            if (randomChance < probabilityOfInfection) {
+              treesToInfect.push_back(nearbyTree);
+            }
+          }
+        }
+      }
+    }
+
+    // Infect trees determined to be infected in this time step
+    for (Tree *treeToInfect : treesToInfect) {
+      treeToInfect->setDiseased(true);
+    }
+  }
+
   void createTrees() {
     const float margin = 2.0f;
     for (int i = 0; i < TREE_COUNT; i++) {
@@ -246,6 +307,7 @@ class DroneSwarmTest : public Test {
           (rand() % static_cast<int>(BORDER_HEIGHT - 2 * margin)) + margin;
       trees.push_back(new Tree(m_world, b2Vec2(x, y), false, false, 1.0f));
     }
+    updateDiseaseSpread(trees, 20.0f);
   }
 
   void DestroyDrones() {
@@ -405,7 +467,7 @@ class DroneSwarmTest : public Test {
               const b2CircleShape *circleShape =
                   static_cast<const b2CircleShape *>(fixture->GetShape());
 
-              if (tree->isMapped()) {
+              if (tree->isDiseased()) {
                 b2Color customColor =
                     b2Color(0.0f, 1.0f, 0.0f);  // Custom color for mapped trees
                 g_debugDraw.DrawSolidCircle(position, circleShape->m_radius,
@@ -485,10 +547,17 @@ class DroneSwarmTest : public Test {
     // Update Drone position
     for (auto &drone : drones) {
       drone->update(drones);
+      for (auto &treepos : drone->getFoundDiseasedTreePositions()) {
+        foundDiseaseadTreePositionsSet.insert(treepos);
+      }
     }
 
-    int mappedTreeCount = tMappedTrees.size();
-    // std::cout << mappedTreeCount << std::endl;
+    for (auto &pos : foundDiseaseadTreePositionsSet) {
+      std::cout << "Found diseased tree at: " << pos->x << ", " << pos->y
+                << std::endl;
+    }
+
+    // Update lists
   }
 };
 
