@@ -2,10 +2,9 @@
 #pragma once
 #include <box2d/box2d.h>
 
+#include <string>
 #include <unordered_map>
 #include <vector>
-
-#include "BehaviourTypes.h"
 
 class Drone;
 

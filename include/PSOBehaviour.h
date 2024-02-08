@@ -5,7 +5,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include "BehaviourTypes.h"
 #include "RayCastCallback.h"
 #include "SwarmBehaviour.h"
 
