@@ -5,12 +5,14 @@
 
 #include <map>
 
+#include "RayCastCallback.h"
 #include "SwarmBehaviour.h"
 
 class Drone;  // Forward declaration
 
 struct PheremoneParameters {
   float decayRate;
+  float obstacleAvoidanceWeight;
 };
 
 class PheremoneBehaviour : public SwarmBehaviour {
@@ -27,7 +29,9 @@ class PheremoneBehaviour : public SwarmBehaviour {
   // Define the parameter names and their expected min and max values
   // (for the UI)
   std::unordered_map<std::string, ParameterDefinition> cleanParams = {
-      {"Decay Rate", {&params.decayRate, 0.0f, 1.0f}}};
+      {"Decay Rate", {&params.decayRate, 0.0f, 1.0f}},
+      {"Obstacle Avoidance Weight",
+       {&params.obstacleAvoidanceWeight, 0.0f, 3.0f}}};
 
  public:
   PheremoneBehaviour(const PheremoneParameters &params) : params(params) {}
@@ -40,6 +44,9 @@ class PheremoneBehaviour : public SwarmBehaviour {
   }
 
  private:
+  b2Vec2 avoidObstacles(std::vector<b2Vec2> &obstaclePoints,
+                        Drone *currentDrone);
+  void performRayCasting(Drone *currentDrone, RayCastCallback &callback);
   void updatePheremones();
   void layPheremone(const b2Vec2 &position);
 };

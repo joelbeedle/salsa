@@ -91,6 +91,10 @@ void Drone::update(std::vector<Drone *> &drones) {
   if (behaviour) {
     behaviour->execute(drones, this);
   }
+  // Clear found trees for this cycle?
+  this->foundDiseasedTrees.clear();
+  this->foundDiseasedTreePositions.clear();
+  this->foundTrees.clear();
 
   b2Vec2 position = body->GetPosition();
 
@@ -102,3 +106,5 @@ void Drone::foundDiseasedTree(Tree *tree) {
   b2Vec2 *position = new b2Vec2(tree->getBody()->GetPosition());
   foundDiseasedTreePositions.push_back(position);
 }
+
+void Drone::foundTree(Tree *tree) { foundTrees.push_back(tree); }

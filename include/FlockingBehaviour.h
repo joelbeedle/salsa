@@ -32,7 +32,7 @@ class FlockingBehaviour : public SwarmBehaviour {
       {"Cohesion Weight", {&params.cohesionWeight, 0.0f, 2.0f}},
       {"Separation Weight", {&params.separationWeight, 0.0f, 2.0f}},
       {"Obstacle Avoidance Weight",
-       {&params.obstacleAvoidanceWeight, 0.0f, 2.0f}}};
+       {&params.obstacleAvoidanceWeight, 0.0f, 5.0f}}};
   std::vector<b2Body *> obstacles;
 
  public:

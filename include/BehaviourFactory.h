@@ -3,12 +3,14 @@
 #include <variant>
 
 #include "FlockingBehaviour.h"
+#include "PSOBehaviour.h"
 #include "PheremoneBehaviour.h"
 #include "SwarmBehaviour.h"
 
 class BehaviourFactory {
  public:
-  using BehaviourParams = std::variant<FlockingParameters, PheremoneParameters>;
+  using BehaviourParams =
+      std::variant<FlockingParameters, PheremoneParameters, PSOParameters>;
 
   static SwarmBehaviour *createBehaviour(BehaviourType type,
                                          BehaviourParams params) {
@@ -19,6 +21,8 @@ class BehaviourFactory {
       case BehaviourType::Pheremone:
         return new PheremoneBehaviour(
             extractParameters<PheremoneParameters>(params));
+      case BehaviourType::PSO:
+        return new PSOBehaviour(extractParameters<PSOParameters>(params));
       default:
         throw std::runtime_error("Unknown behaviour type");
     }

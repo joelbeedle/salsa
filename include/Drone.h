@@ -10,6 +10,7 @@
 class Drone {
  private:
   std::vector<Tree *> foundDiseasedTrees;
+  std::vector<Tree *> foundTrees;
   std::vector<b2Vec2 *> foundDiseasedTreePositions;
   b2Body *body;
   b2Fixture *viewSensor;  // The view range sensor
@@ -28,6 +29,7 @@ class Drone {
   void updateSensorRange();
 
   void foundDiseasedTree(Tree *tree);
+  void foundTree(Tree *tree);
 
   // Accessors and Mutators
   void setBehaviour(SwarmBehaviour *newBehaviour) { behaviour = newBehaviour; }
@@ -51,4 +53,6 @@ class Drone {
   std::vector<b2Vec2 *> getFoundDiseasedTreePositions() {
     return foundDiseasedTreePositions;
   }
+
+  std::vector<Tree *> getFoundTrees() { return foundTrees; }
 };

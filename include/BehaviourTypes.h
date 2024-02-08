@@ -3,7 +3,7 @@
 
 #include <string>
 
-enum class BehaviourType { Flocking, Pheremone };
+enum class BehaviourType { Flocking, Pheremone, PSO };
 
 struct BehaviourTypeInfo {
   BehaviourType type;

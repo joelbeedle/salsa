@@ -1,5 +1,7 @@
 // SwarmBehaviour.h
 #pragma once
+#include <box2d/box2d.h>
+
 #include <unordered_map>
 #include <vector>
 

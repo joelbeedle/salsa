@@ -20,6 +20,7 @@ set(SOURCES
     src/Drone.cpp
     src/FlockingBehaviour.cpp
     src/PheremoneBehaviour.cpp
+    src/PSOBehaviour.cpp
     src/Tree.cpp)
 
 # Executable

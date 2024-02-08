@@ -14,6 +14,7 @@
 #include "Drone.h"
 #include "FlockingBehaviour.h"
 #include "ObjectTypes.h"
+#include "PSOBehaviour.h"
 #include "PheremoneBehaviour.h"
 #include "Tree.h"
 #include "draw.h"
@@ -21,7 +22,7 @@
 #include "test.h"
 
 #define DRONE_COUNT 50
-#define TREE_COUNT 500
+#define TREE_COUNT 1000
 #define BORDER_WIDTH 100.0f
 #define BORDER_HEIGHT 100.0f
 
@@ -173,7 +174,8 @@ class DroneSwarmTest : public Test {
 
   // Parameters
   FlockingParameters flockingParams = {50.0f, 1.0f, 1.0f, 1.0f, 1.0f};
-  PheremoneParameters pheremoneParams = {0.1f};
+  PheremoneParameters pheremoneParams = {0.1f, 1.0f};
+  PSOParameters psoParams = {0.5f, 0.5f, 0.9f};
 
   // Drone settings
   std::vector<Drone *> drones;
@@ -191,13 +193,16 @@ class DroneSwarmTest : public Test {
 
   // IMPORTANT: UPDATE WHEN ADDING BEHAVIOURS
   std::vector<BehaviourType> indexToBehaviourType = {
-      BehaviourType::Flocking,  // 0
-      BehaviourType::Pheremone  // 1
+      BehaviourType::Flocking,   // 0
+      BehaviourType::Pheremone,  // 1
+      BehaviourType::PSO,        // 2
   };
   const std::vector<BehaviourTypeInfo> behaviourTypes = {
       {BehaviourType::Flocking, "flockingBehaviour"},
-      {BehaviourType::Pheremone, "pheremoneBehaviour"}};
-  const char *behaviours[2] = {"flockingBehaviour", "pheremoneBehaviour"};
+      {BehaviourType::Pheremone, "pheremoneBehaviour"},
+      {BehaviourType::PSO, "psoBehaviour"}};
+  const char *behaviours[3] = {"flockingBehaviour", "pheremoneBehaviour",
+                               "psoBehaviour"};
 
   // Visual settings
   bool drawDroneVisualRange = false;
@@ -237,7 +242,7 @@ class DroneSwarmTest : public Test {
     maxForce = 0.3f;
 
     flockingParams = {50.0f, 1.0f, 1.0f, 1.0f, 1.0f};
-    pheremoneParams = {0.1f};
+    pheremoneParams = {0.1f, 1.0f};
   }
 
   void createDrones(SwarmBehaviour *b) {
@@ -333,6 +338,12 @@ class DroneSwarmTest : public Test {
     }
   }
 
+  void ResetTrees() {
+    for (auto &tree : trees) {
+      tree->setMapped(false);
+    }
+  }
+
   void UpdateBehaviour() {
     currentBehaviourType = behaviourTypes[currentBehaviourIndex].type;
     SwarmBehaviour *newBehaviour;
@@ -344,6 +355,10 @@ class DroneSwarmTest : public Test {
       case (BehaviourType::Pheremone):
         newBehaviour = BehaviourFactory::createBehaviour(
             BehaviourType::Pheremone, pheremoneParams);
+        break;
+      case (BehaviourType::PSO):
+        newBehaviour =
+            BehaviourFactory::createBehaviour(BehaviourType::PSO, psoParams);
         break;
     }
     // delete behaviour;
@@ -407,6 +422,7 @@ class DroneSwarmTest : public Test {
       DestroyDrones();
       initDefaultParameters();
       createDrones(behaviour);
+      ResetTrees();
     }
 
     ImGui::End();
@@ -467,7 +483,7 @@ class DroneSwarmTest : public Test {
               const b2CircleShape *circleShape =
                   static_cast<const b2CircleShape *>(fixture->GetShape());
 
-              if (tree->isDiseased()) {
+              if (tree->isMapped()) {
                 b2Color customColor =
                     b2Color(0.0f, 1.0f, 0.0f);  // Custom color for mapped trees
                 g_debugDraw.DrawSolidCircle(position, circleShape->m_radius,
@@ -550,11 +566,6 @@ class DroneSwarmTest : public Test {
       for (auto &treepos : drone->getFoundDiseasedTreePositions()) {
         foundDiseaseadTreePositionsSet.insert(treepos);
       }
-    }
-
-    for (auto &pos : foundDiseaseadTreePositionsSet) {
-      std::cout << "Found diseased tree at: " << pos->x << ", " << pos->y
-                << std::endl;
     }
 
     // Update lists
