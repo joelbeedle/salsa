@@ -97,36 +97,6 @@ void PheremoneBehaviour::performRayCasting(Drone *currentDrone,
   }
 }
 
-b2Vec2 PheremoneBehaviour::avoidObstacles(std::vector<b2Vec2> &obstaclePoints,
-                                          Drone *currentDrone) {
-  b2Vec2 steering(0, 0);
-  int32 count = 0;
-
-  for (auto &point : obstaclePoints) {
-    float distance = b2Distance(currentDrone->getPosition(), point);
-    if (distance < currentDrone->getViewRange() && distance > 0) {
-      b2Vec2 diff = currentDrone->getPosition() - point;
-      // Weighted by the inverse distance
-      diff.Normalize();
-      diff.x /= distance;
-      diff.y /= distance;
-      steering += diff;
-      count++;
-    }
-  }
-
-  if (count > 0) {
-    steering.x /= count;
-    steering.y /= count;
-    steering.Normalize();
-    steering *= currentDrone->getMaxSpeed();
-    steering -= currentDrone->getVelocity();
-    clampMagnitude(steering, currentDrone->getMaxForce());
-  }
-
-  return steering;
-}
-
 void PheremoneBehaviour::layPheremone(const b2Vec2 &position) {
   Pheremone pheremone = {position, 1.0f};
   pheremones[pheremoneCount++] = pheremone;

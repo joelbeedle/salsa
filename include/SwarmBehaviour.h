@@ -5,7 +5,6 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-
 class Drone;
 
 struct ParameterDefinition {
@@ -23,6 +22,7 @@ class SwarmBehaviour {
   virtual std::unordered_map<std::string, ParameterDefinition>
   getParameters() = 0;
 
+ protected:
   void clampMagnitude(b2Vec2 &vector, float maxMagnitude) {
     float lengthSquared = vector.LengthSquared();
     if (lengthSquared > maxMagnitude * maxMagnitude && lengthSquared > 0) {
@@ -30,4 +30,7 @@ class SwarmBehaviour {
       vector *= maxMagnitude;
     }
   }
+  b2Vec2 avoidDrones(std::vector<b2Body *> &neighbours, Drone *currentDrone);
+  b2Vec2 avoidObstacles(std::vector<b2Vec2> &obstaclePoints,
+                        Drone *currentDrone);
 };

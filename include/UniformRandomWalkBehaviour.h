@@ -54,9 +54,6 @@ class UniformRandomWalkBehaviour : public SwarmBehaviour {
   void execute(std::vector<Drone *> &drones, Drone *currentDrone) override;
 
  private:
-  b2Vec2 avoidObstacles(std::vector<b2Vec2> &obstaclePoints,
-                        Drone *currentDrone);
-  b2Vec2 avoidDrones(std::vector<b2Body *> &neighbours, Drone *currentDrone);
   void performRayCasting(Drone *currentDrone, RayCastCallback &callback);
 
   // Function to generate a random time interval between 0 and 10 seconds

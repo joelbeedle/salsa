@@ -45,8 +45,6 @@ class PheremoneBehaviour : public SwarmBehaviour {
   }
 
  private:
-  b2Vec2 avoidObstacles(std::vector<b2Vec2> &obstaclePoints,
-                        Drone *currentDrone);
   void performRayCasting(Drone *currentDrone, RayCastCallback &callback);
   void updatePheremones();
   void layPheremone(const b2Vec2 &position);

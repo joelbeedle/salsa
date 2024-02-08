@@ -18,6 +18,7 @@ include_directories(lib/Box2D)
 set(SOURCES
     src/main.cpp
     src/Drone.cpp
+    src/SwarmBehaviour.cpp
     src/FlockingBehaviour.cpp
     src/PheremoneBehaviour.cpp
     src/PSOBehaviour.cpp
