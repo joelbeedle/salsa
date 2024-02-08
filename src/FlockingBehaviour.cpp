@@ -5,6 +5,7 @@
 
 #include "Drone.h"
 #include "RayCastCallback.h"
+#include "box2d/box2d.h"
 
 void FlockingBehaviour::execute(std::vector<Drone *> &drones,
                                 Drone *currentDrone) {

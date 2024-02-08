@@ -16,6 +16,7 @@
 #include "ObjectTypes.h"
 #include "PSOBehaviour.h"
 #include "PheremoneBehaviour.h"
+#include "SwarmBehaviourRegistry.h"
 #include "Tree.h"
 #include "draw.h"
 #include "imgui/imgui.h"
@@ -166,8 +167,10 @@ class DroneSwarmTest : public Test {
   std::vector<b2Vec2 *> foundDiseasedTreePositions;
   std::set<b2Vec2 *> foundDiseaseadTreePositionsSet;
   std::vector<b2Vec2 *> actualDiseasedTreePositions;
+
   // Behaviours
   SwarmBehaviour *behaviour;
+  std::string currentBehaviourName;
   BehaviourType currentBehaviourType;
   MyDraw myDraw;
   DroneContactListener droneContactListener;
@@ -214,14 +217,36 @@ class DroneSwarmTest : public Test {
       m_world->SetContactListener(&droneContactListener);
 
       initDefaultParameters();
+      std::unique_ptr<FlockingBehaviour> flockBehaviour =
+          std::make_unique<FlockingBehaviour>(flockingParams);
+      std::unique_ptr<PheremoneBehaviour> pheremoneBehaviour =
+          std::make_unique<PheremoneBehaviour>(pheremoneParams);
+      std::unique_ptr<PSOBehaviour> psoBehaviour =
+          std::make_unique<PSOBehaviour>(psoParams);
 
+      SwarmBehaviourRegistry::getInstance().add("FlockingBehaviour",
+                                                std::move(flockBehaviour));
+      SwarmBehaviourRegistry::getInstance().add("PheremoneBehaviour",
+                                                std::move(pheremoneBehaviour));
+      SwarmBehaviourRegistry::getInstance().add("PSOBehaviour",
+                                                std::move(psoBehaviour));
       // Set initial behaviour
       currentBehaviourType = BehaviourType::Flocking;
       currentBehaviourIndex = 0;
 
+      auto &registry = SwarmBehaviourRegistry::getInstance();
+      auto behaviorNames = registry.getSwarmBehaviourNames();
+
+      if (!behaviorNames.empty()) {
+        // Select the first behavior as the default one
+        currentBehaviourName = behaviorNames[0];
+        behaviour = registry.getSwarmBehaviour(currentBehaviourName);
+      }
+
       // Set behaviour to equal our current behaviour
-      UpdateBehaviour();
-      //  Create our drones with our selected behaviour
+      // behaviour = flockBehaviour;
+      // UpdateBehaviour();
+      //   Create our drones with our selected behaviour
       createDrones(behaviour);
       createTrees();
       myDraw.setTrees(trees);
@@ -373,16 +398,17 @@ class DroneSwarmTest : public Test {
     ImGui::Begin("Swarm Controls", nullptr,
                  ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 
-    // Dropdown to select the behaviour
-    if (ImGui::BeginCombo(
-            "Behaviour",
-            behaviourTypes[currentBehaviourIndex].displayName.c_str())) {
-      for (int i = 0; i < behaviourTypes.size(); i++) {
-        bool isSelected = (currentBehaviourIndex == i);
-        if (ImGui::Selectable(behaviourTypes[i].displayName.c_str(),
-                              isSelected)) {
-          currentBehaviourIndex = i;
-          UpdateBehaviour();
+    if (ImGui::BeginCombo("Behaviours", currentBehaviourName.c_str())) {
+      auto behaviourNames =
+          SwarmBehaviourRegistry::getInstance().getSwarmBehaviourNames();
+
+      for (auto &name : behaviourNames) {
+        bool isSelected = (currentBehaviourName == name);
+        if (ImGui::Selectable(name.c_str(), isSelected)) {
+          currentBehaviourName = name;
+          behaviour =
+              SwarmBehaviourRegistry::getInstance().getSwarmBehaviour(name);
+          // UpdateBehaviour();
           SetBehaviour();
         }
         if (isSelected) {
@@ -391,6 +417,37 @@ class DroneSwarmTest : public Test {
       }
       ImGui::EndCombo();
     }
+
+    ImGui::Text("Behaviour Settings");
+    bool changed = false;
+    for (auto &[name, parameter] : behaviour->getParameters()) {
+      changed |= ImGui::SliderFloat(name.c_str(), parameter.value,
+                                    parameter.minSetting, parameter.maxSetting);
+    }
+
+    if (changed) {
+      // UpdateBehaviour();
+      SetBehaviour();
+    }
+
+    // Dropdown to select the behaviour
+    // if (ImGui::BeginCombo(
+    //         "Behaviour",
+    //         behaviourTypes[currentBehaviourIndex].displayName.c_str())) {
+    //   for (int i = 0; i < behaviourTypes.size(); i++) {
+    //     bool isSelected = (currentBehaviourIndex == i);
+    //     if (ImGui::Selectable(behaviourTypes[i].displayName.c_str(),
+    //                           isSelected)) {
+    //       currentBehaviourIndex = i;
+    //       UpdateBehaviour();
+    //       SetBehaviour();
+    //     }
+    //     if (isSelected) {
+    //       ImGui::SetItemDefaultFocus();
+    //     }
+    //   }
+    //   ImGui::EndCombo();
+    // }
 
     // Drone settings
     ImGui::Text("Drone Settings");
@@ -403,18 +460,18 @@ class DroneSwarmTest : public Test {
       UpdateDroneSettings();
     }
 
-    // Display different behaviour settings depending on the behaviour selected
-    ImGui::Text("Behaviour Settings");
-    bool changed = false;
-    for (auto &[name, parameter] : behaviour->getParameters()) {
-      changed |= ImGui::SliderFloat(name.c_str(), parameter.value,
-                                    parameter.minSetting, parameter.maxSetting);
-    }
+    // // Display different behaviour settings depending on the behaviour
+    // selected ImGui::Text("Behaviour Settings"); bool changed = false; for
+    // (auto &[name, parameter] : behaviour->getParameters()) {
+    //   changed |= ImGui::SliderFloat(name.c_str(), parameter.value,
+    //                                 parameter.minSetting,
+    //                                 parameter.maxSetting);
+    // }
 
-    if (changed) {
-      // UpdateBehaviour();
-      SetBehaviour();
-    }
+    // if (changed) {
+    //   // UpdateBehaviour();
+    //   SetBehaviour();
+    // }
 
     // Visual settings
     ImGui::Text("Visual Settings");
