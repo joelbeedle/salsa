@@ -3,7 +3,7 @@
 #include <unordered_set>
 
 #include "Drone.h"
-#include "RayCastCallBack.h"
+#include "RayCastCallback.h"
 
 float PSOBehaviour::randomFactor() {
   return static_cast<float>(rand()) / static_cast<float>(RAND_MAX);

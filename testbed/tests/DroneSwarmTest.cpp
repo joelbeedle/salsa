@@ -84,78 +84,6 @@ class DroneContactListener : public b2ContactListener {
     // Handle end of contact if needed
   }
 };
-class MyDraw : public b2Draw {
- private:
-  std::vector<Tree *> allTrees;
-  std::vector<Drone *> allDrones;
-
- public:
-  void setTrees(std::vector<Tree *> trees) { allTrees = trees; }
-
-  void DrawPolygon(const b2Vec2 *vertices, int32 vertexCount,
-                   const b2Color &color) override {
-    // Use default debug draw for polygons
-    g_debugDraw.DrawPolygon(vertices, vertexCount, color);
-  }
-
-  void DrawSolidPolygon(const b2Vec2 *vertices, int32 vertexCount,
-                        const b2Color &color) override {
-    // Use default debug draw for solid polygons
-    g_debugDraw.DrawSolidPolygon(vertices, vertexCount, color);
-  }
-
-  void DrawCircle(const b2Vec2 &center, float radius,
-                  const b2Color &color) override {
-    // Default debug draw for other circles
-    g_debugDraw.DrawCircle(center, radius, color);
-  }
-
-  void DrawSolidCircle(const b2Vec2 &center, float radius, const b2Vec2 &axis,
-                       const b2Color &color) override {
-    g_debugDraw.DrawSolidCircle(center, radius, axis, color);
-  }
-
-  void DrawSegment(const b2Vec2 &p1, const b2Vec2 &p2,
-                   const b2Color &color) override {
-    g_debugDraw.DrawSegment(p1, p2, color);
-  }
-
-  void DrawTransform(const b2Transform &xf) override {
-    g_debugDraw.DrawTransform(xf);
-  }
-
-  void DrawPoint(const b2Vec2 &p, float size, const b2Color &color) override {
-    g_debugDraw.DrawPoint(p, size, color);
-  }
-};
-
-void createBounds(b2World *world) {
-  // Define the ground body.
-  b2BodyDef groundBodyDef;
-  groundBodyDef.position.Set(0.0f, 0.0f);
-
-  b2Body *groundBody = world->CreateBody(&groundBodyDef);
-
-  b2EdgeShape groundBox;
-
-  // bottom
-  groundBox.SetTwoSided(b2Vec2(0.0f, 0.0f), b2Vec2(BORDER_WIDTH, 0.0f));
-  groundBody->CreateFixture(&groundBox, 0.0f);
-
-  // top
-  groundBox.SetTwoSided(b2Vec2(0.0f, BORDER_HEIGHT),
-                        b2Vec2(BORDER_WIDTH, BORDER_HEIGHT));
-  groundBody->CreateFixture(&groundBox, 0.0f);
-
-  // left
-  groundBox.SetTwoSided(b2Vec2(0.0f, 0.0f), b2Vec2(0.0f, BORDER_HEIGHT));
-  groundBody->CreateFixture(&groundBox, 0.0f);
-
-  // right
-  groundBox.SetTwoSided(b2Vec2(BORDER_WIDTH, 0.0f),
-                        b2Vec2(BORDER_WIDTH, BORDER_HEIGHT));
-  groundBody->CreateFixture(&groundBox, 0.0f);
-}
 
 class DroneSwarmTest : public Test {
  public:
@@ -169,7 +97,6 @@ class DroneSwarmTest : public Test {
   // Behaviours
   SwarmBehaviour *behaviour;
   std::string currentBehaviourName;
-  MyDraw myDraw;
   DroneContactListener droneContactListener;
 
   // Parameters
@@ -222,14 +149,41 @@ class DroneSwarmTest : public Test {
       }
       createDrones(behaviour);
       createTrees();
-      myDraw.setTrees(trees);
     }
+  }
+
+  void createBounds(b2World *world) {
+    // Define the ground body.
+    b2BodyDef groundBodyDef;
+    groundBodyDef.position.Set(0.0f, 0.0f);
+
+    b2Body *groundBody = world->CreateBody(&groundBodyDef);
+
+    b2EdgeShape groundBox;
+
+    // bottom
+    groundBox.SetTwoSided(b2Vec2(0.0f, 0.0f), b2Vec2(BORDER_WIDTH, 0.0f));
+    groundBody->CreateFixture(&groundBox, 0.0f);
+
+    // top
+    groundBox.SetTwoSided(b2Vec2(0.0f, BORDER_HEIGHT),
+                          b2Vec2(BORDER_WIDTH, BORDER_HEIGHT));
+    groundBody->CreateFixture(&groundBox, 0.0f);
+
+    // left
+    groundBox.SetTwoSided(b2Vec2(0.0f, 0.0f), b2Vec2(0.0f, BORDER_HEIGHT));
+    groundBody->CreateFixture(&groundBox, 0.0f);
+
+    // right
+    groundBox.SetTwoSided(b2Vec2(BORDER_WIDTH, 0.0f),
+                          b2Vec2(BORDER_WIDTH, BORDER_HEIGHT));
+    groundBody->CreateFixture(&groundBox, 0.0f);
   }
 
   void initWorld() {
     createBounds(m_world);
-    myDraw.SetFlags(b2Draw::e_shapeBit | b2Draw::e_jointBit);
-    m_world->SetDebugDraw(&myDraw);
+    g_debugDraw.SetFlags(b2Draw::e_shapeBit | b2Draw::e_jointBit);
+    // m_world->SetDebugDraw(&myDraw);
     b2Vec2 gravity(0.0f, 0.0f);
     m_world->SetGravity(gravity);
   }
@@ -404,7 +358,7 @@ class DroneSwarmTest : public Test {
 
   static Test *Create() { return new DroneSwarmTest; }
 
-  void ManualDebugDraw(b2World *world, MyDraw *debugDraw) {
+  void Draw(b2World *world, DebugDraw *debugDraw) {
     for (b2Body *body = world->GetBodyList(); body; body = body->GetNext()) {
       const b2Transform &transform = body->GetTransform();
 
@@ -533,7 +487,7 @@ class DroneSwarmTest : public Test {
     Test::Step(settings);
 
     // m_world->DebugDraw();
-    ManualDebugDraw(m_world, &myDraw);
+    Draw(m_world, &g_debugDraw);
     // Update Drone position
     for (auto &drone : drones) {
       drone->update(drones);
