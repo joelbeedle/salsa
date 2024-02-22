@@ -1,2 +1,0 @@
-// RandWalkDisperseBehaviour.h
-#pragma once

@@ -1,2 +1,0 @@
-// DSPBehaviour.h
-#pragma once
