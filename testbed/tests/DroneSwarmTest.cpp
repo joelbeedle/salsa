@@ -6,6 +6,7 @@
 #include <set>
 #include <stdexcept>
 #include <string>
+#include <unordered_map>
 #include <variant>
 #include <vector>
 
@@ -28,6 +29,30 @@
 #define BORDER_WIDTH 100.0f
 #define BORDER_HEIGHT 100.0f
 
+struct DroneParameters {
+  float viewRange;
+  float obstacleViewRange;
+  float maxSpeed;
+  float maxForce;
+  float mass;
+  float radius;
+};
+
+void CreatePreset(std::unordered_map<std::string, DroneParameters> &presets,
+                  const std::string &name, const DroneParameters &params) {
+  presets[name] = params;
+}
+
+void DeletePreset(std::unordered_map<std::string, DroneParameters> &presets,
+                  const std::string &name) {
+  presets.erase(name);
+}
+
+void UpdatePreset(std::unordered_map<std::string, DroneParameters> &presets,
+                  const std::string &name, const DroneParameters &params) {
+  presets[name] = params;
+}
+
 class DroneSwarmTest : public Test {
  public:
   // Lists
@@ -36,6 +61,8 @@ class DroneSwarmTest : public Test {
   std::vector<b2Vec2 *> foundDiseasedTreePositions;
   std::set<b2Vec2 *> foundDiseaseadTreePositionsSet;
   std::vector<b2Vec2 *> actualDiseasedTreePositions;
+
+  std::unordered_map<std::string, DroneParameters> dronePresets;
 
   // Behaviours
   SwarmBehaviour *behaviour;
@@ -57,6 +84,11 @@ class DroneSwarmTest : public Test {
   float maxSpeed;
   float maxForce;
 
+  DroneParameters djiMatrice300RTK = {8.0f, 40.0f, 17.0f, 0.3f, 6.3f, 0.45f};
+  DroneParameters djiPhantom4RTK = {7.0f, 30.0f, 13.0f, 0.3f, 1.4f, 0.35f};
+  std::string currentPresetName;
+  DroneParameters *droneParams;
+
   // Tree settings
   std::vector<Tree *> trees;
   std::vector<Tree *> mappedTrees;
@@ -73,7 +105,7 @@ class DroneSwarmTest : public Test {
 
       initDefaultParameters();
       initDefaultBehaviours();
-      createDrones(behaviour);
+      createDrones(behaviour, droneParams);
       createTrees();
     }
   }
@@ -115,6 +147,12 @@ class DroneSwarmTest : public Test {
   }
 
   void initDefaultParameters() {
+    // based off of drone Matrice 300 RTK
+    CreatePreset(dronePresets, "Matrice 300 RTK", djiMatrice300RTK);
+    CreatePreset(dronePresets, "Phantom 4 RTK", djiPhantom4RTK);
+    currentPresetName = dronePresets.begin()->first;
+    droneParams = &dronePresets[currentPresetName];
+
     viewRange = 8.0f;
     obstacleViewRange = 40.0f;
     maxSpeed = 17.0f;
@@ -156,17 +194,17 @@ class DroneSwarmTest : public Test {
     }
   }
 
-  void createDrones(SwarmBehaviour *b) {
+  void createDrones(SwarmBehaviour *b, DroneParameters *params) {
     const float margin = 2.0f;  // Define a margin to prevent spawning exactly
                                 // at the border or outside
-    // Drone currently modelled on DJI Matrice 300 RTK
     for (int i = 0; i < DRONE_COUNT; i++) {
       float x = (rand() % static_cast<int>(BORDER_WIDTH - 2 * margin)) + margin;
       float y =
           (rand() % static_cast<int>(BORDER_HEIGHT - 2 * margin)) + margin;
-      drones.push_back(new Drone(m_world, b2Vec2(x, y), behaviour, viewRange,
-                                 obstacleViewRange, maxSpeed, maxForce, 0.45f,
-                                 6.3f));
+      drones.push_back(new Drone(m_world, b2Vec2(x, y), behaviour,
+                                 params->viewRange, params->obstacleViewRange,
+                                 params->maxSpeed, params->maxForce,
+                                 params->radius, params->mass));
     }
   }
 
@@ -244,10 +282,10 @@ class DroneSwarmTest : public Test {
   void UpdateDroneSettings() {
     // Update drone settings:
     for (auto &drone : drones) {
-      drone->setMaxForce(maxForce);
-      drone->setMaxSpeed(maxSpeed);
-      drone->setViewRange(viewRange);
-      drone->setObstacleViewRange(obstacleViewRange);
+      drone->setMaxForce(droneParams->maxForce);
+      drone->setMaxSpeed(droneParams->maxSpeed);
+      drone->setViewRange(droneParams->viewRange);
+      drone->setObstacleViewRange(droneParams->obstacleViewRange);
       drone->updateSensorRange();
     }
   }
@@ -293,16 +331,6 @@ class DroneSwarmTest : public Test {
     if (changed) {
       SetBehaviour();
     }
-    // Drone settings
-    ImGui::Text("Drone Settings");
-    bool droneChanged = false;
-    droneChanged |= ImGui::SliderFloat("maxSpeed", &maxSpeed, 0.0f, 50.0f);
-    droneChanged |= ImGui::SliderFloat("maxForce", &maxForce, 0.0f, 10.0f);
-    droneChanged |= ImGui::SliderFloat("viewRange", &viewRange, 0.0f, 100.0f);
-
-    if (droneChanged) {
-      UpdateDroneSettings();
-    }
 
     // Visual settings
     ImGui::Text("Visual Settings");
@@ -312,8 +340,54 @@ class DroneSwarmTest : public Test {
     if (ImGui::Button("Reset Simulation")) {
       DestroyDrones();
       initDefaultParameters();
-      createDrones(behaviour);
+      createDrones(behaviour, droneParams);
       ResetTrees();
+    }
+
+    ImGui::End();
+
+    // Drone settings window
+    ImGui::SetNextWindowPos(ImVec2(10.0f, 400.0f));
+    ImGui::SetNextWindowSize(ImVec2(285.0f, 285.0f));
+    ImGui::Begin("Drone Settings", nullptr,
+                 ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+    if (ImGui::BeginCombo("Drone Preset", currentPresetName.c_str())) {
+      for (auto &[name, params] : dronePresets) {
+        bool isSelected = (currentPresetName == name);
+        if (ImGui::Selectable(name.c_str(), isSelected)) {
+          currentPresetName = name;
+          droneParams = &dronePresets[name];
+          std::vector<Drone *> newDrones;
+          for (auto &drone : drones) {
+            newDrones.push_back(new Drone(
+                m_world, drone->getBody()->GetPosition(), behaviour,
+                droneParams->viewRange, droneParams->obstacleViewRange,
+                droneParams->maxSpeed, droneParams->maxForce,
+                droneParams->radius, droneParams->mass));
+            m_world->DestroyBody(drone->getBody());
+          }
+          drones = newDrones;
+        }
+        if (isSelected) {
+          ImGui::SetItemDefaultFocus();
+        }
+      }
+      ImGui::EndCombo();
+    }
+
+    ImGui::Text("Drone Preset Settings");
+    bool droneChanged = false;
+    droneChanged |=
+        ImGui::SliderFloat("maxSpeed", &droneParams->maxSpeed, 0.0f, 50.0f);
+    droneChanged |=
+        ImGui::SliderFloat("maxForce", &droneParams->maxForce, 0.0f, 10.0f);
+    droneChanged |=
+        ImGui::SliderFloat("viewRange", &droneParams->viewRange, 0.0f, 100.0f);
+    droneChanged |= ImGui::SliderFloat(
+        "obstacleViewRange", &droneParams->obstacleViewRange, 0.0f, 100.0f);
+
+    if (droneChanged) {
+      UpdateDroneSettings();
     }
 
     ImGui::End();
