@@ -52,9 +52,10 @@ class DroneSwarmTest : public Test {
   // Drone settings
   std::vector<Drone *> drones;
 
-  float viewRange = 10.0f;
-  float maxSpeed = 10.0f;
-  float maxForce = 0.3f;
+  float obstacleViewRange;
+  float viewRange;
+  float maxSpeed;
+  float maxForce;
 
   // Tree settings
   std::vector<Tree *> trees;
@@ -62,6 +63,7 @@ class DroneSwarmTest : public Test {
 
   // Visual settings
   bool drawDroneVisualRange = false;
+  bool drawTrees = true;
 
  public:
   DroneSwarmTest() {
@@ -113,8 +115,9 @@ class DroneSwarmTest : public Test {
   }
 
   void initDefaultParameters() {
-    viewRange = 5.0f;
-    maxSpeed = 10.0f;
+    viewRange = 8.0f;
+    obstacleViewRange = 40.0f;
+    maxSpeed = 17.0f;
     maxForce = 0.3f;
 
     flockingParams = {50.0f, 1.6f, 0.8f, 1.6f, 1.2f};
@@ -156,12 +159,14 @@ class DroneSwarmTest : public Test {
   void createDrones(SwarmBehaviour *b) {
     const float margin = 2.0f;  // Define a margin to prevent spawning exactly
                                 // at the border or outside
+    // Drone currently modelled on DJI Matrice 300 RTK
     for (int i = 0; i < DRONE_COUNT; i++) {
       float x = (rand() % static_cast<int>(BORDER_WIDTH - 2 * margin)) + margin;
       float y =
           (rand() % static_cast<int>(BORDER_HEIGHT - 2 * margin)) + margin;
       drones.push_back(new Drone(m_world, b2Vec2(x, y), behaviour, viewRange,
-                                 maxSpeed, maxForce, 1.0f));
+                                 obstacleViewRange, maxSpeed, maxForce, 0.45f,
+                                 6.3f));
     }
   }
 
@@ -242,6 +247,7 @@ class DroneSwarmTest : public Test {
       drone->setMaxForce(maxForce);
       drone->setMaxSpeed(maxSpeed);
       drone->setViewRange(viewRange);
+      drone->setObstacleViewRange(obstacleViewRange);
       drone->updateSensorRange();
     }
   }
@@ -301,6 +307,7 @@ class DroneSwarmTest : public Test {
     // Visual settings
     ImGui::Text("Visual Settings");
     ImGui::Checkbox("Draw Drone visual range", &drawDroneVisualRange);
+    ImGui::Checkbox("Draw Trees", &drawTrees);
 
     if (ImGui::Button("Reset Simulation")) {
       DestroyDrones();
@@ -362,23 +369,25 @@ class DroneSwarmTest : public Test {
               break;
             }
             case ObjectType::Tree: {
-              Tree *tree = userData->tree;
-              b2Vec2 position = body->GetPosition();
-              const b2CircleShape *circleShape =
-                  static_cast<const b2CircleShape *>(fixture->GetShape());
+              if (drawTrees) {
+                Tree *tree = userData->tree;
+                b2Vec2 position = body->GetPosition();
+                const b2CircleShape *circleShape =
+                    static_cast<const b2CircleShape *>(fixture->GetShape());
 
-              if (tree->isMapped()) {
-                b2Color customColor =
-                    b2Color(0.0f, 1.0f, 0.0f);  // Custom color for mapped trees
-                g_debugDraw.DrawSolidCircle(position, circleShape->m_radius,
-                                            transform.q.GetXAxis(),
-                                            customColor);
-              } else {
-                b2Color customColor =
-                    b2Color(1.0f, 0.0f, 0.0f);  // Custom color for mapped trees
-                g_debugDraw.DrawSolidCircle(position, circleShape->m_radius,
-                                            transform.q.GetXAxis(),
-                                            customColor);
+                if (tree->isMapped()) {
+                  b2Color customColor = b2Color(
+                      0.0f, 1.0f, 0.0f);  // Custom color for mapped trees
+                  g_debugDraw.DrawSolidCircle(position, circleShape->m_radius,
+                                              transform.q.GetXAxis(),
+                                              customColor);
+                } else {
+                  b2Color customColor = b2Color(
+                      1.0f, 0.0f, 0.0f);  // Custom color for mapped trees
+                  g_debugDraw.DrawSolidCircle(position, circleShape->m_radius,
+                                              transform.q.GetXAxis(),
+                                              customColor);
+                }
               }
               break;
             }

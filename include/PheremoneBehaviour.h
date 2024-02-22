@@ -45,7 +45,6 @@ class PheremoneBehaviour : public SwarmBehaviour {
   }
 
  private:
-  void performRayCasting(Drone *currentDrone, RayCastCallback &callback);
   void updatePheremones();
   void layPheremone(const b2Vec2 &position);
 };

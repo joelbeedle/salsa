@@ -5,6 +5,8 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+
+#include "RayCastCallback.h"
 class Drone;
 
 struct ParameterDefinition {
@@ -33,4 +35,5 @@ class SwarmBehaviour {
   b2Vec2 avoidDrones(std::vector<b2Body *> &neighbours, Drone *currentDrone);
   b2Vec2 avoidObstacles(std::vector<b2Vec2> &obstaclePoints,
                         Drone *currentDrone);
+  void performRayCasting(Drone *currentDrone, RayCastCallback &callback);
 };

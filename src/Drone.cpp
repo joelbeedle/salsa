@@ -1,6 +1,7 @@
 // Drone.cpp
 #include "Drone.h"
 
+#include <cmath>
 #include <valarray>
 
 #include "ObjectTypes.h"
@@ -9,12 +10,15 @@
 #define SCREEN_HEIGHT 600
 
 Drone::Drone(b2World *world, const b2Vec2 &position, SwarmBehaviour *behaviour,
-             float viewRange, float maxSpeed, float maxForce, float radius)
+             float viewRange, float obstacleViewRange, float maxSpeed,
+             float maxForce, float radius, float mass)
     : behaviour(behaviour),
       viewRange(viewRange),
+      obstacleViewRange(obstacleViewRange),
       maxSpeed(maxSpeed),
       maxForce(maxForce),
-      radius(radius) {
+      radius(radius),
+      mass(mass) {
   // Create Box2D body
   b2BodyDef bodyDef;
   bodyDef.type = b2_dynamicBody;
@@ -27,7 +31,12 @@ Drone::Drone(b2World *world, const b2Vec2 &position, SwarmBehaviour *behaviour,
 
   b2FixtureDef fixtureDef;
   fixtureDef.shape = &circleShape;
-  fixtureDef.density = 1.0f;
+  float area_m2 = M_PI * pow(radius, 2);
+
+  // Calculating the required density for Box2D
+  float density_box2d = mass / area_m2;
+
+  fixtureDef.density = density_box2d;
   UserData *userData = new UserData();
   userData->type = ObjectType::Drone;  // or ObjectType::Tree for a tree
   userData->drone = this;              // or userData->tree = this for a tree
@@ -35,6 +44,7 @@ Drone::Drone(b2World *world, const b2Vec2 &position, SwarmBehaviour *behaviour,
   fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(userData);
   body->CreateFixture(&fixtureDef);
 
+  // Create tree detecting sensor (downwards camera)
   b2CircleShape sCircleShape;
   sCircleShape.m_radius = viewRange;
 

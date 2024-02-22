@@ -16,13 +16,16 @@ class Drone {
   b2Fixture *viewSensor;  // The view range sensor
   SwarmBehaviour *behaviour;
   float viewRange;
+  float obstacleViewRange;
   float maxSpeed;
   float maxForce;
   float radius;
+  float mass;
 
  public:
   Drone(b2World *world, const b2Vec2 &position, SwarmBehaviour *behaviour,
-        float viewRange, float maxSpeed, float maxForce, float radius);
+        float viewRange, float obstacleViewRange, float maxSpeed,
+        float maxForce, float radius, float mass);
   ~Drone();
 
   void update(std::vector<Drone *> &drones);
@@ -40,6 +43,9 @@ class Drone {
 
   float getViewRange() { return viewRange; }
   void setViewRange(float newRange) { viewRange = newRange; }
+
+  float getObstacleViewRange() { return obstacleViewRange; }
+  void setObstacleViewRange(float newRange) { obstacleViewRange = newRange; }
 
   float getMaxSpeed() { return maxSpeed; }
   void setMaxSpeed(float newSpeed) { maxSpeed = newSpeed; }

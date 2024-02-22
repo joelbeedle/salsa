@@ -81,22 +81,6 @@ void PheremoneBehaviour::execute(std::vector<Drone *> &drones,
                            // being transient
 }
 
-void PheremoneBehaviour::performRayCasting(Drone *currentDrone,
-                                           RayCastCallback &callback) {
-  // Define the ray casting range and angle
-  float rayRange = currentDrone->getViewRange();
-  ;
-  float deltaAngle = 15.0f;  // dividing the circle into segments
-
-  for (float angle = 0; angle < 360; angle += deltaAngle) {
-    b2Vec2 start = currentDrone->getPosition();
-    b2Vec2 end = start + rayRange * b2Vec2(cosf(angle * (b2_pi / 180.0f)),
-                                           sinf(angle * (b2_pi / 180.0f)));
-
-    currentDrone->getBody()->GetWorld()->RayCast(&callback, start, end);
-  }
-}
-
 void PheremoneBehaviour::layPheremone(const b2Vec2 &position) {
   Pheremone pheremone = {position, 1.0f};
   pheremones[pheremoneCount++] = pheremone;

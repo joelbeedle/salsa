@@ -67,3 +67,18 @@ b2Vec2 SwarmBehaviour::avoidObstacles(std::vector<b2Vec2> &obstaclePoints,
 
   return steering;
 }
+
+void SwarmBehaviour::performRayCasting(Drone *currentDrone,
+                                       RayCastCallback &callback) {
+  // Define the ray casting range and angle
+  float rayRange = currentDrone->getObstacleViewRange();
+  float deltaAngle = 15.0f;  // dividing the circle into segments
+
+  for (float angle = 0; angle < 360; angle += deltaAngle) {
+    b2Vec2 start = currentDrone->getPosition();
+    b2Vec2 end = start + rayRange * b2Vec2(cosf(angle * (b2_pi / 180.0f)),
+                                           sinf(angle * (b2_pi / 180.0f)));
+
+    currentDrone->getBody()->GetWorld()->RayCast(&callback, start, end);
+  }
+}

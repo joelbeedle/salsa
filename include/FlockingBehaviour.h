@@ -49,5 +49,4 @@ class FlockingBehaviour : public SwarmBehaviour {
   b2Vec2 align(std::vector<b2Body *> &drones, Drone *currentDrone);
   b2Vec2 separate(std::vector<b2Body *> &drones, Drone *currentDrone);
   b2Vec2 cohere(std::vector<b2Body *> &drones, Drone *currentDrone);
-  void performRayCasting(Drone *currentDrone, RayCastCallback &callback);
 };
