@@ -845,6 +845,7 @@ void DebugDraw::DrawCircle(const b2Vec2& center, float radius,
 //
 void DebugDraw::DrawSolidCircle(const b2Vec2& center, float radius,
                                 const b2Vec2& axis, const b2Color& color) {
+  glDisable(GL_DEPTH_TEST);
   const float k_segments = 16.0f;
   const float k_increment = 2.0f * b2_pi / k_segments;
   float sinInc = sinf(k_increment);
@@ -883,6 +884,7 @@ void DebugDraw::DrawSolidCircle(const b2Vec2& center, float radius,
   b2Vec2 p = center + radius * axis;
   m_lines->Vertex(center, color);
   m_lines->Vertex(p, color);
+  glEnable(GL_DEPTH_TEST);
 }
 
 //

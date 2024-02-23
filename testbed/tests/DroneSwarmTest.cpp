@@ -95,7 +95,7 @@ class DroneSwarmTest : public Test {
 
   // Visual settings
   bool drawDroneVisualRange = false;
-  bool drawTrees = true;
+  bool drawTrees = false;
   bool firstRun = true;
   std::vector<b2Vec2> treePositions;
   std::vector<b2Color> treeColors;
@@ -266,7 +266,7 @@ class DroneSwarmTest : public Test {
           (rand() % static_cast<int>(BORDER_HEIGHT - 2 * margin)) + margin;
       trees.push_back(new Tree(m_world, i, b2Vec2(x, y), false, false, 1.0f));
       treePositions.push_back(trees[i]->getBody()->GetPosition());
-      treeColors.push_back(b2Color(1.0f, 0.0f, 0.0f, 0.5f));
+      treeColors.push_back(b2Color(0.5f, 0.0f, 0.0f, 0.5f));
     }
     updateDiseaseSpread(trees, 20.0f);
   }
@@ -544,14 +544,10 @@ class DroneSwarmTest : public Test {
       drone->clearLists();
     }
 
-    // Not first run, only update changed trees
+    // Not first run, only update newly found trees
     for (Tree *tree : foundTrees) {
       int id = tree->getID();
-      if (tree->isMapped()) {
-        treeColors[id] = b2Color(0.0f, 1.0f, 0.0f, 0.5f);
-      } else {
-        treeColors[id] = b2Color(1.0f, 0.0f, 0.0f, 0.5f);
-      }
+      treeColors[id] = b2Color(0.0f, 0.5f, 0.0f, 0.5f);
     }
 
     if (firstRun) {
@@ -560,6 +556,7 @@ class DroneSwarmTest : public Test {
     } else {
       g_debugDraw.DrawTrees(treePositions, treeColors, foundIDs);
     }
+    Draw(m_world, &g_debugDraw);
   }
 };
 
