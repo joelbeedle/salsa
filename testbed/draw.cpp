@@ -630,13 +630,15 @@ struct GLRenderTrees {
                 color = f_color;
             }
         )";
-    // Initialize circle vertices for a unit circle
     circleVertices[0] = 0.0f;  // Center of circle
     circleVertices[1] = 0.0f;
     const float increment = 2.0f * M_PI / e_maxVertices;
+    const float radius = 2.5f;  // New radius for the circle
     for (int i = 0; i <= e_maxVertices; ++i) {
-      circleVertices[2 + i * 2] = cosf(i * increment);
-      circleVertices[3 + i * 2] = sinf(i * increment);
+      circleVertices[2 + i * 2] =
+          cosf(i * increment) * radius;  // Scale x coordinate
+      circleVertices[3 + i * 2] =
+          sinf(i * increment) * radius;  // Scale y coordinate
     }
     // Repeat first vertex at end to close circle
     circleVertices[NUM_CIRCLE_VERTICES * 2 - 2] = circleVertices[2];

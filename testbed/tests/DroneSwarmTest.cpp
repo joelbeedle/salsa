@@ -26,8 +26,8 @@
 
 #define DRONE_COUNT 50
 #define TREE_COUNT 10000
-#define BORDER_WIDTH 200.0f
-#define BORDER_HEIGHT 200.0f
+#define BORDER_WIDTH 500.0f
+#define BORDER_HEIGHT 500.0f
 
 struct DroneParameters {
   float viewRange;
@@ -264,7 +264,7 @@ class DroneSwarmTest : public Test {
       float x = (rand() % static_cast<int>(BORDER_WIDTH - 2 * margin)) + margin;
       float y =
           (rand() % static_cast<int>(BORDER_HEIGHT - 2 * margin)) + margin;
-      trees.push_back(new Tree(m_world, i, b2Vec2(x, y), false, false, 1.0f));
+      trees.push_back(new Tree(m_world, i, b2Vec2(x, y), false, false, 2.5f));
       treePositions.push_back(trees[i]->getBody()->GetPosition());
       treeColors.push_back(b2Color(0.5f, 0.0f, 0.0f, 0.5f));
     }
