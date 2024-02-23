@@ -25,9 +25,9 @@
 #include "test.h"
 
 #define DRONE_COUNT 50
-#define TREE_COUNT 1000
-#define BORDER_WIDTH 100.0f
-#define BORDER_HEIGHT 100.0f
+#define TREE_COUNT 10000
+#define BORDER_WIDTH 200.0f
+#define BORDER_HEIGHT 200.0f
 
 struct DroneParameters {
   float viewRange;
@@ -96,6 +96,9 @@ class DroneSwarmTest : public Test {
   // Visual settings
   bool drawDroneVisualRange = false;
   bool drawTrees = true;
+  bool firstRun = true;
+  std::vector<b2Vec2> treePositions;
+  std::vector<b2Color> treeColors;
 
  public:
   DroneSwarmTest() {
@@ -261,7 +264,9 @@ class DroneSwarmTest : public Test {
       float x = (rand() % static_cast<int>(BORDER_WIDTH - 2 * margin)) + margin;
       float y =
           (rand() % static_cast<int>(BORDER_HEIGHT - 2 * margin)) + margin;
-      trees.push_back(new Tree(m_world, b2Vec2(x, y), false, false, 1.0f));
+      trees.push_back(new Tree(m_world, i, b2Vec2(x, y), false, false, 1.0f));
+      treePositions.push_back(trees[i]->getBody()->GetPosition());
+      treeColors.push_back(b2Color(1.0f, 0.0f, 0.0f, 0.5f));
     }
     updateDiseaseSpread(trees, 20.0f);
   }
@@ -524,14 +529,43 @@ class DroneSwarmTest : public Test {
 
   void Step(Settings &settings) override {
     Test::Step(settings);
+    std::vector<Tree *> foundTrees;
+    std::vector<bool> hasChanged;
+    std::vector<int> foundIDs;
+
     // m_world->DebugDraw();
-    Draw(m_world, &g_debugDraw);
-    // Update Drone position
+    // Draw(m_world, &g_debugDraw);
+    // SEE HOW WE UPDATE TREES IN USUAL DRAW SETTING TO FIND IF THEY'RE MAPPED
+    // FOUND TREES ARE CHANGED
+    //  Update Drone position
     for (auto &drone : drones) {
       drone->update(drones);
-      for (auto &treepos : drone->getFoundDiseasedTreePositions()) {
-        foundDiseaseadTreePositionsSet.insert(treepos);
+      for (auto &tree : drone->getFoundDiseasedTrees()) {
+        foundTrees.push_back(tree);
       }
+      drone->clearLists();
+    }
+
+    // Not first run, only update changed trees
+    for (Tree *tree : foundTrees) {
+      int id = tree->getID();
+      foundIDs.push_back(id);
+      treePositions[id] = tree->getBody()->GetPosition();
+      if (tree->isMapped()) {
+        treeColors[id] = b2Color(0.0f, 1.0f, 0.0f, 0.5f);
+      } else {
+        treeColors[id] = b2Color(1.0f, 0.0f, 0.0f, 0.5f);
+      }
+    }
+    for (auto &id : foundIDs) {
+      std::cout << "Found tree with ID: " << id << std::endl;
+    }
+
+    if (firstRun) {
+      g_debugDraw.DrawAllTrees(treePositions, treeColors);
+      firstRun = false;
+    } else {
+      g_debugDraw.DrawTrees(treePositions, treeColors, foundIDs);
     }
   }
 };

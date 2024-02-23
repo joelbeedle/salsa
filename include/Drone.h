@@ -61,4 +61,6 @@ class Drone {
   }
 
   std::vector<Tree *> getFoundTrees() { return foundTrees; }
+
+  void clearLists();
 };

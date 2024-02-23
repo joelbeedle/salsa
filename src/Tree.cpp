@@ -2,9 +2,9 @@
 
 #include "ObjectTypes.h"
 
-Tree::Tree(b2World *world, const b2Vec2 &position, bool diseased, bool mapped,
-           float radius)
-    : diseased(diseased), mapped(mapped), radius(radius) {
+Tree::Tree(b2World *world, int treeID, const b2Vec2 &position, bool diseased,
+           bool mapped, float radius)
+    : treeID(treeID), diseased(diseased), mapped(mapped), radius(radius) {
   // Create Box2D body
   b2BodyDef bodyDef;
   bodyDef.type = b2_staticBody;

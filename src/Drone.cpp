@@ -97,14 +97,20 @@ void Drone::updateSensorRange() {
   viewSensor = body->CreateFixture(&sFixtureDef);
 }
 
+void Drone::clearLists() {
+  this->foundDiseasedTrees.clear();
+  this->foundDiseasedTreePositions.clear();
+  this->foundTrees.clear();
+}
+
 void Drone::update(std::vector<Drone *> &drones) {
   if (behaviour) {
     behaviour->execute(drones, this);
   }
   // Clear found trees for this cycle?
-  this->foundDiseasedTrees.clear();
-  this->foundDiseasedTreePositions.clear();
-  this->foundTrees.clear();
+  // this->foundDiseasedTrees.clear();
+  // this->foundDiseasedTreePositions.clear();
+  // this->foundTrees.clear();
 
   b2Vec2 position = body->GetPosition();
 
