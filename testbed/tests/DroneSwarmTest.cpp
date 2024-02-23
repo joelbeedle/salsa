@@ -535,9 +535,7 @@ class DroneSwarmTest : public Test {
 
     // m_world->DebugDraw();
     // Draw(m_world, &g_debugDraw);
-    // SEE HOW WE UPDATE TREES IN USUAL DRAW SETTING TO FIND IF THEY'RE MAPPED
-    // FOUND TREES ARE CHANGED
-    //  Update Drone position
+    //  Update Drone position and add found trees to list
     for (auto &drone : drones) {
       drone->update(drones);
       for (auto &tree : drone->getFoundDiseasedTrees()) {
@@ -549,16 +547,11 @@ class DroneSwarmTest : public Test {
     // Not first run, only update changed trees
     for (Tree *tree : foundTrees) {
       int id = tree->getID();
-      foundIDs.push_back(id);
-      treePositions[id] = tree->getBody()->GetPosition();
       if (tree->isMapped()) {
         treeColors[id] = b2Color(0.0f, 1.0f, 0.0f, 0.5f);
       } else {
         treeColors[id] = b2Color(1.0f, 0.0f, 0.0f, 0.5f);
       }
-    }
-    for (auto &id : foundIDs) {
-      std::cout << "Found tree with ID: " << id << std::endl;
     }
 
     if (firstRun) {

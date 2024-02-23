@@ -587,8 +587,7 @@ struct GLRenderTriangles {
 //
 struct GLRenderTrees {
   enum { e_maxVertices = 16 };  // Number of segments in the circle
-  static const int NUM_CIRCLE_VERTICES =
-      e_maxVertices + 2;  // Additional for center and duplicate of first vertex
+  static const int NUM_CIRCLE_VERTICES = e_maxVertices + 2;
   float circleVertices[NUM_CIRCLE_VERTICES * 2];  // Each vertex has x and y
 
   std::vector<b2Vec2> treePositions;  // Dynamic array to hold tree positions
@@ -631,7 +630,6 @@ struct GLRenderTrees {
                 color = f_color;
             }
         )";
-
     // Initialize circle vertices for a unit circle
     circleVertices[0] = 0.0f;  // Center of circle
     circleVertices[1] = 0.0f;
@@ -659,17 +657,38 @@ struct GLRenderTrees {
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-    // Instance positions
+    // // Instance positions
+    // glBindBuffer(GL_ARRAY_BUFFER, m_buffers[1]);
+    // glEnableVertexAttribArray(1);
+    // glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    // glVertexAttribDivisor(1, 1);  // Advance once per instance
+
+    // // Instance colors
+    // glBindBuffer(GL_ARRAY_BUFFER, m_buffers[2]);
+    // glEnableVertexAttribArray(2);
+    // glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    // glVertexAttribDivisor(2, 1);  // Advance once per instance
+
+    // glBindVertexArray(0);  // Unbind VAO
+
+    // sCheckGLError();
+  }
+
+  void setBuffers(const std::vector<b2Vec2>& positions,
+                  const std::vector<b2Color>& colors) {
+    // Instance positions - Set once since positions are static
     glBindBuffer(GL_ARRAY_BUFFER, m_buffers[1]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(b2Vec2) * positions.size(),
+                 positions.data(), GL_STATIC_DRAW);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
-    glVertexAttribDivisor(1, 1);  // Advance once per instance
+    glVertexAttribDivisor(1, 1);
 
-    // Instance colors
+    // Instance colors - Initially empty, updated dynamically
     glBindBuffer(GL_ARRAY_BUFFER, m_buffers[2]);
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
-    glVertexAttribDivisor(2, 1);  // Advance once per instance
+    glVertexAttribDivisor(2, 1);
 
     glBindVertexArray(0);  // Unbind VAO
 
@@ -691,30 +710,20 @@ struct GLRenderTrees {
 
   void UpdateTree(int index, const b2Vec2& position, const b2Color& color) {
     // Update only the specified tree
-    glBindBuffer(GL_ARRAY_BUFFER, m_buffers[1]);  // Positions buffer
-    glBufferSubData(GL_ARRAY_BUFFER, sizeof(b2Vec2) * index, sizeof(b2Vec2),
-                    &position);
-
     glBindBuffer(GL_ARRAY_BUFFER, m_buffers[2]);  // Colors buffer
     glBufferSubData(GL_ARRAY_BUFFER, sizeof(b2Color) * index, sizeof(b2Color),
                     &color);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);  // Unbind after update
   }
 
   void UpdateTrees(const std::vector<b2Vec2>& positions,
                    const std::vector<b2Color>& colors) {
     m_count = positions.size();  // Assume colors and positions are synchronized
 
-    glBindBuffer(GL_ARRAY_BUFFER, m_buffers[1]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(b2Vec2) * positions.size(),
-                 positions.data(), GL_DYNAMIC_DRAW);
-
     glBindBuffer(GL_ARRAY_BUFFER, m_buffers[2]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(b2Color) * colors.size(),
                  colors.data(), GL_DYNAMIC_DRAW);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);  // Unbind after update
   }
 
   void Flush() {
@@ -963,16 +972,13 @@ void DebugDraw::DrawTrees(const std::vector<b2Vec2>& positions,
                           const std::vector<int>& changedIDs) {
   // Update the tree data. This could be optimized to only happen if data has
   // changed.
-  for (size_t i = 0; i < changedIDs.size(); ++i) {
-    int index = changedIDs[i];
-    m_trees->UpdateTree(index, positions[index], colors[index]);
-  }
-  // Draw the trees
+  m_trees->UpdateTrees(positions, colors);
   m_trees->Flush();
 }
 
 void DebugDraw::DrawAllTrees(const std::vector<b2Vec2>& positions,
                              const std::vector<b2Color>& colors) {
+  m_trees->setBuffers(positions, colors);
   m_trees->UpdateTrees(positions, colors);
   m_trees->Flush();
 }
