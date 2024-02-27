@@ -259,6 +259,8 @@ class DroneSwarmTest : public Test {
   }
 
   void createTrees() {
+    // Seed for reproducability
+    srand(1967);
     const float margin = 2.0f;
     for (int i = 0; i < TREE_COUNT; i++) {
       float x = (rand() % static_cast<int>(BORDER_WIDTH - 2 * margin)) + margin;
@@ -297,8 +299,11 @@ class DroneSwarmTest : public Test {
   }
 
   void ResetTrees() {
+    treeColors.clear();
     for (auto &tree : trees) {
       tree->setMapped(false);
+      treeColors.push_back(b2Color(0.5f * 0.95294f, 0.5f * 0.50588f,
+                                   0.5f * 0.50588f, 0.5f * 0.25f));
     }
   }
 

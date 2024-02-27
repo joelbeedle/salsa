@@ -693,7 +693,7 @@ struct GLRenderTrees {
 
     glBindVertexArray(0);  // Unbind VAO
 
-    sCheckGLError();
+    // sCheckGLError();
   }
 
   void Destroy() {
@@ -742,7 +742,7 @@ struct GLRenderTrees {
     glBindVertexArray(0);
     glUseProgram(0);
 
-    sCheckGLError();
+    // sCheckGLError();
   }
 };
 
@@ -987,7 +987,6 @@ void DebugDraw::DrawAllTrees(const std::vector<b2Vec2>& positions,
   m_trees->setBuffers(positions, colors);
   m_trees->UpdateTrees(positions, colors);
   glDepthMask(GL_FALSE);
-
   m_trees->Flush();
   glDepthMask(GL_TRUE);
 }
