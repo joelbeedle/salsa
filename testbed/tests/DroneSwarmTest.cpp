@@ -529,8 +529,6 @@ class DroneSwarmTest : public Test {
     std::vector<bool> hasChanged;
     std::vector<int> foundIDs;
 
-    // m_world->DebugDraw();
-    // Draw(m_world, &g_debugDraw);
     //  Update Drone position and add found trees to list
     for (auto &drone : drones) {
       drone->update(drones);
@@ -540,12 +538,13 @@ class DroneSwarmTest : public Test {
       drone->clearLists();
     }
 
-    // Not first run, only update newly found trees
+    // Update newly found trees with their correct colours
     for (Tree *tree : foundTrees) {
       int id = tree->getID();
       treeColors[id] = b2Color(0.5f * 0.77f, 0.5f * 0.92f, 0.5f * 0.66f, 0.5f);
     }
 
+    // Draw world
     Draw(m_world, &g_debugDraw, foundIDs);
   }
 };
