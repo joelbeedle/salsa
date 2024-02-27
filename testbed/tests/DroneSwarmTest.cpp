@@ -406,7 +406,17 @@ class DroneSwarmTest : public Test {
 
   static Test *Create() { return new DroneSwarmTest; }
 
-  void Draw(b2World *world, DebugDraw *debugDraw) {
+  void Draw(b2World *world, DebugDraw *debugDraw,
+            std::vector<int> foundTreeIDs) {
+    if (drawTrees) {
+      if (firstRun) {
+        g_debugDraw.DrawAllTrees(treePositions, treeColors);
+        firstRun = false;
+      } else {
+        g_debugDraw.DrawTrees(treePositions, treeColors, foundTreeIDs);
+      }
+    }
+
     for (b2Body *body = world->GetBodyList(); body; body = body->GetNext()) {
       const b2Transform &transform = body->GetTransform();
 
@@ -536,15 +546,7 @@ class DroneSwarmTest : public Test {
       treeColors[id] = b2Color(0.5f * 0.77f, 0.5f * 0.92f, 0.5f * 0.66f, 0.5f);
     }
 
-    if (drawTrees) {
-      if (firstRun) {
-        g_debugDraw.DrawAllTrees(treePositions, treeColors);
-        firstRun = false;
-      } else {
-        g_debugDraw.DrawTrees(treePositions, treeColors, foundIDs);
-      }
-    }
-    Draw(m_world, &g_debugDraw);
+    Draw(m_world, &g_debugDraw, foundIDs);
   }
 };
 
