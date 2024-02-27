@@ -548,6 +548,7 @@ class DroneSwarmTest : public Test {
 
     // Draw world
     Draw(m_world, &g_debugDraw, foundIDs);
+    g_debugDraw.Flush();
   }
 };
 

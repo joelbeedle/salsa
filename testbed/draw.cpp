@@ -254,7 +254,7 @@ struct GLRenderPoints {
                           BUFFER_OFFSET(0));
     glBufferData(GL_ARRAY_BUFFER, sizeof(m_sizes), m_sizes, GL_DYNAMIC_DRAW);
 
-    sCheckGLError();
+    // sCheckGLError();
 
     // Cleanup
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -310,7 +310,7 @@ struct GLRenderPoints {
     glDrawArrays(GL_POINTS, 0, m_count);
     glDisable(GL_PROGRAM_POINT_SIZE);
 
-    sCheckGLError();
+    // sCheckGLError();
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
@@ -385,7 +385,7 @@ struct GLRenderLines {
                           BUFFER_OFFSET(0));
     glBufferData(GL_ARRAY_BUFFER, sizeof(m_colors), m_colors, GL_DYNAMIC_DRAW);
 
-    sCheckGLError();
+    // sCheckGLError();
 
     // Cleanup
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -435,7 +435,7 @@ struct GLRenderLines {
 
     glDrawArrays(GL_LINES, 0, m_count);
 
-    sCheckGLError();
+    // sCheckGLError();
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
@@ -508,7 +508,7 @@ struct GLRenderTriangles {
                           BUFFER_OFFSET(0));
     glBufferData(GL_ARRAY_BUFFER, sizeof(m_colors), m_colors, GL_DYNAMIC_DRAW);
 
-    sCheckGLError();
+    // sCheckGLError();
 
     // Cleanup
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -560,7 +560,7 @@ struct GLRenderTriangles {
     glDrawArrays(GL_TRIANGLES, 0, m_count);
     glDisable(GL_BLEND);
 
-    sCheckGLError();
+    // sCheckGLError();
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);

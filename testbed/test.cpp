@@ -281,7 +281,7 @@ void Test::Step(Settings& settings) {
                 settings.m_positionIterations);
 
   // m_world->DebugDraw();
-  g_debugDraw.Flush();
+  // g_debugDraw.Flush();
 
   if (timeStep > 0.0f) {
     ++m_stepCount;
