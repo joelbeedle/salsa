@@ -331,6 +331,7 @@ class DroneSwarmTest : public Test {
       }
       ImGui::EndCombo();
     }
+    ImGui::Separator();
 
     ImGui::Text("Behaviour Settings");
     bool changed = false;
@@ -342,6 +343,7 @@ class DroneSwarmTest : public Test {
     if (changed) {
       SetBehaviour();
     }
+    ImGui::Separator();
 
     // Visual settings
     ImGui::Text("Visual Settings");
@@ -385,6 +387,7 @@ class DroneSwarmTest : public Test {
       }
       ImGui::EndCombo();
     }
+    ImGui::Separator();
 
     ImGui::Text("Drone Preset Settings");
     bool droneChanged = false;
@@ -410,10 +413,10 @@ class DroneSwarmTest : public Test {
             std::vector<int> foundTreeIDs) {
     if (drawTrees) {
       if (firstRun) {
-        g_debugDraw.DrawAllTrees(treePositions, treeColors);
+        debugDraw->DrawAllTrees(treePositions, treeColors);
         firstRun = false;
       } else {
-        g_debugDraw.DrawTrees(treePositions, treeColors, foundTreeIDs);
+        debugDraw->DrawTrees(treePositions, treeColors, foundTreeIDs);
       }
     }
 
