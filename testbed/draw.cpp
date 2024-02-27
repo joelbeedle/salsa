@@ -540,7 +540,6 @@ struct GLRenderTriangles {
 
   void Flush() {
     if (m_count == 0) return;
-
     glUseProgram(m_programId);
 
     float proj[16] = {0.0f};
@@ -566,7 +565,6 @@ struct GLRenderTriangles {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
     glUseProgram(0);
-
     m_count = 0;
   }
 
@@ -618,6 +616,7 @@ struct GLRenderTrees {
                 f_color = instanceColor;
                 vec2 finalPosition = v_position + instancePosition; // Move base circle vertex by tree's center position
                 gl_Position = projectionMatrix * vec4(finalPosition, 0.0, 1.0);
+								gl_Position.z = gl_Position.w * 0.50;
             }
         )";
 
@@ -855,16 +854,16 @@ void DebugDraw::DrawSolidCircle(const b2Vec2& center, float radius,
   b2Vec2 v0 = center;
   b2Vec2 r1(cosInc, sinInc);
   b2Vec2 v1 = center + radius * r1;
-  b2Color fillColor(0.5f * color.r, 0.5f * color.g, 0.5f * color.b, 0.5f);
+  b2Color fillColor(0.5f * color.r, 0.5f * color.g, 0.5f * color.b, 1.0f);
   for (int32 i = 0; i < k_segments; ++i) {
     // Perform rotation to avoid additional trigonometry.
     b2Vec2 r2;
     r2.x = cosInc * r1.x - sinInc * r1.y;
     r2.y = sinInc * r1.x + cosInc * r1.y;
     b2Vec2 v2 = center + radius * r2;
-    m_triangles->Vertex(v0, fillColor);
-    m_triangles->Vertex(v1, fillColor);
-    m_triangles->Vertex(v2, fillColor);
+    m_triangles->Vertex(v0, color);
+    m_triangles->Vertex(v1, color);
+    m_triangles->Vertex(v2, color);
     r1 = r2;
     v1 = v2;
   }
@@ -883,9 +882,9 @@ void DebugDraw::DrawSolidCircle(const b2Vec2& center, float radius,
   }
 
   // Draw a line fixed in the circle to animate rotation.
-  b2Vec2 p = center + radius * axis;
-  m_lines->Vertex(center, color);
-  m_lines->Vertex(p, color);
+  // b2Vec2 p = center + radius * axis;
+  // m_lines->Vertex(center, color);
+  // m_lines->Vertex(p, color);
   glEnable(GL_DEPTH_TEST);
 }
 
@@ -977,14 +976,20 @@ void DebugDraw::DrawTrees(const std::vector<b2Vec2>& positions,
   // Update the tree data. This could be optimized to only happen if data has
   // changed.
   m_trees->UpdateTrees(positions, colors);
+  glDepthMask(GL_FALSE);
+
   m_trees->Flush();
+  glDepthMask(GL_TRUE);
 }
 
 void DebugDraw::DrawAllTrees(const std::vector<b2Vec2>& positions,
                              const std::vector<b2Color>& colors) {
   m_trees->setBuffers(positions, colors);
   m_trees->UpdateTrees(positions, colors);
+  glDepthMask(GL_FALSE);
+
   m_trees->Flush();
+  glDepthMask(GL_TRUE);
 }
 
 //
