@@ -526,7 +526,6 @@ class DroneSwarmTest : public Test {
   void Step(Settings &settings) override {
     Test::Step(settings);
     std::vector<Tree *> foundTrees;
-    std::vector<bool> hasChanged;
     std::vector<int> foundIDs;
 
     //  Update Drone position and add found trees to list
