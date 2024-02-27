@@ -107,6 +107,7 @@ class DroneSwarmTest : public Test {
       b2Color(0.5f * 0.77f, 0.5f * 0.92f, 0.5f * 0.66f, 0.5f * 0.25f);
 
   // Data collection settings
+  bool testRunning = false;
   float time = 0.0f;
   int iters = 0;
 
@@ -118,7 +119,7 @@ class DroneSwarmTest : public Test {
 
       initDefaultParameters();
       initDefaultBehaviours();
-      createDrones(behaviour, droneParams);
+      createDronesCircular(behaviour, droneParams);
       createTrees();
     }
   }
@@ -221,6 +222,37 @@ class DroneSwarmTest : public Test {
     }
   }
 
+  void createDronesCircular(SwarmBehaviour *b, DroneParameters *params) {
+    // Calculate the total area needed for all drones
+    float droneArea = M_PI * std::pow(params->radius, 2);
+    float totalDroneArea = DRONE_COUNT * droneArea;
+
+    // Calculate the radius of the circle needed to fit all drones
+    float requiredCircleRadius = sqrt(totalDroneArea / M_PI);
+
+    // Adjust center of the circle to be the center of the map
+    float centerX = BORDER_WIDTH / 2.0f;
+    float centerY = BORDER_HEIGHT / 2.0f;
+
+    for (int i = 0; i < DRONE_COUNT; i++) {
+      // Generate random angle and radius within the required circle
+      float theta = static_cast<float>(rand()) / RAND_MAX * 2.0f * M_PI;
+      // Ensure drones fit within the required circle, leaving a margin equal to
+      // the drone's radius
+      float r = sqrt(static_cast<float>(rand()) / RAND_MAX) *
+                (requiredCircleRadius - params->radius);
+
+      // Convert polar coordinates (r, theta) to Cartesian coordinates (x, y)
+      float x = centerX + r * cos(theta);
+      float y = centerY + r * sin(theta);
+
+      drones.push_back(new Drone(m_world, b2Vec2(x, y), behaviour,
+                                 params->viewRange, params->obstacleViewRange,
+                                 params->maxSpeed, params->maxForce,
+                                 params->radius, params->mass));
+    }
+  }
+
   std::vector<Tree *> getTreesInRadius(const b2Vec2 &position, float radius,
                                        const std::vector<Tree *> &allTrees) {
     std::vector<Tree *> nearbyTrees;
@@ -315,6 +347,15 @@ class DroneSwarmTest : public Test {
     }
   }
 
+  void BeginSimulation() {
+    testRunning = true;
+    time = 0.0f;
+    iters = 0;
+    DestroyDrones();
+    createDronesCircular(behaviour, droneParams);
+    ResetTrees();
+  }
+
   void UpdateUI() override {
     ImGui::SetNextWindowPos(ImVec2(10.0f, 100.0f));
     ImGui::SetNextWindowSize(ImVec2(285.0f, 285.0f));
@@ -360,7 +401,7 @@ class DroneSwarmTest : public Test {
 
     if (ImGui::Button("Reset Simulation")) {
       DestroyDrones();
-      createDrones(behaviour, droneParams);
+      createDronesCircular(behaviour, droneParams);
       ResetTrees();
     }
 
@@ -409,6 +450,16 @@ class DroneSwarmTest : public Test {
 
     if (droneChanged) {
       UpdateDroneSettings();
+    }
+
+    ImGui::Separator();
+    if (ImGui::Button("Run Simulation")) {
+      if (!testRunning) {
+        BeginSimulation();
+      } else {
+        testRunning = false;
+        BeginSimulation();
+      }
     }
 
     ImGui::End();
@@ -533,6 +584,47 @@ class DroneSwarmTest : public Test {
     }
   }
 
+  void Log(float time, int iters) {
+    if (iters == 1) {
+      std::cout << "=======================================" << std::endl;
+      std::cout << "Starting simulation" << std::endl;
+      std::cout << "=======================================" << std::endl;
+      std::cout << "Drone count: " << DRONE_COUNT << std::endl;
+      std::cout << "Tree count: " << TREE_COUNT << std::endl;
+      std::cout << "Area: " << BORDER_WIDTH << "x" << BORDER_HEIGHT
+                << std::endl;
+      std::cout << "=======================================" << std::endl;
+      std::cout << "Using Behaviour: " << currentBehaviourName << std::endl;
+      std::cout << "Behaviour settings: " << std::endl;
+      for (auto &[name, parameter] : behaviour->getParameters()) {
+        std::cout << name << ": " << *parameter.value << std::endl;
+      }
+      std::cout << "=======================================" << std::endl;
+      std::cout << "Using Preset: " << currentPresetName << std::endl;
+      std::cout << "Drone count: " << DRONE_COUNT << std::endl;
+      std::cout << "=======================================" << std::endl;
+      std::cout << "Time (s) | Trees mapped | % mapped of total" << std::endl;
+    }
+    if (iters == 1 || iters % 300 == 0) {
+      int totalMapped = 0;
+      for (auto &tree : trees) {
+        if (tree->isMapped()) {
+          totalMapped++;
+        }
+      }
+      float percentage =
+          (static_cast<float>(totalMapped) / static_cast<float>(trees.size())) *
+          100.0f;
+      std::cout << time << " | " << totalMapped << " | " << percentage << "%"
+                << std::endl;
+      if (time >= MAX_TIME || totalMapped == TREE_COUNT) {
+        std::cout << "=======================================" << std::endl;
+        std::cout << "Simulation complete" << std::endl;
+        std::cout << "Time taken: " << time << "s" << std::endl;
+        std::cout << "=======================================" << std::endl;
+      }
+    }
+  }
   void Step(Settings &settings) override {
     Test::Step(settings);
     float timeStep =
@@ -559,47 +651,9 @@ class DroneSwarmTest : public Test {
 
     // Draw world
     Draw(m_world, &g_debugDraw, foundIDs);
-
     // Logging
-    // 5s steps = every 300 iterations
-    if (iters == 1 || iters % 300 == 0) {
-      if (iters == 1) {
-        std::cout << "=======================================" << std::endl;
-        std::cout << "Starting simulation" << std::endl;
-        std::cout << "=======================================" << std::endl;
-        std::cout << "Drone count: " << DRONE_COUNT << std::endl;
-        std::cout << "Tree count: " << TREE_COUNT << std::endl;
-        std::cout << "Area: " << BORDER_WIDTH << "x" << BORDER_HEIGHT
-                  << std::endl;
-        std::cout << "=======================================" << std::endl;
-        std::cout << "Using Behaviour: " << currentBehaviourName << std::endl;
-        std::cout << "Behaviour settings: " << std::endl;
-        for (auto &[name, parameter] : behaviour->getParameters()) {
-          std::cout << name << ": " << *parameter.value << std::endl;
-        }
-        std::cout << "=======================================" << std::endl;
-        std::cout << "Using Preset: " << currentPresetName << std::endl;
-        std::cout << "Drone count: " << DRONE_COUNT << std::endl;
-        std::cout << "=======================================" << std::endl;
-        std::cout << "Time (s) | Trees mapped | % mapped of total" << std::endl;
-      }
-      int totalMapped = 0;
-      for (auto &tree : trees) {
-        if (tree->isMapped()) {
-          totalMapped++;
-        }
-      }
-      float percentage =
-          (static_cast<float>(totalMapped) / static_cast<float>(trees.size())) *
-          100.0f;
-      std::cout << time << " | " << totalMapped << " | " << percentage << "%"
-                << std::endl;
-      if (time >= MAX_TIME || totalMapped == TREE_COUNT) {
-        std::cout << "=======================================" << std::endl;
-        std::cout << "Simulation complete" << std::endl;
-        std::cout << "Time taken: " << time << "s" << std::endl;
-        std::cout << "=======================================" << std::endl;
-      }
+    if (testRunning) {
+      Log(time, iters);
     }
   }
 };
