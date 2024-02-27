@@ -95,7 +95,7 @@ class DroneSwarmTest : public Test {
 
   // Visual settings
   bool drawDroneVisualRange = false;
-  bool drawTrees = false;
+  bool drawTrees = true;
   bool firstRun = true;
   std::vector<b2Vec2> treePositions;
   std::vector<b2Color> treeColors;
@@ -454,26 +454,6 @@ class DroneSwarmTest : public Test {
               break;
             }
             case ObjectType::Tree: {
-              if (drawTrees) {
-                Tree *tree = userData->tree;
-                b2Vec2 position = body->GetPosition();
-                const b2CircleShape *circleShape =
-                    static_cast<const b2CircleShape *>(fixture->GetShape());
-
-                if (tree->isMapped()) {
-                  b2Color customColor = b2Color(
-                      0.0f, 1.0f, 0.0f);  // Custom color for mapped trees
-                  g_debugDraw.DrawSolidCircle(position, circleShape->m_radius,
-                                              transform.q.GetXAxis(),
-                                              customColor);
-                } else {
-                  b2Color customColor = b2Color(
-                      1.0f, 0.0f, 0.0f);  // Custom color for mapped trees
-                  g_debugDraw.DrawSolidCircle(position, circleShape->m_radius,
-                                              transform.q.GetXAxis(),
-                                              customColor);
-                }
-              }
               break;
             }
           }
@@ -556,11 +536,13 @@ class DroneSwarmTest : public Test {
       treeColors[id] = b2Color(0.5f * 0.77f, 0.5f * 0.92f, 0.5f * 0.66f, 0.5f);
     }
 
-    if (firstRun) {
-      g_debugDraw.DrawAllTrees(treePositions, treeColors);
-      firstRun = false;
-    } else {
-      g_debugDraw.DrawTrees(treePositions, treeColors, foundIDs);
+    if (drawTrees) {
+      if (firstRun) {
+        g_debugDraw.DrawAllTrees(treePositions, treeColors);
+        firstRun = false;
+      } else {
+        g_debugDraw.DrawTrees(treePositions, treeColors, foundIDs);
+      }
     }
     Draw(m_world, &g_debugDraw);
   }
