@@ -266,7 +266,8 @@ class DroneSwarmTest : public Test {
           (rand() % static_cast<int>(BORDER_HEIGHT - 2 * margin)) + margin;
       trees.push_back(new Tree(m_world, i, b2Vec2(x, y), false, false, 2.5f));
       treePositions.push_back(trees[i]->getBody()->GetPosition());
-      treeColors.push_back(b2Color(0.5f, 0.0f, 0.0f, 0.5f));
+      treeColors.push_back(b2Color(0.5f * 0.95294f, 0.5f * 0.50588f,
+                                   0.5f * 0.50588f, 0.5f * 0.25f));
     }
     updateDiseaseSpread(trees, 20.0f);
   }
@@ -547,7 +548,7 @@ class DroneSwarmTest : public Test {
     // Not first run, only update newly found trees
     for (Tree *tree : foundTrees) {
       int id = tree->getID();
-      treeColors[id] = b2Color(0.0f, 0.5f, 0.0f, 0.5f);
+      treeColors[id] = b2Color(0.5f * 0.77f, 0.5f * 0.92f, 0.5f * 0.66f, 0.5f);
     }
 
     if (firstRun) {
