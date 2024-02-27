@@ -28,6 +28,7 @@
 #define TREE_COUNT 10000
 #define BORDER_WIDTH 500.0f
 #define BORDER_HEIGHT 500.0f
+#define MAX_TIME 10000.0f
 
 struct DroneParameters {
   float viewRange;
@@ -104,6 +105,10 @@ class DroneSwarmTest : public Test {
       b2Color(0.5f * 0.95294f, 0.5f * 0.50588f, 0.5f * 0.50588f, 0.5f * 0.25f);
   b2Color trueColour =
       b2Color(0.5f * 0.77f, 0.5f * 0.92f, 0.5f * 0.66f, 0.5f * 0.25f);
+
+  // Data collection settings
+  float time = 0.0f;
+  int iters = 0;
 
  public:
   DroneSwarmTest() {
@@ -530,6 +535,10 @@ class DroneSwarmTest : public Test {
 
   void Step(Settings &settings) override {
     Test::Step(settings);
+    float timeStep =
+        settings.m_hertz > 0.0f ? 1.0f / settings.m_hertz : float(0.0f);
+    time += timeStep;
+    iters += 1;
     std::vector<Tree *> foundTrees;
     std::vector<int> foundIDs;
 
@@ -550,6 +559,48 @@ class DroneSwarmTest : public Test {
 
     // Draw world
     Draw(m_world, &g_debugDraw, foundIDs);
+
+    // Logging
+    // 5s steps = every 300 iterations
+    if (iters == 1 || iters % 300 == 0) {
+      if (iters == 1) {
+        std::cout << "=======================================" << std::endl;
+        std::cout << "Starting simulation" << std::endl;
+        std::cout << "=======================================" << std::endl;
+        std::cout << "Drone count: " << DRONE_COUNT << std::endl;
+        std::cout << "Tree count: " << TREE_COUNT << std::endl;
+        std::cout << "Area: " << BORDER_WIDTH << "x" << BORDER_HEIGHT
+                  << std::endl;
+        std::cout << "=======================================" << std::endl;
+        std::cout << "Using Behaviour: " << currentBehaviourName << std::endl;
+        std::cout << "Behaviour settings: " << std::endl;
+        for (auto &[name, parameter] : behaviour->getParameters()) {
+          std::cout << name << ": " << *parameter.value << std::endl;
+        }
+        std::cout << "=======================================" << std::endl;
+        std::cout << "Using Preset: " << currentPresetName << std::endl;
+        std::cout << "Drone count: " << DRONE_COUNT << std::endl;
+        std::cout << "=======================================" << std::endl;
+        std::cout << "Time (s) | Trees mapped | % mapped of total" << std::endl;
+      }
+      int totalMapped = 0;
+      for (auto &tree : trees) {
+        if (tree->isMapped()) {
+          totalMapped++;
+        }
+      }
+      float percentage =
+          (static_cast<float>(totalMapped) / static_cast<float>(trees.size())) *
+          100.0f;
+      std::cout << time << " | " << totalMapped << " | " << percentage << "%"
+                << std::endl;
+      if (time >= MAX_TIME || totalMapped == TREE_COUNT) {
+        std::cout << "=======================================" << std::endl;
+        std::cout << "Simulation complete" << std::endl;
+        std::cout << "Time taken: " << time << "s" << std::endl;
+        std::cout << "=======================================" << std::endl;
+      }
+    }
   }
 };
 
