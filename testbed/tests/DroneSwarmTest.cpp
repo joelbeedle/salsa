@@ -28,7 +28,7 @@
 #define TREE_COUNT 10000
 #define BORDER_WIDTH 500.0f
 #define BORDER_HEIGHT 500.0f
-#define MAX_TIME 10000.0f
+#define MAX_TIME 100000.0f
 
 struct DroneParameters {
   float viewRange;
@@ -71,11 +71,10 @@ class DroneSwarmTest : public Test {
   DroneContactListener droneContactListener;
 
   // Parameters
-  FlockingParameters flockingParams = {50.0f, 1.0f, 1.0f, 1.0f, 1.0f};
-  PheremoneParameters pheremoneParams = {0.1f, 1.0f};
-  PSOParameters psoParams = {0.5f, 0.5f, 0.9f};
-  UniformRandomWalkParameters uniformRandomWalkParams = {5.0f, 0.5f, 1.0f,
-                                                         1.0 / 60.0f};
+  FlockingParameters flockingParams;
+  PheremoneParameters pheremoneParams;
+  PSOParameters psoParams;
+  UniformRandomWalkParameters uniformRandomWalkParams;
 
   // Drone settings
   std::vector<Drone *> drones;
@@ -86,7 +85,8 @@ class DroneSwarmTest : public Test {
   float maxForce;
 
   DroneParameters djiMatrice300RTK = {8.0f, 40.0f, 17.0f, 0.3f, 6.3f, 0.45f};
-  DroneParameters djiPhantom4RTK = {7.0f, 30.0f, 13.0f, 0.3f, 1.4f, 0.35f};
+  DroneParameters djiPhantom4RTK = {7.0f, 40.0f, 13.0f, 0.3f, 1.4f, 0.35f};
+  DroneParameters smallDrone = {7.0f, 40.0f, 10.0f, 0.3f, 1.5f, 0.10f};
   std::string currentPresetName;
   DroneParameters *droneParams;
 
@@ -116,7 +116,9 @@ class DroneSwarmTest : public Test {
     {
       initWorld();
       m_world->SetContactListener(&droneContactListener);
-
+      g_camera.m_center.x = BORDER_HEIGHT / 2;
+      g_camera.m_center.y = BORDER_WIDTH / 2;
+      g_camera.m_zoom = 10.0f;
       initDefaultParameters();
       initDefaultBehaviours();
       createDronesCircular(behaviour, droneParams);
@@ -164,6 +166,7 @@ class DroneSwarmTest : public Test {
     // based off of drone Matrice 300 RTK
     CreatePreset(dronePresets, "Matrice 300 RTK", djiMatrice300RTK);
     CreatePreset(dronePresets, "Phantom 4 RTK", djiPhantom4RTK);
+    CreatePreset(dronePresets, "Small Drone", smallDrone);
     currentPresetName = dronePresets.begin()->first;
     droneParams = &dronePresets[currentPresetName];
 
@@ -172,7 +175,7 @@ class DroneSwarmTest : public Test {
     maxSpeed = 17.0f;
     maxForce = 0.3f;
 
-    flockingParams = {50.0f, 1.6f, 0.8f, 1.6f, 1.2f};
+    flockingParams = {50.0f, 1.6f, 0.8f, 1.8f, 3.0f};
     pheremoneParams = {0.1f, 1.0f};
     uniformRandomWalkParams = {5.0f, 0.5f, 1.0f, 1.0 / 60.0f};
   }
