@@ -25,7 +25,7 @@
 #include "test.h"
 
 #define DRONE_COUNT 50
-#define TREE_COUNT 50000
+#define TREE_COUNT 10000
 #define BORDER_WIDTH 2000.0f
 #define BORDER_HEIGHT 2000.0f
 #define MAX_TIME 100000.0f

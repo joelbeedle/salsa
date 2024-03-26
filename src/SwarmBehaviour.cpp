@@ -72,7 +72,7 @@ void SwarmBehaviour::performRayCasting(Drone *currentDrone,
                                        RayCastCallback &callback) {
   // Define the ray casting range and angle
   float rayRange = currentDrone->getObstacleViewRange();
-  float deltaAngle = 15.0f;  // dividing the circle into segments
+  float deltaAngle = 45.0f;  // dividing the circle into segments
 
   for (float angle = 0; angle < 360; angle += deltaAngle) {
     b2Vec2 start = currentDrone->getPosition();
