@@ -10,15 +10,17 @@
 #define SCREEN_HEIGHT 600
 
 Drone::Drone(b2World *world, const b2Vec2 &position, SwarmBehaviour *behaviour,
-             float viewRange, float obstacleViewRange, float maxSpeed,
-             float maxForce, float radius, float mass)
+             float cameraViewRange, float obstacleViewRange, float maxSpeed,
+             float maxForce, float radius, float mass,
+             float droneDetectionRange)
     : behaviour(behaviour),
-      viewRange(viewRange),
+      cameraViewRange(cameraViewRange),
       obstacleViewRange(obstacleViewRange),
       maxSpeed(maxSpeed),
       maxForce(maxForce),
       radius(radius),
-      mass(mass) {
+      mass(mass),
+      droneDetectionRange(droneDetectionRange) {
   // Create Box2D body
   b2BodyDef bodyDef;
   bodyDef.type = b2_dynamicBody;
@@ -46,7 +48,7 @@ Drone::Drone(b2World *world, const b2Vec2 &position, SwarmBehaviour *behaviour,
 
   // Create tree detecting sensor (downwards camera)
   b2CircleShape sCircleShape;
-  sCircleShape.m_radius = viewRange;
+  sCircleShape.m_radius = cameraViewRange;
 
   b2FixtureDef sFixtureDef;
   sFixtureDef.shape = &sCircleShape;
@@ -81,7 +83,7 @@ Drone::~Drone() {
 
 void Drone::updateSensorRange() {
   b2CircleShape sCircleShape;
-  sCircleShape.m_radius = viewRange;
+  sCircleShape.m_radius = cameraViewRange;
 
   b2FixtureDef sFixtureDef;
   sFixtureDef.shape = &sCircleShape;

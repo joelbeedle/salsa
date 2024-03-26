@@ -25,14 +25,15 @@
 #include "test.h"
 
 #define DRONE_COUNT 50
-#define TREE_COUNT 10000
-#define BORDER_WIDTH 500.0f
-#define BORDER_HEIGHT 500.0f
+#define TREE_COUNT 50000
+#define BORDER_WIDTH 2000.0f
+#define BORDER_HEIGHT 2000.0f
 #define MAX_TIME 100000.0f
 
 struct DroneParameters {
-  float viewRange;
+  float cameraViewRange;
   float obstacleViewRange;
+  float droneDetectionRange;
   float maxSpeed;
   float maxForce;
   float mass;
@@ -80,13 +81,15 @@ class DroneSwarmTest : public Test {
   std::vector<Drone *> drones;
 
   float obstacleViewRange;
-  float viewRange;
+  float cameraViewRange;
   float maxSpeed;
   float maxForce;
 
-  DroneParameters djiMatrice300RTK = {8.0f, 40.0f, 17.0f, 0.3f, 6.3f, 0.45f};
-  DroneParameters djiPhantom4RTK = {7.0f, 40.0f, 13.0f, 0.3f, 1.4f, 0.35f};
-  DroneParameters smallDrone = {7.0f, 40.0f, 10.0f, 0.3f, 1.5f, 0.10f};
+  DroneParameters djiMatrice300RTK = {8.0f, 40.0f, 2000.0f, 17.0f,
+                                      0.3f, 6.3f,  0.45f};
+  DroneParameters djiPhantom4RTK = {7.0f, 40.0f, 2000.0f, 13.0f,
+                                    0.3f, 1.4f,  0.35f};
+  DroneParameters smallDrone = {7.0f, 40.0f, 2000.0f, 10.0f, 0.3f, 1.5f, 0.10f};
   std::string currentPresetName;
   DroneParameters *droneParams;
 
@@ -110,6 +113,7 @@ class DroneSwarmTest : public Test {
   bool testRunning = false;
   float time = 0.0f;
   int iters = 0;
+  float timestep;
 
  public:
   DroneSwarmTest() {
@@ -170,7 +174,7 @@ class DroneSwarmTest : public Test {
     currentPresetName = dronePresets.begin()->first;
     droneParams = &dronePresets[currentPresetName];
 
-    viewRange = 8.0f;
+    cameraViewRange = 8.0f;
     obstacleViewRange = 40.0f;
     maxSpeed = 17.0f;
     maxForce = 0.3f;
@@ -218,10 +222,10 @@ class DroneSwarmTest : public Test {
       float x = (rand() % static_cast<int>(BORDER_WIDTH - 2 * margin)) + margin;
       float y =
           (rand() % static_cast<int>(BORDER_HEIGHT - 2 * margin)) + margin;
-      drones.push_back(new Drone(m_world, b2Vec2(x, y), behaviour,
-                                 params->viewRange, params->obstacleViewRange,
-                                 params->maxSpeed, params->maxForce,
-                                 params->radius, params->mass));
+      drones.push_back(new Drone(
+          m_world, b2Vec2(x, y), behaviour, params->cameraViewRange,
+          params->obstacleViewRange, params->maxSpeed, params->maxForce,
+          params->radius, params->mass, params->droneDetectionRange));
     }
   }
 
@@ -249,10 +253,10 @@ class DroneSwarmTest : public Test {
       float x = centerX + r * cos(theta);
       float y = centerY + r * sin(theta);
 
-      drones.push_back(new Drone(m_world, b2Vec2(x, y), behaviour,
-                                 params->viewRange, params->obstacleViewRange,
-                                 params->maxSpeed, params->maxForce,
-                                 params->radius, params->mass));
+      drones.push_back(new Drone(
+          m_world, b2Vec2(x, y), behaviour, params->cameraViewRange,
+          params->obstacleViewRange, params->maxSpeed, params->maxForce,
+          params->radius, params->mass, params->droneDetectionRange));
     }
   }
 
@@ -336,7 +340,7 @@ class DroneSwarmTest : public Test {
     for (auto &drone : drones) {
       drone->setMaxForce(droneParams->maxForce);
       drone->setMaxSpeed(droneParams->maxSpeed);
-      drone->setViewRange(droneParams->viewRange);
+      drone->setViewRange(droneParams->cameraViewRange);
       drone->setObstacleViewRange(droneParams->obstacleViewRange);
       drone->updateSensorRange();
     }
@@ -423,11 +427,12 @@ class DroneSwarmTest : public Test {
           droneParams = &dronePresets[name];
           std::vector<Drone *> newDrones;
           for (auto &drone : drones) {
-            newDrones.push_back(new Drone(
-                m_world, drone->getBody()->GetPosition(), behaviour,
-                droneParams->viewRange, droneParams->obstacleViewRange,
-                droneParams->maxSpeed, droneParams->maxForce,
-                droneParams->radius, droneParams->mass));
+            newDrones.push_back(
+                new Drone(m_world, drone->getBody()->GetPosition(), behaviour,
+                          droneParams->cameraViewRange,
+                          droneParams->obstacleViewRange, droneParams->maxSpeed,
+                          droneParams->maxForce, droneParams->radius,
+                          droneParams->mass, droneParams->droneDetectionRange));
             m_world->DestroyBody(drone->getBody());
           }
           drones = newDrones;
@@ -446,8 +451,8 @@ class DroneSwarmTest : public Test {
         ImGui::SliderFloat("maxSpeed", &droneParams->maxSpeed, 0.0f, 50.0f);
     droneChanged |=
         ImGui::SliderFloat("maxForce", &droneParams->maxForce, 0.0f, 10.0f);
-    droneChanged |=
-        ImGui::SliderFloat("viewRange", &droneParams->viewRange, 0.0f, 100.0f);
+    droneChanged |= ImGui::SliderFloat(
+        "cameraViewRange", &droneParams->cameraViewRange, 0.0f, 100.0f);
     droneChanged |= ImGui::SliderFloat(
         "obstacleViewRange", &droneParams->obstacleViewRange, 0.0f, 100.0f);
 
@@ -630,26 +635,23 @@ class DroneSwarmTest : public Test {
   }
   void Step(Settings &settings) override {
     Test::Step(settings);
-    float timeStep =
-        settings.m_hertz > 0.0f ? 1.0f / settings.m_hertz : float(0.0f);
-    time += timeStep;
+    time += 1.0f / 30.0f;
     iters += 1;
     std::vector<Tree *> foundTrees;
     std::vector<int> foundIDs;
+    foundTrees.reserve(3 * drones.size());
 
     //  Update Drone position and add found trees to list
     for (auto &drone : drones) {
       drone->update(drones);
-      for (auto &tree : drone->getFoundDiseasedTrees()) {
-        foundTrees.push_back(tree);
-      }
+      auto &found = drone->getFoundDiseasedTrees();
+      foundTrees.insert(foundTrees.end(), found.begin(), found.end());
       drone->clearLists();
     }
 
     // Update newly found trees with their correct colours
     for (Tree *tree : foundTrees) {
-      int id = tree->getID();
-      treeColors[id] = trueColour;
+      treeColors[tree->getID()] = trueColour;
     }
 
     // Draw world

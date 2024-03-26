@@ -15,8 +15,9 @@ class Drone {
   b2Body *body;
   b2Fixture *viewSensor;  // The view range sensor
   SwarmBehaviour *behaviour;
-  float viewRange;
+  float cameraViewRange;
   float obstacleViewRange;
+  float droneDetectionRange;
   float maxSpeed;
   float maxForce;
   float radius;
@@ -24,8 +25,8 @@ class Drone {
 
  public:
   Drone(b2World *world, const b2Vec2 &position, SwarmBehaviour *behaviour,
-        float viewRange, float obstacleViewRange, float maxSpeed,
-        float maxForce, float radius, float mass);
+        float cameraViewRange, float obstacleViewRange, float maxSpeed,
+        float maxForce, float radius, float mass, float droneDetectionRange);
   ~Drone();
 
   void update(std::vector<Drone *> &drones);
@@ -41,8 +42,13 @@ class Drone {
   b2Vec2 getVelocity() { return body->GetLinearVelocity(); }
   b2Vec2 getPosition() { return body->GetPosition(); }
 
-  float getViewRange() { return viewRange; }
-  void setViewRange(float newRange) { viewRange = newRange; }
+  float getViewRange() { return cameraViewRange; }
+  void setViewRange(float newRange) { cameraViewRange = newRange; }
+
+  float getDroneDetectionRange() { return droneDetectionRange; }
+  void setDroneDetectionRange(float newRange) {
+    droneDetectionRange = newRange;
+  }
 
   float getObstacleViewRange() { return obstacleViewRange; }
   void setObstacleViewRange(float newRange) { obstacleViewRange = newRange; }
@@ -55,7 +61,7 @@ class Drone {
 
   float getRadius() { return radius; }
 
-  std::vector<Tree *> getFoundDiseasedTrees() { return foundDiseasedTrees; }
+  std::vector<Tree *> &getFoundDiseasedTrees() { return foundDiseasedTrees; }
   std::vector<b2Vec2 *> getFoundDiseasedTreePositions() {
     return foundDiseasedTreePositions;
   }
