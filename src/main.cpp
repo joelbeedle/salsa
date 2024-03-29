@@ -136,7 +136,7 @@ int main() {
   FlockingBehaviour flockingBehaviour(params);
 
   // Create drones
-  std::vector<Drone *> drones;
+  std::vector<std::unique_ptr<Drone>> drones;
   for (int i = 0; i < 50; i++) {
     drones.push_back(DroneFactory::createDrone(
         &world, b2Vec2(rand() % SCREEN_WIDTH, rand() % SCREEN_HEIGHT),
@@ -166,11 +166,6 @@ int main() {
     world.Step(1.0f / 60.0f, 6, 2);
 
     window.display();
-  }
-
-  // Cleanup
-  for (auto &drone : drones) {
-    delete drone;
   }
   return 0;
 }

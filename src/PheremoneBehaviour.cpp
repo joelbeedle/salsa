@@ -2,7 +2,7 @@
 
 #include "Drone.h"
 
-void PheremoneBehaviour::execute(std::vector<Drone *> &drones,
+void PheremoneBehaviour::execute(std::vector<std::unique_ptr<Drone>> &drones,
                                  Drone *currentDrone) {
   // Perform ray casting to detect nearby drones and obstacles
   RayCastCallback callback;

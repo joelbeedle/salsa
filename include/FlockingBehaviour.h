@@ -38,7 +38,8 @@ class FlockingBehaviour : public SwarmBehaviour {
  public:
   FlockingBehaviour(const FlockingParameters &params) : params(params) {}
 
-  void execute(std::vector<Drone *> &drones, Drone *currentDrone) override;
+  void execute(std::vector<std::unique_ptr<Drone>> &drones,
+               Drone *currentDrone) override;
 
   std::unordered_map<std::string, ParameterDefinition> getParameters()
       override {

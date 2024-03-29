@@ -83,7 +83,7 @@ class DroneSwarmTest : public Test {
   UniformRandomWalkParameters uniformRandomWalkParams;
 
   // Drone settings
-  std::vector<Drone *> drones;
+  std::vector<std::unique_ptr<Drone>> drones;
 
   float obstacleViewRange;
   float cameraViewRange;
@@ -132,7 +132,7 @@ class DroneSwarmTest : public Test {
       g_camera.m_zoom = 10.0f;
       initDefaultParameters();
       initDefaultBehaviours();
-      createDronesCircular(behaviour, currentDroneConfig);
+      createDronesCircular(behaviour, *currentDroneConfig);
       createTrees();
     }
   }
@@ -217,7 +217,7 @@ class DroneSwarmTest : public Test {
     }
   }
 
-  void createDrones(SwarmBehaviour *b, DroneConfiguration *config) {
+  void createDrones(SwarmBehaviour *b, DroneConfiguration &config) {
     const float margin = 2.0f;  // Define a margin to prevent spawning exactly
                                 // at the border or outside
     for (int i = 0; i < DRONE_COUNT; i++) {
@@ -225,13 +225,13 @@ class DroneSwarmTest : public Test {
       float y =
           (rand() % static_cast<int>(BORDER_HEIGHT - 2 * margin)) + margin;
       drones.push_back(
-          DroneFactory::createDrone(m_world, b2Vec2(x, y), behaviour, *config));
+          DroneFactory::createDrone(m_world, b2Vec2(x, y), behaviour, config));
     }
   }
 
-  void createDronesCircular(SwarmBehaviour *b, DroneConfiguration *config) {
+  void createDronesCircular(SwarmBehaviour *b, DroneConfiguration &config) {
     // Calculate the total area needed for all drones
-    float droneArea = M_PI * std::pow(config->radius, 2);
+    float droneArea = M_PI * std::pow(config.radius, 2);
     float totalDroneArea = DRONE_COUNT * droneArea;
 
     // Calculate the radius of the circle needed to fit all drones
@@ -247,14 +247,14 @@ class DroneSwarmTest : public Test {
       // Ensure drones fit within the required circle, leaving a margin equal to
       // the drone's radius
       float r = sqrt(static_cast<float>(rand()) / RAND_MAX) *
-                (requiredCircleRadius - config->radius);
+                (requiredCircleRadius - config.radius);
 
       // Convert polar coordinates (r, theta) to Cartesian coordinates (x, y)
       float x = centerX + r * cos(theta);
       float y = centerY + r * sin(theta);
 
       drones.push_back(
-          DroneFactory::createDrone(m_world, b2Vec2(x, y), behaviour, *config));
+          DroneFactory::createDrone(m_world, b2Vec2(x, y), behaviour, config));
     }
   }
 
@@ -336,10 +336,10 @@ class DroneSwarmTest : public Test {
   void UpdateDroneSettings() {
     // Update drone settings:
     for (auto &drone : drones) {
-      drone->setMaxForce(droneParams->maxForce);
-      drone->setMaxSpeed(droneParams->maxSpeed);
-      drone->setViewRange(droneParams->cameraViewRange);
-      drone->setObstacleViewRange(droneParams->obstacleViewRange);
+      drone->setMaxForce(currentDroneConfig->maxForce);
+      drone->setMaxSpeed(currentDroneConfig->maxSpeed);
+      drone->setViewRange(currentDroneConfig->cameraViewRange);
+      drone->setObstacleViewRange(currentDroneConfig->obstacleViewRange);
       drone->updateSensorRange();
     }
   }
@@ -357,7 +357,7 @@ class DroneSwarmTest : public Test {
     time = 0.0f;
     iters = 0;
     DestroyDrones();
-    createDronesCircular(behaviour, currentDroneConfig);
+    createDronesCircular(behaviour, *currentDroneConfig);
     ResetTrees();
   }
 
@@ -406,7 +406,7 @@ class DroneSwarmTest : public Test {
 
     if (ImGui::Button("Reset Simulation")) {
       DestroyDrones();
-      createDronesCircular(behaviour, currentDroneConfig);
+      createDronesCircular(behaviour, *currentDroneConfig);
       ResetTrees();
     }
 
@@ -423,14 +423,14 @@ class DroneSwarmTest : public Test {
         if (ImGui::Selectable(name.c_str(), isSelected)) {
           currentConfigName = name;
           currentDroneConfig = droneConfigs[name];
-          std::vector<Drone *> newDrones;
+          std::vector<std::unique_ptr<Drone>> newDrones;
           for (auto &drone : drones) {
-            newDrones.push_back(DroneFactory::createDrone(
-                m_world, drone->getBody()->GetPosition(), behaviour,
-                *currentDroneConfig));
-            m_world->DestroyBody(drone->getBody());
+            auto &newPosition = drone->getBody()->GetPosition();
+            auto newDrone = DroneFactory::createDrone(
+                m_world, newPosition, behaviour, *currentDroneConfig);
+            newDrones.push_back(std::move(newDrone));
           }
-          drones = newDrones;
+          drones = std::move(newDrones);
         }
         if (isSelected) {
           ImGui::SetItemDefaultFocus();

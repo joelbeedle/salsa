@@ -74,9 +74,6 @@ Drone::~Drone() {
       world->DestroyBody(body);
     }
   }
-  if (behaviour) {
-    delete behaviour;
-  }
 }
 
 void Drone::updateSensorRange() {
@@ -103,7 +100,7 @@ void Drone::clearLists() {
   this->foundTrees.clear();
 }
 
-void Drone::update(std::vector<Drone *> &drones) {
+void Drone::update(std::vector<std::unique_ptr<Drone>> &drones) {
   if (behaviour) {
     behaviour->execute(drones, this);
   }

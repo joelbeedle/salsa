@@ -27,7 +27,8 @@ void PSOBehaviour::updatePersonalBest(Drone *drone) {
   }
 }
 
-void PSOBehaviour::execute(std::vector<Drone *> &drones, Drone *currentDrone) {
+void PSOBehaviour::execute(std::vector<std::unique_ptr<Drone>> &drones,
+                           Drone *currentDrone) {
   // Ensure personal best is initialized for the current drone
   if (personalBestPositions.find(currentDrone) == personalBestPositions.end()) {
     personalBestPositions[currentDrone] = currentDrone->getPosition();

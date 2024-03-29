@@ -11,8 +11,8 @@ UniformRandomWalkBehaviour::UniformRandomWalkBehaviour(
   std::srand(std::time(nullptr));  // Initialize random seed
 }
 
-void UniformRandomWalkBehaviour::execute(std::vector<Drone *> &drones,
-                                         Drone *currentDrone) {
+void UniformRandomWalkBehaviour::execute(
+    std::vector<std::unique_ptr<Drone>> &drones, Drone *currentDrone) {
   // Ensure there is a timer info for the current drone
   if (droneTimers.find(currentDrone) == droneTimers.end()) {
     droneTimers[currentDrone] = DroneTimerInfo();

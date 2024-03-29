@@ -19,7 +19,8 @@ class SwarmBehaviour {
  public:
   virtual ~SwarmBehaviour() = default;
 
-  virtual void execute(std::vector<Drone *> &drones, Drone *currentDrone) = 0;
+  virtual void execute(std::vector<std::unique_ptr<Drone>> &drones,
+                       Drone *currentDrone) = 0;
 
   virtual std::unordered_map<std::string, ParameterDefinition>
   getParameters() = 0;
