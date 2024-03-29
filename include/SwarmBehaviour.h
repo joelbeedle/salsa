@@ -20,7 +20,7 @@ class SwarmBehaviour {
   virtual ~SwarmBehaviour() = default;
 
   virtual void execute(const std::vector<std::unique_ptr<Drone>> &drones,
-                       Drone *currentDrone) = 0;
+                       Drone &currentDrone) = 0;
 
   virtual std::unordered_map<std::string, ParameterDefinition>
   getParameters() = 0;
@@ -33,8 +33,8 @@ class SwarmBehaviour {
       vector *= maxMagnitude;
     }
   }
-  b2Vec2 avoidDrones(std::vector<b2Body *> &neighbours, Drone *currentDrone);
+  b2Vec2 avoidDrones(std::vector<b2Body *> &neighbours, Drone &currentDrone);
   b2Vec2 avoidObstacles(std::vector<b2Vec2> &obstaclePoints,
-                        Drone *currentDrone);
-  void performRayCasting(Drone *currentDrone, RayCastCallback &callback);
+                        Drone &currentDrone);
+  void performRayCasting(Drone &currentDrone, RayCastCallback &callback);
 };

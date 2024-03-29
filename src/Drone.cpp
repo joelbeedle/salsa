@@ -102,7 +102,7 @@ void Drone::clearLists() {
 
 void Drone::update(std::vector<std::unique_ptr<Drone>> &drones) {
   if (behaviour) {
-    behaviour->execute(drones, this);
+    behaviour->execute(drones, *this);
   }
   // Clear found trees for this cycle?
   // this->foundDiseasedTrees.clear();

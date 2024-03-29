@@ -16,7 +16,6 @@
 #include "DroneFactory.h"
 #include "FlockingBehaviour.h"
 #include "ObjectTypes.h"
-#include "PSOBehaviour.h"
 #include "PheremoneBehaviour.h"
 #include "SwarmBehaviourRegistry.h"
 #include "Tree.h"
@@ -79,7 +78,6 @@ class DroneSwarmTest : public Test {
   // Parameters
   FlockingParameters flockingParams;
   PheremoneParameters pheremoneParams;
-  PSOParameters psoParams;
   UniformRandomWalkParameters uniformRandomWalkParams;
 
   // Drone settings
@@ -191,16 +189,11 @@ class DroneSwarmTest : public Test {
         std::make_unique<FlockingBehaviour>(flockingParams);
     std::unique_ptr<PheremoneBehaviour> pheremoneBehaviour =
         std::make_unique<PheremoneBehaviour>(pheremoneParams);
-    std::unique_ptr<PSOBehaviour> psoBehaviour =
-        std::make_unique<PSOBehaviour>(psoParams);
     std::unique_ptr<UniformRandomWalkBehaviour> uniformRandomWalkBehaviour =
         std::make_unique<UniformRandomWalkBehaviour>(uniformRandomWalkParams);
 
     SwarmBehaviourRegistry::getInstance().add("PheremoneBehaviour",
                                               std::move(pheremoneBehaviour));
-
-    SwarmBehaviourRegistry::getInstance().add("PSOBehaviour",
-                                              std::move(psoBehaviour));
 
     SwarmBehaviourRegistry::getInstance().add("FlockingBehaviour",
                                               std::move(flockBehaviour));

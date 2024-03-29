@@ -3,7 +3,7 @@
 #include "Drone.h"
 
 void PheremoneBehaviour::execute(
-    const std::vector<std::unique_ptr<Drone>> &drones, Drone *currentDrone) {
+    const std::vector<std::unique_ptr<Drone>> &drones, Drone &currentDrone) {
   // Perform ray casting to detect nearby drones and obstacles
   RayCastCallback callback;
   performRayCasting(currentDrone, callback);
@@ -13,7 +13,7 @@ void PheremoneBehaviour::execute(
   std::vector<b2Body *> neighbours = callback.detectedDrones;
 
   // Lay a pheremone at the Drone's current position
-  layPheremone(currentDrone->getPosition());
+  layPheremone(currentDrone.getPosition());
 
   // Update pheremones (decay)
   updatePheremones();
@@ -27,13 +27,12 @@ void PheremoneBehaviour::execute(
 
   for (auto &pair : pheremones) {
     Pheremone &pheremone = pair.second;
-    float distance =
-        b2Distance(currentDrone->getPosition(), pheremone.position);
+    float distance = b2Distance(currentDrone.getPosition(), pheremone.position);
 
-    if (distance < currentDrone->getViewRange() && distance > 0) {
+    if (distance < currentDrone.getViewRange() && distance > 0) {
       // Calculate a vector pointing away from the pheremone
       b2Vec2 awayFromPheremone =
-          currentDrone->getPosition() - pheremone.position;
+          currentDrone.getPosition() - pheremone.position;
       awayFromPheremone.Normalize();
 
       // Optionally, weight this vector by the inverse of distance or intensity
@@ -51,32 +50,32 @@ void PheremoneBehaviour::execute(
     avoidanceSteering.x /= count;
     avoidanceSteering.y /= count;
     avoidanceSteering.Normalize();
-    avoidanceSteering *= currentDrone->getMaxSpeed();
+    avoidanceSteering *= currentDrone.getMaxSpeed();
 
     // Combine with the original steering vector
-    steering += avoidanceSteering - currentDrone->getVelocity();
-    clampMagnitude(steering, currentDrone->getMaxForce());
+    steering += avoidanceSteering - currentDrone.getVelocity();
+    clampMagnitude(steering, currentDrone.getMaxForce());
   }
 
   b2Vec2 acceleration =
       steering + (params.obstacleAvoidanceWeight *
                   avoidObstacles(obstaclePoints, currentDrone));
-  b2Vec2 velocity = currentDrone->getVelocity();
-  b2Vec2 position = currentDrone->getPosition();
+  b2Vec2 velocity = currentDrone.getVelocity();
+  b2Vec2 position = currentDrone.getPosition();
 
   velocity += acceleration;
   float speed = 0.001f + velocity.Length();
   b2Vec2 dir(velocity.x / speed, velocity.y / speed);
 
   // Clamp speed
-  if (speed > currentDrone->getMaxSpeed()) {
-    speed = currentDrone->getMaxSpeed();
+  if (speed > currentDrone.getMaxSpeed()) {
+    speed = currentDrone.getMaxSpeed();
   } else if (speed < 0) {
     speed = 0.001f;
   }
   velocity = b2Vec2(dir.x * speed, dir.y * speed);
 
-  currentDrone->getBody()->SetLinearVelocity(velocity);
+  currentDrone.getBody()->SetLinearVelocity(velocity);
   acceleration.SetZero();  // TODO: Find out implications of acceleration not
                            // being transient
 }

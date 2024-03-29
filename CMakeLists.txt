@@ -21,7 +21,6 @@ set(SOURCES
     src/SwarmBehaviour.cpp
     src/FlockingBehaviour.cpp
     src/PheremoneBehaviour.cpp
-    src/PSOBehaviour.cpp
     src/UniformRandomWalkBehaviour.cpp
     src/Tree.cpp)
 

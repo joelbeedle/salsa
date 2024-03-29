@@ -39,7 +39,7 @@ class FlockingBehaviour : public SwarmBehaviour {
   FlockingBehaviour(const FlockingParameters &params) : params(params) {}
 
   void execute(const std::vector<std::unique_ptr<Drone>> &drones,
-               Drone *currentDrone) override;
+               Drone &currentDrone) override;
 
   std::unordered_map<std::string, ParameterDefinition> getParameters()
       override {
@@ -47,7 +47,7 @@ class FlockingBehaviour : public SwarmBehaviour {
   }
 
  private:
-  b2Vec2 align(std::vector<b2Body *> &drones, Drone *currentDrone);
-  b2Vec2 separate(std::vector<b2Body *> &drones, Drone *currentDrone);
-  b2Vec2 cohere(std::vector<b2Body *> &drones, Drone *currentDrone);
+  b2Vec2 align(std::vector<b2Body *> &drones, Drone &currentDrone);
+  b2Vec2 separate(std::vector<b2Body *> &drones, Drone &currentDrone);
+  b2Vec2 cohere(std::vector<b2Body *> &drones, Drone &currentDrone);
 };

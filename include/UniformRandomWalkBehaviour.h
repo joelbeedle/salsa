@@ -52,7 +52,7 @@ class UniformRandomWalkBehaviour : public SwarmBehaviour {
   virtual ~UniformRandomWalkBehaviour() override {}
 
   void execute(const std::vector<std::unique_ptr<Drone>> &drones,
-               Drone *currentDrone) override;
+               Drone &currentDrone) override;
 
  private:
   // Function to generate a random time interval between 0 and 10 seconds
