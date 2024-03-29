@@ -4,6 +4,7 @@
 
 // #include <SFML/Graphics.hpp>
 
+#include "DroneConfiguration.h"
 #include "SwarmBehaviour.h"
 #include "Tree.h"
 
@@ -25,8 +26,7 @@ class Drone {
 
  public:
   Drone(b2World *world, const b2Vec2 &position, SwarmBehaviour *behaviour,
-        float cameraViewRange, float obstacleViewRange, float maxSpeed,
-        float maxForce, float radius, float mass, float droneDetectionRange);
+        const DroneConfiguration &config);
   ~Drone();
 
   void update(std::vector<Drone *> &drones);

@@ -10,6 +10,7 @@
 #include <ctime>
 
 #include "Drone.h"
+#include "DroneFactory.h"
 #include "FlockingBehaviour.h"
 #include "SFML/Graphics/Color.hpp"
 
@@ -128,6 +129,8 @@ int main() {
   float maxForce = 0.3f;
 
   FlockingParameters params = {50.0f, 1.0f, 1.0f, 1.0f, 1.0f};
+  DroneConfiguration djiMatrice300RTK_c{8.0f,  40.0f, 17.0f,  0.3f,
+                                        0.45f, 6.3f,  2000.0f};
 
   // Create Behaviour instances
   FlockingBehaviour flockingBehaviour(params);
@@ -135,9 +138,9 @@ int main() {
   // Create drones
   std::vector<Drone *> drones;
   for (int i = 0; i < 50; i++) {
-    drones.push_back(new Drone(
+    drones.push_back(DroneFactory::createDrone(
         &world, b2Vec2(rand() % SCREEN_WIDTH, rand() % SCREEN_HEIGHT),
-        &flockingBehaviour, 5.0f, 5.0f, 10.0f, 0.3f, 1.0f, 3.6f, 2000.0f));
+        &flockingBehaviour, djiMatrice300RTK_c));
   }
   int32 counter = 0;
   while (window.isOpen()) {

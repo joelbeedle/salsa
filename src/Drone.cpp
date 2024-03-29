@@ -10,17 +10,15 @@
 #define SCREEN_HEIGHT 600
 
 Drone::Drone(b2World *world, const b2Vec2 &position, SwarmBehaviour *behaviour,
-             float cameraViewRange, float obstacleViewRange, float maxSpeed,
-             float maxForce, float radius, float mass,
-             float droneDetectionRange)
+             const DroneConfiguration &config)
     : behaviour(behaviour),
-      cameraViewRange(cameraViewRange),
-      obstacleViewRange(obstacleViewRange),
-      maxSpeed(maxSpeed),
-      maxForce(maxForce),
-      radius(radius),
-      mass(mass),
-      droneDetectionRange(droneDetectionRange) {
+      cameraViewRange(config.cameraViewRange),
+      obstacleViewRange(config.obstacleViewRange),
+      maxSpeed(config.maxSpeed),
+      maxForce(config.maxForce),
+      radius(config.radius),
+      mass(config.mass),
+      droneDetectionRange(config.droneDetectionRange) {
   // Create Box2D body
   b2BodyDef bodyDef;
   bodyDef.type = b2_dynamicBody;
