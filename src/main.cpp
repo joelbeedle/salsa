@@ -140,7 +140,7 @@ int main() {
   for (int i = 0; i < 50; i++) {
     drones.push_back(DroneFactory::createDrone(
         &world, b2Vec2(rand() % SCREEN_WIDTH, rand() % SCREEN_HEIGHT),
-        &flockingBehaviour, djiMatrice300RTK_c));
+        flockingBehaviour, djiMatrice300RTK_c));
   }
   int32 counter = 0;
   while (window.isOpen()) {

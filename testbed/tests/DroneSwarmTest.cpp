@@ -43,21 +43,6 @@ struct DroneParameters {
   float radius;
 };
 
-void CreatePreset(std::unordered_map<std::string, DroneParameters> &presets,
-                  const std::string &name, const DroneParameters &params) {
-  presets[name] = params;
-}
-
-void DeletePreset(std::unordered_map<std::string, DroneParameters> &presets,
-                  const std::string &name) {
-  presets.erase(name);
-}
-
-void UpdatePreset(std::unordered_map<std::string, DroneParameters> &presets,
-                  const std::string &name, const DroneParameters &params) {
-  presets[name] = params;
-}
-
 class DroneSwarmTest : public Test {
  public:
   // Lists
@@ -130,7 +115,7 @@ class DroneSwarmTest : public Test {
       g_camera.m_zoom = 10.0f;
       initDefaultParameters();
       initDefaultBehaviours();
-      createDronesCircular(behaviour, *currentDroneConfig);
+      createDronesCircular(*behaviour, *currentDroneConfig);
       createTrees();
     }
   }
@@ -185,32 +170,30 @@ class DroneSwarmTest : public Test {
   }
 
   void initDefaultBehaviours() {
-    std::unique_ptr<FlockingBehaviour> flockBehaviour =
-        std::make_unique<FlockingBehaviour>(flockingParams);
-    std::unique_ptr<PheremoneBehaviour> pheremoneBehaviour =
+    auto flockBehaviour = std::make_unique<FlockingBehaviour>(flockingParams);
+    auto pheremoneBehaviour =
         std::make_unique<PheremoneBehaviour>(pheremoneParams);
-    std::unique_ptr<UniformRandomWalkBehaviour> uniformRandomWalkBehaviour =
+    auto uniformRandomWalkBehaviour =
         std::make_unique<UniformRandomWalkBehaviour>(uniformRandomWalkParams);
 
     SwarmBehaviourRegistry::getInstance().add("PheremoneBehaviour",
                                               std::move(pheremoneBehaviour));
-
     SwarmBehaviourRegistry::getInstance().add("FlockingBehaviour",
                                               std::move(flockBehaviour));
     SwarmBehaviourRegistry::getInstance().add(
         "UniformRandomWalkBehaviour", std::move(uniformRandomWalkBehaviour));
 
     auto &registry = SwarmBehaviourRegistry::getInstance();
-    auto behaviorNames = registry.getSwarmBehaviourNames();
+    auto behaviourNames = registry.getSwarmBehaviourNames();
     // Set initial behaviour
-    if (!behaviorNames.empty()) {
+    if (!behaviourNames.empty()) {
       // Select the first behavior as the default one
-      currentBehaviourName = behaviorNames[0];
+      currentBehaviourName = behaviourNames[0];
       behaviour = registry.getSwarmBehaviour(currentBehaviourName);
     }
   }
 
-  void createDrones(SwarmBehaviour *b, DroneConfiguration &config) {
+  void createDrones(SwarmBehaviour &b, DroneConfiguration &config) {
     const float margin = 2.0f;  // Define a margin to prevent spawning exactly
                                 // at the border or outside
     for (int i = 0; i < DRONE_COUNT; i++) {
@@ -218,11 +201,11 @@ class DroneSwarmTest : public Test {
       float y =
           (rand() % static_cast<int>(BORDER_HEIGHT - 2 * margin)) + margin;
       drones.push_back(
-          DroneFactory::createDrone(m_world, b2Vec2(x, y), behaviour, config));
+          DroneFactory::createDrone(m_world, b2Vec2(x, y), *behaviour, config));
     }
   }
 
-  void createDronesCircular(SwarmBehaviour *b, DroneConfiguration &config) {
+  void createDronesCircular(SwarmBehaviour &b, DroneConfiguration &config) {
     // Calculate the total area needed for all drones
     float droneArea = M_PI * std::pow(config.radius, 2);
     float totalDroneArea = DRONE_COUNT * droneArea;
@@ -247,7 +230,7 @@ class DroneSwarmTest : public Test {
       float y = centerY + r * sin(theta);
 
       drones.push_back(
-          DroneFactory::createDrone(m_world, b2Vec2(x, y), behaviour, config));
+          DroneFactory::createDrone(m_world, b2Vec2(x, y), *behaviour, config));
     }
   }
 
@@ -313,16 +296,11 @@ class DroneSwarmTest : public Test {
     updateDiseaseSpread(trees, 20.0f);
   }
 
-  void DestroyDrones() {
-    for (auto &drone : drones) {
-      m_world->DestroyBody(drone->getBody());
-    }
-    drones.clear();
-  }
+  void DestroyDrones() { drones.clear(); }
 
   void SetBehaviour() {
     for (auto &drone : drones) {
-      drone->setBehaviour(behaviour);
+      drone->setBehaviour(*behaviour);
     }
   }
 
@@ -350,7 +328,7 @@ class DroneSwarmTest : public Test {
     time = 0.0f;
     iters = 0;
     DestroyDrones();
-    createDronesCircular(behaviour, *currentDroneConfig);
+    createDronesCircular(*behaviour, *currentDroneConfig);
     ResetTrees();
   }
 
@@ -399,8 +377,8 @@ class DroneSwarmTest : public Test {
 
     if (ImGui::Button("Reset Simulation")) {
       DestroyDrones();
-      createDronesCircular(behaviour, *currentDroneConfig);
       ResetTrees();
+      createDronesCircular(*behaviour, *currentDroneConfig);
     }
 
     ImGui::End();
@@ -420,7 +398,7 @@ class DroneSwarmTest : public Test {
           for (auto &drone : drones) {
             auto &newPosition = drone->getBody()->GetPosition();
             auto newDrone = DroneFactory::createDrone(
-                m_world, newPosition, behaviour, *currentDroneConfig);
+                m_world, newPosition, *behaviour, *currentDroneConfig);
             newDrones.push_back(std::move(newDrone));
           }
           drones = std::move(newDrones);
@@ -444,6 +422,9 @@ class DroneSwarmTest : public Test {
     droneChanged |= ImGui::SliderFloat("obstacleViewRange",
                                        &currentDroneConfig->obstacleViewRange,
                                        0.0f, 100.0f);
+    droneChanged |= ImGui::SliderFloat("droneDetectionRange",
+                                       &currentDroneConfig->droneDetectionRange,
+                                       0.0f, 4000.0f);
 
     if (droneChanged) {
       UpdateDroneSettings();

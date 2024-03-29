@@ -9,9 +9,9 @@
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
 
-Drone::Drone(b2World *world, const b2Vec2 &position, SwarmBehaviour *behaviour,
+Drone::Drone(b2World *world, const b2Vec2 &position, SwarmBehaviour &behaviour,
              const DroneConfiguration &config)
-    : behaviour(behaviour),
+    : behaviour(&behaviour),
       cameraViewRange(config.cameraViewRange),
       obstacleViewRange(config.obstacleViewRange),
       maxSpeed(config.maxSpeed),

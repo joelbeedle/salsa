@@ -25,7 +25,7 @@ class Drone {
   float mass;
 
  public:
-  Drone(b2World *world, const b2Vec2 &position, SwarmBehaviour *behaviour,
+  Drone(b2World *world, const b2Vec2 &position, SwarmBehaviour &behaviour,
         const DroneConfiguration &config);
   ~Drone();
 
@@ -36,7 +36,7 @@ class Drone {
   void foundTree(Tree *tree);
 
   // Accessors and Mutators
-  void setBehaviour(SwarmBehaviour *newBehaviour) { behaviour = newBehaviour; }
+  void setBehaviour(SwarmBehaviour &newBehaviour) { behaviour = &newBehaviour; }
 
   b2Body *getBody() { return body; }
   b2Vec2 getVelocity() { return body->GetLinearVelocity(); }
