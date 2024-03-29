@@ -12,7 +12,7 @@ UniformRandomWalkBehaviour::UniformRandomWalkBehaviour(
 }
 
 void UniformRandomWalkBehaviour::execute(
-    std::vector<std::unique_ptr<Drone>> &drones, Drone *currentDrone) {
+    const std::vector<std::unique_ptr<Drone>> &drones, Drone *currentDrone) {
   // Ensure there is a timer info for the current drone
   if (droneTimers.find(currentDrone) == droneTimers.end()) {
     droneTimers[currentDrone] = DroneTimerInfo();

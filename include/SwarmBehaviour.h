@@ -19,14 +19,14 @@ class SwarmBehaviour {
  public:
   virtual ~SwarmBehaviour() = default;
 
-  virtual void execute(std::vector<std::unique_ptr<Drone>> &drones,
+  virtual void execute(const std::vector<std::unique_ptr<Drone>> &drones,
                        Drone *currentDrone) = 0;
 
   virtual std::unordered_map<std::string, ParameterDefinition>
   getParameters() = 0;
 
  protected:
-  void clampMagnitude(b2Vec2 &vector, float maxMagnitude) {
+  void clampMagnitude(b2Vec2 &vector, const float maxMagnitude) {
     float lengthSquared = vector.LengthSquared();
     if (lengthSquared > maxMagnitude * maxMagnitude && lengthSquared > 0) {
       vector.Normalize();

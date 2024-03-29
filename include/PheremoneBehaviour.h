@@ -37,7 +37,7 @@ class PheremoneBehaviour : public SwarmBehaviour {
  public:
   PheremoneBehaviour(const PheremoneParameters &params) : params(params) {}
 
-  void execute(std::vector<std::unique_ptr<Drone>> &drones,
+  void execute(const std::vector<std::unique_ptr<Drone>> &drones,
                Drone *currentDrone) override;
 
   std::unordered_map<std::string, ParameterDefinition> getParameters()

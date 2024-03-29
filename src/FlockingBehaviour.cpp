@@ -7,8 +7,8 @@
 #include "RayCastCallback.h"
 #include "box2d/box2d.h"
 
-void FlockingBehaviour::execute(std::vector<std::unique_ptr<Drone>> &drones,
-                                Drone *currentDrone) {
+void FlockingBehaviour::execute(
+    const std::vector<std::unique_ptr<Drone>> &drones, Drone *currentDrone) {
   // Using ray casting to find neighbours and obstacles
   RayCastCallback callback;
   performRayCasting(currentDrone, callback);

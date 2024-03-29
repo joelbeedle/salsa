@@ -51,7 +51,7 @@ class UniformRandomWalkBehaviour : public SwarmBehaviour {
 
   virtual ~UniformRandomWalkBehaviour() override {}
 
-  void execute(std::vector<std::unique_ptr<Drone>> &drones,
+  void execute(const std::vector<std::unique_ptr<Drone>> &drones,
                Drone *currentDrone) override;
 
  private:
