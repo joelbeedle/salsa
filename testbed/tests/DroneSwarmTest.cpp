@@ -15,6 +15,7 @@
 #include "DroneContactListener.h"
 #include "DroneFactory.h"
 #include "FlockingBehaviour.h"
+#include "LevyFlockingBehaviour.h"
 #include "ObjectTypes.h"
 #include "PheremoneBehaviour.h"
 #include "SwarmBehaviourRegistry.h"
@@ -24,11 +25,10 @@
 #include "imgui/imgui.h"
 #include "settings.h"
 #include "test.h"
-
 // TODO: Change drones to use droneDetectionRange when seeing other drones.
 
 #define DRONE_COUNT 50
-#define TREE_COUNT 10000
+#define TREE_COUNT 50000
 #define BORDER_WIDTH 2000.0f
 #define BORDER_HEIGHT 2000.0f
 #define MAX_TIME 100000.0f
@@ -64,6 +64,7 @@ class DroneSwarmTest : public Test {
   FlockingParameters flockingParams;
   PheremoneParameters pheremoneParams;
   UniformRandomWalkParameters uniformRandomWalkParams;
+  LevyFlockingParameters levyFlockingParams;
 
   // Drone settings
   std::vector<std::unique_ptr<Drone>> drones;
@@ -165,6 +166,8 @@ class DroneSwarmTest : public Test {
     currentDroneConfig = droneConfigs[currentConfigName];
 
     flockingParams = {50.0f, 1.6f, 0.8f, 1.8f, 3.0f};
+    levyFlockingParams = {50.0f, 1.6f, 0.8f, 1.8f, 1.0f, 3.0f};
+
     pheremoneParams = {0.1f, 1.0f};
     uniformRandomWalkParams = {5.0f, 0.5f, 1.0f, 1.0 / 60.0f};
   }
@@ -175,6 +178,8 @@ class DroneSwarmTest : public Test {
         std::make_unique<PheremoneBehaviour>(pheremoneParams);
     auto uniformRandomWalkBehaviour =
         std::make_unique<UniformRandomWalkBehaviour>(uniformRandomWalkParams);
+    auto levyFlockBehaviour =
+        std::make_unique<LevyFlockingBehaviour>(levyFlockingParams);
 
     SwarmBehaviourRegistry::getInstance().add("PheremoneBehaviour",
                                               std::move(pheremoneBehaviour));
@@ -182,6 +187,8 @@ class DroneSwarmTest : public Test {
                                               std::move(flockBehaviour));
     SwarmBehaviourRegistry::getInstance().add(
         "UniformRandomWalkBehaviour", std::move(uniformRandomWalkBehaviour));
+    SwarmBehaviourRegistry::getInstance().add("LevyFlockingBehaviour",
+                                              std::move(levyFlockBehaviour));
 
     auto &registry = SwarmBehaviourRegistry::getInstance();
     auto behaviourNames = registry.getSwarmBehaviourNames();

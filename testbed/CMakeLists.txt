@@ -18,6 +18,7 @@ set(MY_PROJECT_SOURCE_FILES
 ${PROJECT_SOURCE_DIR}/src/Drone.cpp
 ${PROJECT_SOURCE_DIR}/src/SwarmBehaviour.cpp
 ${PROJECT_SOURCE_DIR}/src/FlockingBehaviour.cpp
+${PROJECT_SOURCE_DIR}/src/LevyFlockingBehaviour.cpp
 ${PROJECT_SOURCE_DIR}/src/PheremoneBehaviour.cpp
 ${PROJECT_SOURCE_DIR}/src/UniformRandomWalkBehaviour.cpp
 ${PROJECT_SOURCE_DIR}/src/Tree.cpp)

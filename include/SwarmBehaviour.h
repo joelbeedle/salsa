@@ -2,6 +2,7 @@
 #pragma once
 #include <box2d/box2d.h>
 
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -36,5 +37,6 @@ class SwarmBehaviour {
   b2Vec2 avoidDrones(std::vector<b2Body *> &neighbours, Drone &currentDrone);
   b2Vec2 avoidObstacles(std::vector<b2Vec2> &obstaclePoints,
                         Drone &currentDrone);
+  b2Vec2 steerTo(b2Vec2 target, Drone &currentDrone);
   void performRayCasting(Drone &currentDrone, RayCastCallback &callback);
 };

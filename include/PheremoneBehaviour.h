@@ -4,6 +4,7 @@
 #include <box2d/box2d.h>
 
 #include <map>
+#include <memory>
 #include <unordered_map>
 
 #include "RayCastCallback.h"

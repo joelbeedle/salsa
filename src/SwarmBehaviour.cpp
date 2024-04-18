@@ -11,13 +11,12 @@ b2Vec2 SwarmBehaviour::avoidDrones(std::vector<b2Body *> &neighbours,
 
   for (auto &drone : neighbours) {
     if (drone != currentBody) {
-      float distance =
-          b2Distance(currentDrone.getPosition(), drone->GetPosition());
-      if (distance < currentDrone.getViewRange() && distance > 0) {
+      float d = b2Distance(currentDrone.getPosition(), drone->GetPosition());
+      if (d < currentDrone.getViewRange() && d > 0) {
         b2Vec2 diff = currentDrone.getPosition() - drone->GetPosition();
         diff.Normalize();
-        diff.x /= distance;
-        diff.y /= distance;
+        diff.x /= d;
+        diff.y /= d;
         steering += diff;
         count++;
       }
@@ -81,4 +80,17 @@ void SwarmBehaviour::performRayCasting(Drone &currentDrone,
 
     currentDrone.getBody()->GetWorld()->RayCast(&callback, start, end);
   }
+}
+
+b2Vec2 SwarmBehaviour::steerTo(b2Vec2 target, Drone &currentDrone) {
+  b2Vec2 position = currentDrone.getPosition();
+  b2Vec2 desired = target - position;
+  float d = desired.Length();
+  b2Vec2 steer(0.0f, 0.0f);
+  desired.Normalize();
+  desired.x *= currentDrone.getMaxSpeed();
+  desired.y *= currentDrone.getMaxSpeed();
+  steer = desired - currentDrone.getVelocity();
+  clampMagnitude(steer, currentDrone.getMaxForce());
+  return steer;
 }

@@ -4,10 +4,11 @@
 
 // #include <SFML/Graphics.hpp>
 
+#include <memory>
+
 #include "DroneConfiguration.h"
 #include "SwarmBehaviour.h"
 #include "Tree.h"
-
 class Drone {
  private:
   std::vector<Tree *> foundDiseasedTrees;

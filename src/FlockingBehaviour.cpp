@@ -12,9 +12,13 @@ void FlockingBehaviour::execute(
   // Using ray casting to find neighbours and obstacles
   RayCastCallback callback;
   performRayCasting(currentDrone, callback);
+  std::vector<b2Body *> bodies;
+  for (auto &drone : drones) {
+    bodies.push_back(drone.get()->getBody());
+  }
 
   // Separating drones and obstacles from callback results
-  std::vector<b2Body *> neighbours = callback.detectedDrones;
+  std::vector<b2Body *> neighbours = bodies;
   std::vector<b2Vec2> obstaclePoints = callback.obstaclePoints;
 
   b2Vec2 alignment = align(neighbours, currentDrone);
@@ -120,7 +124,6 @@ b2Vec2 FlockingBehaviour::separate(std::vector<b2Body *> &drones,
   if (avgVec.Length() > 0) {
     avgVec.Normalize();
     avgVec *= currentDrone.getMaxSpeed();
-    ;
 
     steering = avgVec - currentDrone.getVelocity();
     clampMagnitude(steering, currentDrone.getMaxForce());

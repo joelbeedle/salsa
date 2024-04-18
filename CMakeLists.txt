@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 option(BUILD_TESTBED "Build the Box2D testbed" ON)
+add_compile_definitions(_USE_MATH_DEFINES)
 
 # Add SFML submodule
 add_subdirectory(lib/SFML)
