@@ -44,7 +44,7 @@ class LevyFlockingBehaviour : public SwarmBehaviour {
     float accumulatedDistance = 0.0f;
     bool isExecuting = false;
 
-    DroneInfo() : levyPoint(levy(2.5f)) {}
+    DroneInfo() : levyPoint(levy(2.8f)) {}
 
     float stepLength = sqrt(pow(levyPoint.x, 2) + pow(levyPoint.y, 2));
   };

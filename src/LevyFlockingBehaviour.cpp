@@ -36,6 +36,7 @@ void LevyFlockingBehaviour::execute(
   b2Vec2 separation = separate(neighbours, currentDrone);
   b2Vec2 cohesion = cohere(neighbours, currentDrone);
   b2Vec2 obstacleAvoidance = avoidObstacles(obstaclePoints, currentDrone);
+  b2Vec2 droneAvoidance = avoidDrones(bodies, currentDrone);
   std::cout << droneInfo.stepLength << " " << droneInfo.accumulatedDistance
             << std::endl;
 
@@ -52,9 +53,9 @@ void LevyFlockingBehaviour::execute(
     dir *= currentDrone.getMaxSpeed();
     b2Vec2 steering = dir - currentDrone.getVelocity();
     clampMagnitude(steering, currentDrone.getMaxForce());
-    acceleration = (params.levyWeight * steering) +
-                   (params.cohesionWeight * cohesion) +
-                   (params.obstacleAvoidanceWeight * obstacleAvoidance);
+    acceleration =
+        (params.levyWeight * steering) + (params.cohesionWeight * cohesion) +
+        (params.obstacleAvoidanceWeight * obstacleAvoidance) + droneAvoidance;
 
     if (droneInfo.accumulatedDistance >= droneInfo.stepLength) {
       // finish walk
@@ -62,9 +63,9 @@ void LevyFlockingBehaviour::execute(
       droneInfo.isExecuting = false;
     }
 
-  } else if (dis(gen) < 0.05) {
+  } else if (dis(gen) < 0.02) {
     // we are not in a levy step, and we should be
-    droneInfo.levyPoint = levy(2.5f);
+    droneInfo.levyPoint = levy(2.8f);
     droneInfo.stepLength =
         sqrt(pow(droneInfo.levyPoint.x, 2) + pow(droneInfo.levyPoint.y, 2));
     droneInfo.accumulatedDistance = 0.0f;
@@ -77,9 +78,9 @@ void LevyFlockingBehaviour::execute(
 
     b2Vec2 steering = dir - currentDrone.getVelocity();
     clampMagnitude(steering, currentDrone.getMaxForce());
-    acceleration = (params.levyWeight * steering) +
-                   (params.cohesionWeight * cohesion) +
-                   (params.obstacleAvoidanceWeight * obstacleAvoidance);
+    acceleration =
+        (params.levyWeight * steering) + (params.cohesionWeight * cohesion) +
+        (params.obstacleAvoidanceWeight * obstacleAvoidance) + droneAvoidance;
 
   } else {
     // usual flocking behaviour
