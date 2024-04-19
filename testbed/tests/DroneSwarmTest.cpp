@@ -1,9 +1,13 @@
 #include <box2d/box2d.h>
 #include <stdio.h>
 
+#include <chrono>
+#include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <memory>
 #include <set>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
@@ -31,7 +35,7 @@
 #define TREE_COUNT 50000
 #define BORDER_WIDTH 2000.0f
 #define BORDER_HEIGHT 2000.0f
-#define MAX_TIME 100000.0f
+#define MAX_TIME 1200.0f
 
 struct DroneParameters {
   float cameraViewRange;
@@ -79,7 +83,7 @@ class DroneSwarmTest : public Test {
   DroneConfiguration *djiPhantom4RTK =
       new DroneConfiguration(7.0f, 40.0f, 13.0f, 0.3f, 0.35f, 1.4f, 2000.0f);
   DroneConfiguration *smallDrone =
-      new DroneConfiguration(7.0f, 40.0f, 10.0f, 0.3f, 0.10f, 1.5f, 2000.0f);
+      new DroneConfiguration(25.0f, 50.0f, 10.0f, 0.3f, 0.10f, 1.5f, 4000.0f);
   std::string currentConfigName;
   DroneParameters *droneParams;
   DroneConfiguration *currentDroneConfig;
@@ -105,6 +109,7 @@ class DroneSwarmTest : public Test {
   float time = 0.0f;
   int iters = 0;
   float timestep;
+  std::string filename;
 
  public:
   DroneSwarmTest() {
@@ -570,29 +575,55 @@ class DroneSwarmTest : public Test {
   }
 
   void Log(float time, int iters) {
+    // Open file
+
     if (iters == 1) {
-      std::cout << "=======================================" << std::endl;
-      std::cout << "Starting simulation" << std::endl;
-      std::cout << "=======================================" << std::endl;
-      std::cout << "Drone count: " << DRONE_COUNT << std::endl;
-      std::cout << "Tree count: " << TREE_COUNT << std::endl;
-      std::cout << "Area: " << BORDER_WIDTH << "x" << BORDER_HEIGHT
-                << std::endl;
-      std::cout << "=======================================" << std::endl;
-      std::cout << "Using Behaviour: " << currentBehaviourName << std::endl;
-      std::cout << "Behaviour settings: " << std::endl;
-      for (auto &[name, parameter] : behaviour->getParameters()) {
-        std::cout << name << ": " << *parameter.value << std::endl;
+      auto now = std::chrono::system_clock::now();
+      auto in_time_t = std::chrono::system_clock::to_time_t(now);
+
+      // Create a timestamp string
+      std::stringstream ss;
+      ss << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d_%H-%M-%S");
+      std::string timestamp = ss.str();
+
+      // Create filename incorporating the current behavior and timestamp
+      filename = timestamp + "_" + currentBehaviourName + ".txt";
+      // Replace spaces or any other special characters in filename if needed
+      std::ofstream logFile(filename, std::ios::out);
+      auto output = [&](const auto &message) {
+        std::cout << message;
+        logFile << message;
+        logFile.flush();
+      };
+      output("=======================================\n");
+      output("Starting simulation\n");
+      output("=======================================\n");
+      output("Drone count: " + std::to_string(DRONE_COUNT) + "\n");
+      output("Tree count: " + std::to_string(TREE_COUNT) + "\n");
+      output("Area: " + std::to_string(BORDER_WIDTH) + "x" +
+             std::to_string(BORDER_HEIGHT) + "\n");
+      output("=======================================\n");
+      output("Using Behaviour: " + currentBehaviourName + "\n");
+      output("Behaviour settings: \n");
+      for (const auto &[name, parameter] : behaviour->getParameters()) {
+        output(name + ": " + std::to_string(*parameter.value) + "\n");
       }
-      std::cout << "=======================================" << std::endl;
-      std::cout << "Using Preset: " << currentConfigName << std::endl;
-      std::cout << "Drone count: " << DRONE_COUNT << std::endl;
-      std::cout << "=======================================" << std::endl;
-      std::cout << "Time (s) | Trees mapped | % mapped of total" << std::endl;
+      output("=======================================\n");
+      output("Using Preset: " + currentConfigName + "\n");
+      output("Drone count: " + std::to_string(DRONE_COUNT) + "\n");
+      output("=======================================\n");
+      output("Time (s) | Trees mapped | % mapped of total\n");
     }
+
     if (iters == 1 || iters % 300 == 0) {
+      std::ofstream logFile(filename, std::ios::app);
+      auto output = [&](const auto &message) {
+        std::cout << message;
+        logFile << message;
+        logFile.flush();
+      };
       int totalMapped = 0;
-      for (auto &tree : trees) {
+      for (const auto &tree : trees) {
         if (tree->isMapped()) {
           totalMapped++;
         }
@@ -600,13 +631,14 @@ class DroneSwarmTest : public Test {
       float percentage =
           (static_cast<float>(totalMapped) / static_cast<float>(trees.size())) *
           100.0f;
-      std::cout << time << " | " << totalMapped << " | " << percentage << "%"
-                << std::endl;
+      output(std::to_string(time) + " | " + std::to_string(totalMapped) +
+             " | " + std::to_string(percentage) + "%\n");
+
       if (time >= MAX_TIME || totalMapped == TREE_COUNT) {
-        std::cout << "=======================================" << std::endl;
-        std::cout << "Simulation complete" << std::endl;
-        std::cout << "Time taken: " << time << "s" << std::endl;
-        std::cout << "=======================================" << std::endl;
+        output("=======================================\n");
+        output("Simulation complete\n");
+        output("Time taken: " + std::to_string(time) + "s\n");
+        output("=======================================\n");
       }
     }
   }

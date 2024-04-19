@@ -37,8 +37,6 @@ void LevyFlockingBehaviour::execute(
   b2Vec2 cohesion = cohere(neighbours, currentDrone);
   b2Vec2 obstacleAvoidance = avoidObstacles(obstaclePoints, currentDrone);
   b2Vec2 droneAvoidance = avoidDrones(bodies, currentDrone);
-  std::cout << droneInfo.stepLength << " " << droneInfo.accumulatedDistance
-            << std::endl;
 
   std::random_device rd;
   std::mt19937 gen(rd());
