@@ -639,6 +639,7 @@ class DroneSwarmTest : public Test {
         output("Simulation complete\n");
         output("Time taken: " + std::to_string(time) + "s\n");
         output("=======================================\n");
+        testRunning = false;
       }
     }
   }
