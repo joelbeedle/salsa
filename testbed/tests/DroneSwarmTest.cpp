@@ -14,6 +14,7 @@
 #include <variant>
 #include <vector>
 
+#include "DSPBehaviour.h"
 #include "Drone.h"
 #include "DroneConfiguration.h"
 #include "DroneContactListener.h"
@@ -69,6 +70,7 @@ class DroneSwarmTest : public Test {
   PheremoneParameters pheremoneParams;
   UniformRandomWalkParameters uniformRandomWalkParams;
   LevyFlockingParameters levyFlockingParams;
+  DSPParameters dspParams;
 
   // Drone settings
   std::vector<std::unique_ptr<Drone>> drones;
@@ -175,6 +177,7 @@ class DroneSwarmTest : public Test {
 
     pheremoneParams = {0.1f, 1.0f};
     uniformRandomWalkParams = {5.0f, 0.5f, 1.0f, 1.0 / 60.0f};
+    dspParams = {};
   }
 
   void initDefaultBehaviours() {
@@ -185,6 +188,7 @@ class DroneSwarmTest : public Test {
         std::make_unique<UniformRandomWalkBehaviour>(uniformRandomWalkParams);
     auto levyFlockBehaviour =
         std::make_unique<LevyFlockingBehaviour>(levyFlockingParams);
+    auto dspBehaviour = std::make_unique<DSPBehaviour>(dspParams);
 
     SwarmBehaviourRegistry::getInstance().add("PheremoneBehaviour",
                                               std::move(pheremoneBehaviour));
@@ -194,6 +198,8 @@ class DroneSwarmTest : public Test {
         "UniformRandomWalkBehaviour", std::move(uniformRandomWalkBehaviour));
     SwarmBehaviourRegistry::getInstance().add("LevyFlockingBehaviour",
                                               std::move(levyFlockBehaviour));
+    SwarmBehaviourRegistry::getInstance().add("DSPBehaviour",
+                                              std::move(dspBehaviour));
 
     auto &registry = SwarmBehaviourRegistry::getInstance();
     auto behaviourNames = registry.getSwarmBehaviourNames();
