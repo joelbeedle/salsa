@@ -22,6 +22,10 @@ void DSPBehaviour::execute(const std::vector<std::unique_ptr<Drone>> &drones,
   for (auto &drone : drones) {
     bodies.push_back(drone.get()->getBody());
   }
+  std::vector<b2Body *> neighbours = bodies;
+  std::vector<b2Vec2> obstaclePoints = callback.obstaclePoints;
+  b2Vec2 obstacleAvoidance = avoidObstacles(obstaclePoints, currentDrone);
+  b2Vec2 neighbourAvoidance = avoidDrones(neighbours, currentDrone);
 
   b2Vec2 bspPos = droneInfo.dsp->body->GetPosition();
   b2Vec2 force(0.0f, 0.0f);
@@ -46,28 +50,58 @@ void DSPBehaviour::execute(const std::vector<std::unique_ptr<Drone>> &drones,
 
   // Update DSP position for this drone
   droneInfo.dsp->body->SetLinearVelocity(force);
-  std::vector<b2Body *> neighbours = bodies;
-  std::vector<b2Vec2> obstaclePoints = callback.obstaclePoints;
 
   b2Vec2 velocity = currentDrone.getVelocity();
   b2Vec2 position = currentDrone.getPosition();
   b2Vec2 acceleration(0, 0);
+  b2Vec2 steer(0, 0);
 
   float distanceToDSP = b2Distance(position, bspPos);
   if (distanceToDSP < 5.0f) {
-    // Drone is at DSP Point, random walk around it
-    velocity.Set(0, 0);
+    if (!droneInfo.beginWalk && droneInfo.elapsedTime == 0.0f) {
+      // Start the random walk if not already started and timer is reset
+      droneInfo.beginWalk = true;
+      droneInfo.elapsedTime = 0.0f;
+    }
+  }
+  // Handle random walk logic
+  if (droneInfo.beginWalk) {
+    if (droneInfo.elapsedTime >= droneInfo.timeToWalk) {
+      // Walk time is up, stop walking
+      droneInfo.beginWalk = false;
+      droneInfo.elapsedTime = 0.0f;
+    } else {
+      // Continue walking
+      if (droneInfo.elapsedTimeSinceLastForce >= droneInfo.randomTimeInterval) {
+        // Change direction at regular intervals
+        float angle = static_cast<float>(std::rand()) / RAND_MAX * 2 * M_PI;
+        droneInfo.desiredVelocity =
+            b2Vec2(std::cos(angle) * currentDrone.getMaxSpeed(),
+                   std::sin(angle) * currentDrone.getMaxSpeed());
 
+        droneInfo.elapsedTimeSinceLastForce =
+            0.0f;  // Reset the timer for force update
+        droneInfo.randomTimeInterval =
+            generateRandomTimeInterval();  // Next interval
+      }
+
+      droneInfo.elapsedTimeSinceLastForce += (1.0 / 30.0f);
+      droneInfo.elapsedTime += (1.0 / 30.0f);
+
+      // Apply random walk velocity as steering force
+      b2Vec2 steer = droneInfo.desiredVelocity - currentDrone.getVelocity();
+      clampMagnitude(steer, currentDrone.getMaxForce());
+      acceleration += steer;
+    }
   } else {
-    // Drone is not at DSP point, go towards it
-    // calculate attractive force to own DSP point
-    float force = droneInfo.dsp->gravDSPForce(position, bspPos);
+    // If not walking, drone should head towards the DSP point
     b2Vec2 dir = directionTo(position, bspPos);
-    b2Vec2 steering = force * dir;
+    dir.Normalize();
+    b2Vec2 steering = currentDrone.getMaxSpeed() * dir;
     clampMagnitude(steering, currentDrone.getMaxForce());
     acceleration += steering;
   }
-
+  acceleration += neighbourAvoidance + obstacleAvoidance;
   velocity += acceleration;
   float speed = 0.001f + velocity.Length();
   b2Vec2 dir(velocity.x / speed, velocity.y / speed);

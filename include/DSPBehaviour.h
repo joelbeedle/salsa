@@ -17,12 +17,12 @@ class DSPPoint {
   float mass = 1.0f;
   float p = 2.0f;
   float F_max = (mass * v_max) / (1.0f / 30.0f);
-  float density = (M_PI * sqrt(3)) / 1.0f;
+  float density = (M_PI / 4);
   float area = 2000.0f * 2000.0f;
   float maxAreaCoverage = density * area;
   float numAgents = 50.0f;
   float searchAreaPerAgent = maxAreaCoverage / numAgents;
-  float R = 2 * sqrt(searchAreaPerAgent / M_PI);
+  float R = 5 * sqrt(searchAreaPerAgent / M_PI);
   float G_const = F_max * pow(R, p) * pow(2 - pow(1.5f, (1 - p)), p / (1 - p));
 
   b2Vec2 position;
@@ -83,6 +83,16 @@ class DSPBehaviour : public SwarmBehaviour {
     bool isAtDSPPoint;
     b2Vec2 dspPoint;
     DSPPoint *dsp;
+    bool beginWalk = false;
+    float elapsedTime = 0.0f;
+    // calculated from sqrt(4000000 + 4000000) / (2 * 10.0f);
+    // 141.421356237f
+    float timeToWalk = 141.421356237f;
+    float elapsedTimeSinceLastForce = 0.0f;
+    float randomTimeInterval = 1.0f;
+    b2Vec2 desiredVelocity;
+
+    DroneInfo() : randomTimeInterval(generateRandomTimeInterval()) {}
   };
 
   std::unordered_map<Drone *, DroneInfo> droneInformation;
@@ -103,5 +113,8 @@ class DSPBehaviour : public SwarmBehaviour {
     float angle = atan2((otherPoint.y - position.y), otherPoint.x - position.x);
     b2Vec2 direction(cos(angle), sin(angle));
     return direction;
+  }
+  static float generateRandomTimeInterval() {
+    return static_cast<float>(std::rand()) / RAND_MAX * 15.0f;
   }
 };
