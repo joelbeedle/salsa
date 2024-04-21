@@ -26,6 +26,8 @@ class SwarmBehaviour {
   virtual std::unordered_map<std::string, ParameterDefinition>
   getParameters() = 0;
 
+  virtual void clean(const std::vector<std::unique_ptr<Drone>> &drones) {}
+
  protected:
   void clampMagnitude(b2Vec2 &vector, const float maxMagnitude) {
     float lengthSquared = vector.LengthSquared();

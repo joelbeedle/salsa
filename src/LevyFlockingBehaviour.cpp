@@ -63,7 +63,7 @@ void LevyFlockingBehaviour::execute(
 
   } else if (dis(gen) < 0.02) {
     // we are not in a levy step, and we should be
-    droneInfo.levyPoint = levy(2.8f);
+    droneInfo.levyPoint = levy(2.0f);
     droneInfo.stepLength =
         sqrt(pow(droneInfo.levyPoint.x, 2) + pow(droneInfo.levyPoint.y, 2));
     droneInfo.accumulatedDistance = 0.0f;

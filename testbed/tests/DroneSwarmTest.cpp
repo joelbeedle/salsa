@@ -8,6 +8,7 @@
 #include <memory>
 #include <set>
 #include <sstream>
+#include <stack>
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
@@ -112,10 +113,19 @@ class DroneSwarmTest : public Test {
   int iters = 0;
   float timestep;
   std::string filename;
+  std::stack<std::string> testStack;
 
  public:
   DroneSwarmTest() {
     {
+      testStack.push("DSPBehaviour");
+      testStack.push("DSPBehaviour");
+      testStack.push("FlockingBehaviour");
+      testStack.push("FlockingBehaviour");
+      testStack.push("LevyFlockingBehaviour");
+      testStack.push("LevyFlockingBehaviour");
+      testStack.push("UniformRandomWalkBehaviour");
+      testStack.push("UniformRandomWalkBehaviour");
       initWorld();
       m_world->SetContactListener(&droneContactListener);
       g_camera.m_center.x = BORDER_HEIGHT / 2;
@@ -190,6 +200,8 @@ class DroneSwarmTest : public Test {
         std::make_unique<LevyFlockingBehaviour>(levyFlockingParams);
     auto dspBehaviour = std::make_unique<DSPBehaviour>(dspParams);
 
+    SwarmBehaviourRegistry::getInstance().add("DSPBehaviour",
+                                              std::move(dspBehaviour));
     SwarmBehaviourRegistry::getInstance().add("PheremoneBehaviour",
                                               std::move(pheremoneBehaviour));
     SwarmBehaviourRegistry::getInstance().add("FlockingBehaviour",
@@ -198,8 +210,6 @@ class DroneSwarmTest : public Test {
         "UniformRandomWalkBehaviour", std::move(uniformRandomWalkBehaviour));
     SwarmBehaviourRegistry::getInstance().add("LevyFlockingBehaviour",
                                               std::move(levyFlockBehaviour));
-    SwarmBehaviourRegistry::getInstance().add("DSPBehaviour",
-                                              std::move(dspBehaviour));
 
     auto &registry = SwarmBehaviourRegistry::getInstance();
     auto behaviourNames = registry.getSwarmBehaviourNames();
@@ -341,10 +351,28 @@ class DroneSwarmTest : public Test {
     }
   }
 
-  void BeginSimulation() {
+  void RunSimulation(std::string behaviourName) {
+    if (!testRunning) {
+      BeginSimulation(behaviourName);
+    }
+  }
+
+  void RunNextTest() {
+    std::string nextName = testStack.top();
+    testStack.pop();
+    RunSimulation(nextName);
+  }
+
+  void BeginSimulation(std::string behaviourName) {
     testRunning = true;
     time = 0.0f;
     iters = 0;
+    behaviour->clean(drones);
+    currentBehaviourName = behaviourName;
+    behaviour =
+        SwarmBehaviourRegistry::getInstance().getSwarmBehaviour(behaviourName);
+    SetBehaviour();
+
     DestroyDrones();
     createDronesCircular(*behaviour, *currentDroneConfig);
     ResetTrees();
@@ -451,10 +479,10 @@ class DroneSwarmTest : public Test {
     ImGui::Separator();
     if (ImGui::Button("Run Simulation")) {
       if (!testRunning) {
-        BeginSimulation();
+        BeginSimulation(currentBehaviourName);
       } else {
         testRunning = false;
-        BeginSimulation();
+        BeginSimulation(currentBehaviourName);
       }
     }
 
@@ -644,6 +672,12 @@ class DroneSwarmTest : public Test {
         output("=======================================\n");
         output("Simulation complete\n");
         output("Time taken: " + std::to_string(time) + "s\n");
+        long double acc = 0;
+        for (auto &tree : trees) {
+          acc += tree->getNumMapped();
+        }
+        acc /= trees.size();
+        output("Avg times trees mapped: " + std::to_string(acc));
         output("=======================================\n");
         testRunning = false;
       }
@@ -675,6 +709,8 @@ class DroneSwarmTest : public Test {
     // Logging
     if (testRunning) {
       Log(time, iters);
+    } else {
+      RunNextTest();
     }
   }
 };

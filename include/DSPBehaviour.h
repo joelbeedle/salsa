@@ -108,6 +108,8 @@ class DSPBehaviour : public SwarmBehaviour {
     return cleanParams;
   }
 
+  void clean(const std::vector<std::unique_ptr<Drone>> &drones) override;
+
  private:
   b2Vec2 directionTo(b2Vec2 &position, b2Vec2 &otherPoint) {
     float angle = atan2((otherPoint.y - position.y), otherPoint.x - position.x);

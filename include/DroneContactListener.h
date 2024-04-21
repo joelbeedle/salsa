@@ -46,6 +46,7 @@ class DroneContactListener : public b2ContactListener {
       drone = droneData->drone;
       drone->foundDiseasedTree(tree);
       tree->setMapped(true);
+      tree->addNumMapped();
 
     } else if (fixtureB->IsSensor() &&
                fixtureA->GetFilterData().categoryBits == 0x0002) {
@@ -56,12 +57,32 @@ class DroneContactListener : public b2ContactListener {
       UserData *droneData =
           reinterpret_cast<UserData *>(fixtureB->GetUserData().pointer);
       drone = droneData->drone;
+
       drone->foundDiseasedTree(tree);
       tree->setMapped(true);
+      tree->addNumMapped();
     }
   }
 
   void EndContact(b2Contact *contact) override {
-    // Handle end of contact if needed
+    b2Fixture *fixtureA = contact->GetFixtureA();
+    b2Fixture *fixtureB = contact->GetFixtureB();
+    Tree *tree = nullptr;
+
+    if (fixtureB->IsSensor() &&
+        fixtureA->GetFilterData().categoryBits == 0x0002) {
+      UserData *userData =
+          reinterpret_cast<UserData *>(fixtureA->GetUserData().pointer);
+      tree = userData->tree;
+    } else if (fixtureA->IsSensor() &&
+               fixtureB->GetFilterData().categoryBits == 0x0002) {
+      UserData *userData =
+          reinterpret_cast<UserData *>(fixtureB->GetUserData().pointer);
+      tree = userData->tree;
+    }
+
+    if (tree) {
+      tree->resetMapping();  // Reset the mapping state when contact ends
+    }
   }
 };

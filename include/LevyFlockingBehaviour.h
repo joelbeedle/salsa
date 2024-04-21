@@ -33,7 +33,6 @@ class LevyFlockingBehaviour : public SwarmBehaviour {
       {"Cohesion Weight", {&params.cohesionWeight, 0.0f, 2.0f}},
       {"Separation Weight", {&params.separationWeight, 0.0f, 2.0f}},
       {"Levy Weight", {&params.levyWeight, 0.0f, 10.0f}},
-
       {"Obstacle Avoidance Weight",
        {&params.obstacleAvoidanceWeight, 0.0f, 5.0f}}};
   std::vector<b2Body *> obstacles;
@@ -44,7 +43,7 @@ class LevyFlockingBehaviour : public SwarmBehaviour {
     float accumulatedDistance = 0.0f;
     bool isExecuting = false;
 
-    DroneInfo() : levyPoint(levy(2.8f)) {}
+    DroneInfo() : levyPoint(levy(2.0f)) {}
 
     float stepLength = sqrt(pow(levyPoint.x, 2) + pow(levyPoint.y, 2));
   };

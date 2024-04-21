@@ -101,7 +101,7 @@ void DSPBehaviour::execute(const std::vector<std::unique_ptr<Drone>> &drones,
     clampMagnitude(steering, currentDrone.getMaxForce());
     acceleration += steering;
   }
-  acceleration += neighbourAvoidance + obstacleAvoidance;
+  acceleration += neighbourAvoidance + (3.0f * obstacleAvoidance);
   velocity += acceleration;
   float speed = 0.001f + velocity.Length();
   b2Vec2 dir(velocity.x / speed, velocity.y / speed);
@@ -117,4 +117,13 @@ void DSPBehaviour::execute(const std::vector<std::unique_ptr<Drone>> &drones,
   currentDrone.getBody()->SetLinearVelocity(velocity);
   acceleration.SetZero();  // TODO: Find out implications of acceleration not
                            // being transient
+}
+
+void DSPBehaviour::clean(const std::vector<std::unique_ptr<Drone>> &drones) {
+  for (auto &point : dspPoints) {
+    b2World *world = point->body->GetWorld();
+    world->DestroyBody(point->body);
+  }
+  dspPoints.clear();
+  droneInformation.clear();
 }

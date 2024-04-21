@@ -7,8 +7,10 @@ class Tree {
   b2Body *body;
   bool diseased;
   bool mapped;
+  bool currentlyMapped = false;
   float radius;
   int treeID;
+  int numMapped = 0;
 
  public:
   Tree(b2World *world, int treeID, const b2Vec2 &position, bool diseased,
@@ -23,5 +25,13 @@ class Tree {
   b2Body *getBody() { return body; }
   void setID(int newID) { treeID = newID; }
   int getID() { return treeID; }
+  void addNumMapped() {
+    if (!currentlyMapped) {
+      numMapped++;
+      currentlyMapped = true;
+    }
+  }
+  void resetMapping() { currentlyMapped = false; }
+  int getNumMapped() { return numMapped; }
   void render();
 };
