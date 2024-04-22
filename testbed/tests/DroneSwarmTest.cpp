@@ -1,7 +1,9 @@
 #include <box2d/box2d.h>
 #include <stdio.h>
 
+#include <algorithm>
 #include <chrono>
+#include <filesystem>  // C++17 header for directory operations
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -81,7 +83,7 @@ class DroneSwarmTest : public Test {
   float maxSpeed;
   float maxForce;
 
-  int numDrones = 30;
+  int numDrones = 20;
 
   DroneConfiguration *djiMatrice300RTK_c =
       new DroneConfiguration(8.0f, 40.0f, 17.0f, 0.3f, 0.45f, 6.3f, 2000.0f);
@@ -120,17 +122,44 @@ class DroneSwarmTest : public Test {
  public:
   DroneSwarmTest() {
     {
-      // testStack.push("DSPBehaviour");
+      testStack.push("DSPBehaviour");
+      testStack.push("DSPBehaviour");
       testStack.push("LevyFlockingBehaviour");
       testStack.push("LevyFlockingBehaviour");
-      testStack.push("PheremoneBehaviour");
-      testStack.push("PheremoneBehaviour");
       testStack.push("UniformRandomWalkBehaviour");
       testStack.push("UniformRandomWalkBehaviour");
       testStack.push("FlockingBehaviour");
       testStack.push("FlockingBehaviour");
+      testStack.push("PheremoneBehaviour");
+      testStack.push("PheremoneBehaviour");
+
+      testStack.push("50");
       testStack.push("DSPBehaviour");
       testStack.push("DSPBehaviour");
+      testStack.push("LevyFlockingBehaviour");
+      testStack.push("LevyFlockingBehaviour");
+      testStack.push("UniformRandomWalkBehaviour");
+      testStack.push("UniformRandomWalkBehaviour");
+      testStack.push("FlockingBehaviour");
+      testStack.push("FlockingBehaviour");
+      testStack.push("PheremoneBehaviour");
+      testStack.push("PheremoneBehaviour");
+
+      testStack.push("40");
+      testStack.push("DSPBehaviour");
+      testStack.push("DSPBehaviour");
+      testStack.push("LevyFlockingBehaviour");
+      testStack.push("LevyFlockingBehaviour");
+      testStack.push("UniformRandomWalkBehaviour");
+      testStack.push("UniformRandomWalkBehaviour");
+      testStack.push("FlockingBehaviour");
+      testStack.push("FlockingBehaviour");
+      testStack.push("PheremoneBehaviour");
+      testStack.push("PheremoneBehaviour");
+
+      testStack.push("30");
+      testStack.push("LevyFlockingBehaviour");
+      testStack.push("LevyFlockingBehaviour");
 
       initWorld();
       m_world->SetContactListener(&droneContactListener);
@@ -365,6 +394,19 @@ class DroneSwarmTest : public Test {
 
   void RunNextTest() {
     std::string nextName = testStack.top();
+    auto behaviourNames =
+        SwarmBehaviourRegistry::getInstance().getSwarmBehaviourNames();
+    auto it = std::find(behaviourNames.begin(), behaviourNames.end(), nextName);
+    if (it == behaviourNames.end()) {
+      // Number
+      int num = std::stoi(nextName);
+      numDrones = num;
+      testStack.pop();
+      nextName = testStack.top();
+    }
+    // Check if the iterator points to the end (not found) or a valid position
+    // (found)
+
     testStack.pop();
     RunSimulation(nextName);
   }
@@ -625,9 +667,12 @@ class DroneSwarmTest : public Test {
       std::stringstream ss;
       ss << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d_%H-%M-%S");
       std::string timestamp = ss.str();
+      std::string dir = "results/" + std::to_string(numDrones);
+      std::filesystem::create_directories(
+          dir);  // Create directories if they do not exist
 
       // Create filename incorporating the current behavior and timestamp
-      filename = timestamp + "_" + currentBehaviourName + ".txt";
+      filename = dir + "/" + timestamp + "_" + currentBehaviourName + ".txt";
       // Replace spaces or any other special characters in filename if needed
       std::ofstream logFile(filename, std::ios::out);
       auto output = [&](const auto &message) {

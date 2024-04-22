@@ -29,7 +29,7 @@ void PheremoneBehaviour::execute(
     Pheremone &pheremone = pair.second;
     float distance = b2Distance(currentDrone.getPosition(), pheremone.position);
 
-    if (distance < currentDrone.getViewRange() && distance > 0) {
+    if (distance < currentDrone.getObstacleViewRange() && distance > 0) {
       // Calculate a vector pointing away from the pheremone
       b2Vec2 awayFromPheremone =
           currentDrone.getPosition() - pheremone.position;
@@ -81,7 +81,7 @@ void PheremoneBehaviour::execute(
 }
 
 void PheremoneBehaviour::layPheremone(const b2Vec2 &position) {
-  Pheremone pheremone = {position, 1.0f};
+  Pheremone pheremone = {position, 500.0f};
   pheremones[pheremoneCount++] = pheremone;
 }
 

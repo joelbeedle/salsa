@@ -10,6 +10,7 @@ void DSPBehaviour::execute(const std::vector<std::unique_ptr<Drone>> &drones,
     droneInformation[&currentDrone] = DroneInfo();
     DSPPoint *dsp = new DSPPoint(currentDrone.getBody()->GetWorld(),
                                  currentDrone.getPosition());
+    dsp->recalc(drones.size());
     droneInformation[&currentDrone].dsp = dsp;
     dspPoints.push_back(dsp);
   }
@@ -57,7 +58,7 @@ void DSPBehaviour::execute(const std::vector<std::unique_ptr<Drone>> &drones,
   b2Vec2 steer(0, 0);
 
   float distanceToDSP = b2Distance(position, bspPos);
-  if (distanceToDSP < 5.0f) {
+  if (distanceToDSP < 40.0f) {
     if (!droneInfo.beginWalk && droneInfo.elapsedTime == 0.0f) {
       // Start the random walk if not already started and timer is reset
       droneInfo.beginWalk = true;
