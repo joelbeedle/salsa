@@ -20,7 +20,7 @@ class DSPPoint {
   float density = (M_PI / 4);
   float area = 2000.0f * 2000.0f;
   float maxAreaCoverage = density * area;
-  float numAgents = 50.0f;
+  float numAgents = 30.0f;
   float searchAreaPerAgent = maxAreaCoverage / numAgents;
   float R = 5 * sqrt(searchAreaPerAgent / M_PI);
   float G_const = F_max * pow(R, p) * pow(2 - pow(1.5f, (1 - p)), p / (1 - p));

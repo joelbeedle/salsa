@@ -81,6 +81,8 @@ class DroneSwarmTest : public Test {
   float maxSpeed;
   float maxForce;
 
+  int numDrones = 30;
+
   DroneConfiguration *djiMatrice300RTK_c =
       new DroneConfiguration(8.0f, 40.0f, 17.0f, 0.3f, 0.45f, 6.3f, 2000.0f);
   DroneConfiguration *djiPhantom4RTK =
@@ -118,14 +120,18 @@ class DroneSwarmTest : public Test {
  public:
   DroneSwarmTest() {
     {
-      testStack.push("DSPBehaviour");
-      testStack.push("DSPBehaviour");
-      testStack.push("FlockingBehaviour");
-      testStack.push("FlockingBehaviour");
+      // testStack.push("DSPBehaviour");
       testStack.push("LevyFlockingBehaviour");
       testStack.push("LevyFlockingBehaviour");
+      testStack.push("PheremoneBehaviour");
+      testStack.push("PheremoneBehaviour");
       testStack.push("UniformRandomWalkBehaviour");
       testStack.push("UniformRandomWalkBehaviour");
+      testStack.push("FlockingBehaviour");
+      testStack.push("FlockingBehaviour");
+      testStack.push("DSPBehaviour");
+      testStack.push("DSPBehaviour");
+
       initWorld();
       m_world->SetContactListener(&droneContactListener);
       g_camera.m_center.x = BORDER_HEIGHT / 2;
@@ -182,8 +188,8 @@ class DroneSwarmTest : public Test {
     currentConfigName = droneConfigs.begin()->first;
     currentDroneConfig = droneConfigs[currentConfigName];
 
-    flockingParams = {50.0f, 1.6f, 0.8f, 1.8f, 3.0f};
-    levyFlockingParams = {50.0f, 1.6f, 0.8f, 1.8f, 1.0f, 3.0f};
+    flockingParams = {90.0f, 1.6f, 0.8f, 2.0f, 3.0f};
+    levyFlockingParams = {90.0f, 1.6f, 0.4f, 2.0f, 3.0f, 3.0f};
 
     pheremoneParams = {0.1f, 1.0f};
     uniformRandomWalkParams = {5.0f, 0.5f, 1.0f, 1.0 / 60.0f};
@@ -224,7 +230,7 @@ class DroneSwarmTest : public Test {
   void createDrones(SwarmBehaviour &b, DroneConfiguration &config) {
     const float margin = 2.0f;  // Define a margin to prevent spawning exactly
                                 // at the border or outside
-    for (int i = 0; i < DRONE_COUNT; i++) {
+    for (int i = 0; i < numDrones; i++) {
       float x = (rand() % static_cast<int>(BORDER_WIDTH - 2 * margin)) + margin;
       float y =
           (rand() % static_cast<int>(BORDER_HEIGHT - 2 * margin)) + margin;
@@ -236,7 +242,7 @@ class DroneSwarmTest : public Test {
   void createDronesCircular(SwarmBehaviour &b, DroneConfiguration &config) {
     // Calculate the total area needed for all drones
     float droneArea = M_PI * std::pow(config.radius, 2);
-    float totalDroneArea = DRONE_COUNT * droneArea;
+    float totalDroneArea = numDrones * droneArea;
 
     // Calculate the radius of the circle needed to fit all drones
     float requiredCircleRadius = sqrt(totalDroneArea / M_PI);
@@ -245,7 +251,7 @@ class DroneSwarmTest : public Test {
     float centerX = BORDER_WIDTH / 2.0f;
     float centerY = BORDER_HEIGHT / 2.0f;
 
-    for (int i = 0; i < DRONE_COUNT; i++) {
+    for (int i = 0; i < numDrones; i++) {
       // Generate random angle and radius within the required circle
       float theta = static_cast<float>(rand()) / RAND_MAX * 2.0f * M_PI;
       // Ensure drones fit within the required circle, leaving a margin equal to
@@ -632,7 +638,7 @@ class DroneSwarmTest : public Test {
       output("=======================================\n");
       output("Starting simulation\n");
       output("=======================================\n");
-      output("Drone count: " + std::to_string(DRONE_COUNT) + "\n");
+      output("Drone count: " + std::to_string(numDrones) + "\n");
       output("Tree count: " + std::to_string(TREE_COUNT) + "\n");
       output("Area: " + std::to_string(BORDER_WIDTH) + "x" +
              std::to_string(BORDER_HEIGHT) + "\n");
@@ -644,7 +650,7 @@ class DroneSwarmTest : public Test {
       }
       output("=======================================\n");
       output("Using Preset: " + currentConfigName + "\n");
-      output("Drone count: " + std::to_string(DRONE_COUNT) + "\n");
+      output("Drone count: " + std::to_string(numDrones) + "\n");
       output("=======================================\n");
       output("Time (s) | Trees mapped | % mapped of total\n");
     }
