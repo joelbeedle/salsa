@@ -38,8 +38,8 @@ Drone::Drone(b2World *world, const b2Vec2 &position, SwarmBehaviour &behaviour,
 
   fixtureDef.density = density_box2d;
   UserData *userData = new UserData();
-  userData->type = ObjectType::Drone;  // or ObjectType::Tree for a tree
-  userData->drone = this;              // or userData->tree = this for a tree
+  userData->type = ObjectType::Drone;
+  userData->drone = this;
 
   fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(userData);
   body->CreateFixture(&fixtureDef);
@@ -86,7 +86,7 @@ void Drone::updateSensorRange() {
   sFixtureDef.filter.categoryBits = 0x0001;
   sFixtureDef.filter.maskBits = 0x0002;
   UserData *userData = new UserData();
-  userData->type = ObjectType::Drone;  // or ObjectType::Tree for a tree
+  userData->type = ObjectType::Drone;
   userData->drone = this;
   sFixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(userData);
 
@@ -104,11 +104,6 @@ void Drone::update(std::vector<std::unique_ptr<Drone>> &drones) {
   if (behaviour) {
     behaviour->execute(drones, *this);
   }
-  // Clear found trees for this cycle?
-  // this->foundDiseasedTrees.clear();
-  // this->foundDiseasedTreePositions.clear();
-  // this->foundTrees.clear();
-
   b2Vec2 position = body->GetPosition();
 
   body->SetTransform(position, body->GetAngle());

@@ -20,7 +20,6 @@
 #define VIEW_ANGLE 90.0f * (b2_pi * 180.0f)
 
 void renderDrones(sf::RenderWindow &window, b2Body *body, float radius) {
-  // Calculate the angle of the velocity
   b2Vec2 velocity = body->GetLinearVelocity();
   float angle = std::atan2(velocity.y, velocity.x);
 
@@ -36,12 +35,10 @@ void renderDrones(sf::RenderWindow &window, b2Body *body, float radius) {
   triangle.setPoint(2, sf::Vector2f(radius * std::cos(angle - 2.5f),
                                     radius * std::sin(angle - 2.5f)));
 
-  // Set the position and color of the triangle
   b2Vec2 position = body->GetPosition();
   triangle.setPosition({position.x, position.y});
   triangle.setFillColor(sf::Color::White);
 
-  // Draw the triangle
   window.draw(triangle);
 }
 
@@ -73,12 +70,8 @@ void createScreenBounds(b2World *world, float screenWidth, float screenHeight) {
   b2BodyDef groundBodyDef;
   groundBodyDef.position.Set(0.0f, 0.0f);
 
-  // Call the body factory which allocates memory for the ground body
-  // from a pool and creates the ground box shape (also from a pool).
-  // The body is also added to the world.
   b2Body *groundBody = world->CreateBody(&groundBodyDef);
 
-  // Define the ground box shape.
   b2EdgeShape groundBox;
 
   // bottom

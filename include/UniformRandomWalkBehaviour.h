@@ -56,7 +56,6 @@ class UniformRandomWalkBehaviour : public SwarmBehaviour {
                Drone &currentDrone) override;
 
  private:
-  // Function to generate a random time interval between 0 and 10 seconds
   static float generateRandomTimeInterval() {
     return static_cast<float>(std::rand()) / RAND_MAX * 5.0f;
   }

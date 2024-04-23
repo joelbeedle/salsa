@@ -69,7 +69,6 @@ b2Vec2 SwarmBehaviour::avoidObstacles(std::vector<b2Vec2> &obstaclePoints,
 
 void SwarmBehaviour::performRayCasting(Drone &currentDrone,
                                        RayCastCallback &callback) {
-  // Define the ray casting range and angle
   float rayRange = currentDrone.getObstacleViewRange();
   float deltaAngle = 45.0f;  // dividing the circle into segments
 

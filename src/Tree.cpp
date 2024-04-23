@@ -24,8 +24,8 @@ Tree::Tree(b2World *world, int treeID, const b2Vec2 &position, bool diseased,
   fixtureDef.filter.categoryBits = 0x0002;
   fixtureDef.filter.maskBits = 0x0001;
   UserData *userData = new UserData();
-  userData->type = ObjectType::Tree;  // or ObjectType::Tree for a tree
-  userData->tree = this;              // or userData->tree = this for a tree
+  userData->type = ObjectType::Tree;
+  userData->tree = this;
 
   fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(userData);
   body->CreateFixture(&fixtureDef);

@@ -11,7 +11,6 @@ class DroneConfiguration {
   float mass;
   float droneDetectionRange;
 
-  // Constructor for DroneConfiguration
   DroneConfiguration(float cameraView, float obstacleView, float maxSpd,
                      float maxFrc, float rad, float mss, float droneDetectRange)
       : cameraViewRange(cameraView),

@@ -43,20 +43,18 @@ class DSPPoint {
     fixtureDef.shape = &circleShape;
     float area_m2 = M_PI * pow(radius, 2);
 
-    // Calculating the required density for Box2D
     float density_box2d = mass / area_m2;
 
     fixtureDef.density = density_box2d;
 
     body->CreateFixture(&fixtureDef);
 
-    // Initialize random starting velocity
     body->SetLinearVelocity(b2Vec2(0, 0));
   }
 
   float gravDSPForce(b2Vec2 &position, b2Vec2 &otherPoint) {
     float distance = b2Distance(otherPoint, position);
-    if (distance < 0.0001f) {  // Prevent division by zero
+    if (distance < 0.0001f) {
       distance = 0.0001f;
     }
 

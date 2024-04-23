@@ -8,7 +8,7 @@
 UniformRandomWalkBehaviour::UniformRandomWalkBehaviour(
     const UniformRandomWalkParameters &params)
     : params(params) {
-  std::srand(std::time(nullptr));  // Initialize random seed
+  std::srand(std::time(nullptr));
 }
 
 void UniformRandomWalkBehaviour::execute(

@@ -83,7 +83,7 @@ class DroneSwarmTest : public Test {
   float maxSpeed;
   float maxForce;
 
-  int numDrones = 20;
+  int numDrones = 10;
 
   DroneConfiguration *djiMatrice300RTK_c =
       new DroneConfiguration(8.0f, 40.0f, 17.0f, 0.3f, 0.45f, 6.3f, 2000.0f);
@@ -154,12 +154,26 @@ class DroneSwarmTest : public Test {
       testStack.push("UniformRandomWalkBehaviour");
       testStack.push("FlockingBehaviour");
       testStack.push("FlockingBehaviour");
-      testStack.push("PheremoneBehaviour");
-      testStack.push("PheremoneBehaviour");
 
       testStack.push("30");
+      testStack.push("DSPBehaviour");
+      testStack.push("DSPBehaviour");
       testStack.push("LevyFlockingBehaviour");
       testStack.push("LevyFlockingBehaviour");
+      testStack.push("UniformRandomWalkBehaviour");
+      testStack.push("UniformRandomWalkBehaviour");
+      testStack.push("FlockingBehaviour");
+      testStack.push("FlockingBehaviour");
+
+      testStack.push("20");
+      testStack.push("DSPBehaviour");
+      testStack.push("DSPBehaviour");
+      testStack.push("LevyFlockingBehaviour");
+      testStack.push("LevyFlockingBehaviour");
+      testStack.push("UniformRandomWalkBehaviour");
+      testStack.push("UniformRandomWalkBehaviour");
+      testStack.push("FlockingBehaviour");
+      testStack.push("FlockingBehaviour");
 
       initWorld();
       m_world->SetContactListener(&droneContactListener);
@@ -217,8 +231,8 @@ class DroneSwarmTest : public Test {
     currentConfigName = droneConfigs.begin()->first;
     currentDroneConfig = droneConfigs[currentConfigName];
 
-    flockingParams = {90.0f, 1.6f, 0.8f, 2.0f, 3.0f};
-    levyFlockingParams = {90.0f, 1.6f, 0.4f, 2.0f, 3.0f, 3.0f};
+    flockingParams = {250.0f, 1.6f, 1.0f, 3.0f, 3.0f};
+    levyFlockingParams = {250.0f, 1.6f, 0.8f, 3.0f, 3.0f, 3.0f};
 
     pheremoneParams = {0.1f, 1.0f};
     uniformRandomWalkParams = {5.0f, 0.5f, 1.0f, 1.0 / 60.0f};
@@ -281,7 +295,7 @@ class DroneSwarmTest : public Test {
     float centerY = BORDER_HEIGHT / 2.0f;
 
     for (int i = 0; i < numDrones; i++) {
-      // Generate random angle and radius within the required circle
+      // generate random angle and radius within the required circle
       float theta = static_cast<float>(rand()) / RAND_MAX * 2.0f * M_PI;
       // Ensure drones fit within the required circle, leaving a margin equal to
       // the drone's radius
@@ -315,19 +329,15 @@ class DroneSwarmTest : public Test {
 
     for (Tree *tree : allTrees) {
       if (tree->isDiseased()) {
-        // Get all nearby trees within the infection radius
         std::vector<Tree *> nearbyTrees = getTreesInRadius(
             tree->getBody()->GetPosition(), infectionRadius, allTrees);
 
         for (Tree *nearbyTree : nearbyTrees) {
           if (!nearbyTree->isDiseased()) {
-            // Calculate infection probability based on distance
             float distance = b2Distance(tree->getBody()->GetPosition(),
                                         nearbyTree->getBody()->GetPosition());
-            float probabilityOfInfection =
-                1.0f - (distance / infectionRadius);  // Example calculation
+            float probabilityOfInfection = 1.0f - (distance / infectionRadius);
 
-            // Random chance to infect based on calculated probability
             float randomChance =
                 static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
             if (randomChance < probabilityOfInfection) {
@@ -338,7 +348,6 @@ class DroneSwarmTest : public Test {
       }
     }
 
-    // Infect trees determined to be infected in this time step
     for (Tree *treeToInfect : treesToInfect) {
       treeToInfect->setDiseased(true);
     }
@@ -398,14 +407,11 @@ class DroneSwarmTest : public Test {
         SwarmBehaviourRegistry::getInstance().getSwarmBehaviourNames();
     auto it = std::find(behaviourNames.begin(), behaviourNames.end(), nextName);
     if (it == behaviourNames.end()) {
-      // Number
       int num = std::stoi(nextName);
       numDrones = num;
       testStack.pop();
       nextName = testStack.top();
     }
-    // Check if the iterator points to the end (not found) or a valid position
-    // (found)
 
     testStack.pop();
     RunSimulation(nextName);
@@ -576,8 +582,6 @@ class DroneSwarmTest : public Test {
           }
         }
 
-        // Check if the fixture has user data, if it does its a drone (non
-        // sensor) or tree (sensor) fixture
         if (fixture->GetUserData().pointer != 0) {
           UserData *userData =
               reinterpret_cast<UserData *>(fixture->GetUserData().pointer);
@@ -663,17 +667,14 @@ class DroneSwarmTest : public Test {
       auto now = std::chrono::system_clock::now();
       auto in_time_t = std::chrono::system_clock::to_time_t(now);
 
-      // Create a timestamp string
       std::stringstream ss;
       ss << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d_%H-%M-%S");
       std::string timestamp = ss.str();
       std::string dir = "results/" + std::to_string(numDrones);
-      std::filesystem::create_directories(
-          dir);  // Create directories if they do not exist
+      std::filesystem::create_directories(dir);
 
-      // Create filename incorporating the current behavior and timestamp
+      // filename incorporating the current behavior and timestamp
       filename = dir + "/" + timestamp + "_" + currentBehaviourName + ".txt";
-      // Replace spaces or any other special characters in filename if needed
       std::ofstream logFile(filename, std::ios::out);
       auto output = [&](const auto &message) {
         std::cout << message;

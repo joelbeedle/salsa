@@ -116,8 +116,7 @@ void DSPBehaviour::execute(const std::vector<std::unique_ptr<Drone>> &drones,
   velocity = b2Vec2(dir.x * speed, dir.y * speed);
 
   currentDrone.getBody()->SetLinearVelocity(velocity);
-  acceleration.SetZero();  // TODO: Find out implications of acceleration not
-                           // being transient
+  acceleration.SetZero();
 }
 
 void DSPBehaviour::clean(const std::vector<std::unique_ptr<Drone>> &drones) {

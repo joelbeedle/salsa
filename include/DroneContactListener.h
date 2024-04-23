@@ -82,7 +82,7 @@ class DroneContactListener : public b2ContactListener {
     }
 
     if (tree) {
-      tree->resetMapping();  // Reset the mapping state when contact ends
+      tree->resetMapping();
     }
   }
 };

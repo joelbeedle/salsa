@@ -44,16 +44,16 @@ void LevyFlockingBehaviour::execute(
 
   if (droneInfo.isExecuting) {
     // we are currently in a levy step
-    droneInfo.accumulatedDistance += velocity.Length() * (1.0f / 30.0f);
+    droneInfo.accumulatedDistance += velocity.Length();
 
     b2Vec2 dir = droneInfo.levyDirection;
     dir.Normalize();
     dir *= currentDrone.getMaxSpeed();
     b2Vec2 steering = dir - currentDrone.getVelocity();
     clampMagnitude(steering, currentDrone.getMaxForce());
-    acceleration =
-        (params.levyWeight * steering) + (params.cohesionWeight * cohesion) +
-        (params.obstacleAvoidanceWeight * obstacleAvoidance) + droneAvoidance;
+    acceleration = (params.levyWeight * steering) +
+                   (params.obstacleAvoidanceWeight * obstacleAvoidance) +
+                   droneAvoidance;
 
     if (droneInfo.accumulatedDistance >= droneInfo.stepLength) {
       // finish walk
@@ -61,9 +61,9 @@ void LevyFlockingBehaviour::execute(
       droneInfo.isExecuting = false;
     }
 
-  } else if (dis(gen) < 0.02) {
+  } else if (dis(gen) < 0.05) {
     // we are not in a levy step, and we should be
-    droneInfo.levyPoint = levy(2.0f);
+    droneInfo.levyPoint = levy(1.5f);
     droneInfo.stepLength =
         sqrt(pow(droneInfo.levyPoint.x, 2) + pow(droneInfo.levyPoint.y, 2));
     droneInfo.accumulatedDistance = 0.0f;

@@ -27,10 +27,10 @@ class FlockingBehaviour : public SwarmBehaviour {
   // Define the parameter names and their expected min and max values
   // (for the UI)
   std::unordered_map<std::string, ParameterDefinition> cleanParams = {
-      {"Separation Distance", {&params.separationDistance, 0.0f, 100.0f}},
+      {"Separation Distance", {&params.separationDistance, 0.0f, 1000.0f}},
       {"Alignment Weight", {&params.alignmentWeight, 0.0f, 2.0f}},
       {"Cohesion Weight", {&params.cohesionWeight, 0.0f, 2.0f}},
-      {"Separation Weight", {&params.separationWeight, 0.0f, 2.0f}},
+      {"Separation Weight", {&params.separationWeight, 0.0f, 5.0f}},
       {"Obstacle Avoidance Weight",
        {&params.obstacleAvoidanceWeight, 0.0f, 5.0f}}};
   std::vector<b2Body *> obstacles;

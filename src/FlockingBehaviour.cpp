@@ -17,7 +17,6 @@ void FlockingBehaviour::execute(
     bodies.push_back(drone.get()->getBody());
   }
 
-  // Separating drones and obstacles from callback results
   std::vector<b2Body *> neighbours = bodies;
   std::vector<b2Vec2> obstaclePoints = callback.obstaclePoints;
 
@@ -46,8 +45,7 @@ void FlockingBehaviour::execute(
   velocity = b2Vec2(dir.x * speed, dir.y * speed);
 
   currentDrone.getBody()->SetLinearVelocity(velocity);
-  acceleration.SetZero();  // TODO: Find out implications of acceleration not
-                           // being transient
+  acceleration.SetZero();
 }
 
 b2Vec2 FlockingBehaviour::align(std::vector<b2Body *> &drones,
