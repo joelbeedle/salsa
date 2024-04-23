@@ -76,9 +76,9 @@ void LevyFlockingBehaviour::execute(
 
     b2Vec2 steering = dir - currentDrone.getVelocity();
     clampMagnitude(steering, currentDrone.getMaxForce());
-    acceleration =
-        (params.levyWeight * steering) + (params.cohesionWeight * cohesion) +
-        (params.obstacleAvoidanceWeight * obstacleAvoidance) + droneAvoidance;
+    acceleration = (params.levyWeight * steering) +
+                   (params.obstacleAvoidanceWeight * obstacleAvoidance) +
+                   droneAvoidance;
 
   } else {
     // usual flocking behaviour

@@ -13,16 +13,17 @@ struct DSPParameters {};
 class DSPPoint {
  public:
   float radius = 1.0f;
-  float v_max = 1.0f;
+  float v_max = 45.0f;
   float mass = 1.0f;
   float p = 2.0f;
   float F_max = (mass * v_max) / (1.0f / 30.0f);
-  float density = (M_PI / 4);
+  // float density = (M_PI / 4);
+  float density = (M_PI * sqrt(3)) / 6;
   float area = 2000.0f * 2000.0f;
   float maxAreaCoverage = density * area;
   float numAgents = 50.0f;
   float searchAreaPerAgent = maxAreaCoverage / numAgents;
-  float R = 5 * sqrt(searchAreaPerAgent / M_PI);
+  float R = (numAgents / 10.0f) * sqrt(searchAreaPerAgent / M_PI);
   float G_const = F_max * pow(R, p) * pow(2 - pow(1.5f, (1 - p)), p / (1 - p));
 
   b2Vec2 position;
@@ -69,7 +70,7 @@ class DSPPoint {
   void recalc(int numDrones) {
     numAgents = static_cast<float>(numDrones);
     searchAreaPerAgent = maxAreaCoverage / numAgents;
-    R = 5 * sqrt(searchAreaPerAgent / M_PI);
+    R = (2 + (numAgents / 20.0f)) * sqrt(searchAreaPerAgent / M_PI);
     G_const = F_max * pow(R, p) * pow(2 - pow(1.5f, (1 - p)), p / (1 - p));
   }
 };

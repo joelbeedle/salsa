@@ -1,5 +1,6 @@
 #include <box2d/box2d.h>
 #include <stdio.h>
+#include <time.h>
 
 #include <algorithm>
 #include <chrono>
@@ -156,24 +157,6 @@ class DroneSwarmTest : public Test {
       testStack.push("FlockingBehaviour");
 
       testStack.push("30");
-      testStack.push("DSPBehaviour");
-      testStack.push("DSPBehaviour");
-      testStack.push("LevyFlockingBehaviour");
-      testStack.push("LevyFlockingBehaviour");
-      testStack.push("UniformRandomWalkBehaviour");
-      testStack.push("UniformRandomWalkBehaviour");
-      testStack.push("FlockingBehaviour");
-      testStack.push("FlockingBehaviour");
-
-      testStack.push("20");
-      testStack.push("DSPBehaviour");
-      testStack.push("DSPBehaviour");
-      testStack.push("LevyFlockingBehaviour");
-      testStack.push("LevyFlockingBehaviour");
-      testStack.push("UniformRandomWalkBehaviour");
-      testStack.push("UniformRandomWalkBehaviour");
-      testStack.push("FlockingBehaviour");
-      testStack.push("FlockingBehaviour");
 
       initWorld();
       m_world->SetContactListener(&droneContactListener);
@@ -355,7 +338,10 @@ class DroneSwarmTest : public Test {
 
   void createTrees() {
     // Seed for reproducability
-    srand(1967);
+    auto seed =
+        std::chrono::high_resolution_clock::now().time_since_epoch().count();
+
+    srand(seed);
     const float margin = 2.0f;
     for (int i = 0; i < TREE_COUNT; i++) {
       float x = (rand() % static_cast<int>(BORDER_WIDTH - 2 * margin)) + margin;
@@ -391,6 +377,7 @@ class DroneSwarmTest : public Test {
     treeColors.clear();
     for (auto &tree : trees) {
       tree->setMapped(false);
+      tree->resetNumMapped();
       treeColors.push_back(falseColour);
     }
   }
@@ -670,7 +657,7 @@ class DroneSwarmTest : public Test {
       std::stringstream ss;
       ss << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d_%H-%M-%S");
       std::string timestamp = ss.str();
-      std::string dir = "results/" + std::to_string(numDrones);
+      std::string dir = "new_results/" + std::to_string(numDrones);
       std::filesystem::create_directories(dir);
 
       // filename incorporating the current behavior and timestamp

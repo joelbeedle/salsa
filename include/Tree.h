@@ -32,6 +32,7 @@ class Tree {
     }
   }
   void resetMapping() { currentlyMapped = false; }
+  void resetNumMapped() { numMapped = 0; }
   int getNumMapped() { return numMapped; }
   void render();
 };
