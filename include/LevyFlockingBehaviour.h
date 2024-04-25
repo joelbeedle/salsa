@@ -43,9 +43,9 @@ class LevyFlockingBehaviour : public SwarmBehaviour {
     float accumulatedDistance = 0.0f;
     bool isExecuting = false;
 
-    DroneInfo() : levyPoint(levy(1.5f)) {}
+    DroneInfo() : levyPoint(levy(2.1f)) {}
 
-    float stepLength = sqrt(pow(levyPoint.x, 2) + pow(levyPoint.y, 2));
+    float stepLength = 0.0f;
   };
 
   std::unordered_map<Drone *, DroneInfo> droneInformation;

@@ -45,7 +45,6 @@ void LevyFlockingBehaviour::execute(
   if (droneInfo.isExecuting) {
     // we are currently in a levy step
     droneInfo.accumulatedDistance += velocity.Length();
-
     b2Vec2 dir = droneInfo.levyDirection;
     dir.Normalize();
     dir *= currentDrone.getMaxSpeed();
@@ -63,9 +62,9 @@ void LevyFlockingBehaviour::execute(
 
   } else if (dis(gen) < 0.05) {
     // we are not in a levy step, and we should be
-    droneInfo.levyPoint = levy(1.5f);
-    droneInfo.stepLength =
-        sqrt(pow(droneInfo.levyPoint.x, 2) + pow(droneInfo.levyPoint.y, 2));
+    droneInfo.levyPoint = levy(3.0f);
+    droneInfo.stepLength = static_cast<float>(
+        sqrt(pow(droneInfo.levyPoint.x, 2) + pow(droneInfo.levyPoint.y, 2)));
     droneInfo.accumulatedDistance = 0.0f;
     droneInfo.levyDirection = generateRandomDirection();
     droneInfo.isExecuting = true;

@@ -12,7 +12,7 @@ struct DSPParameters {};
 
 class DSPPoint {
  public:
-  float radius = 1.0f;
+  float radius = 2.0f;
   float v_max = 45.0f;
   float mass = 1.0f;
   float p = 2.0f;

@@ -124,39 +124,7 @@ class DroneSwarmTest : public Test {
   DroneSwarmTest() {
     {
       testStack.push("DSPBehaviour");
-      testStack.push("DSPBehaviour");
-      testStack.push("LevyFlockingBehaviour");
-      testStack.push("LevyFlockingBehaviour");
-      testStack.push("UniformRandomWalkBehaviour");
-      testStack.push("UniformRandomWalkBehaviour");
-      testStack.push("FlockingBehaviour");
-      testStack.push("FlockingBehaviour");
-      testStack.push("PheremoneBehaviour");
-      testStack.push("PheremoneBehaviour");
-
-      testStack.push("50");
-      testStack.push("DSPBehaviour");
-      testStack.push("DSPBehaviour");
-      testStack.push("LevyFlockingBehaviour");
-      testStack.push("LevyFlockingBehaviour");
-      testStack.push("UniformRandomWalkBehaviour");
-      testStack.push("UniformRandomWalkBehaviour");
-      testStack.push("FlockingBehaviour");
-      testStack.push("FlockingBehaviour");
-      testStack.push("PheremoneBehaviour");
-      testStack.push("PheremoneBehaviour");
-
       testStack.push("40");
-      testStack.push("DSPBehaviour");
-      testStack.push("DSPBehaviour");
-      testStack.push("LevyFlockingBehaviour");
-      testStack.push("LevyFlockingBehaviour");
-      testStack.push("UniformRandomWalkBehaviour");
-      testStack.push("UniformRandomWalkBehaviour");
-      testStack.push("FlockingBehaviour");
-      testStack.push("FlockingBehaviour");
-
-      testStack.push("30");
 
       initWorld();
       m_world->SetContactListener(&droneContactListener);
