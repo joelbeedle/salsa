@@ -1,3 +1,3 @@
-[submodule "external/Box2D"]
-	path = external/Box2D
+[submodule "extern/Box2D"]
+	path = extern/Box2D
 	url = https://github.com/erincatto/box2d.git
