@@ -7,10 +7,6 @@ option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 option(BUILD_TESTBED "Build the Box2D testbed" ON)
 add_compile_definitions(_USE_MATH_DEFINES)
 
-# Add SFML submodule
-add_subdirectory(lib/SFML)
-include_directories(lib/SFML/include)
-
 # Add Box2D submodule
 add_subdirectory(lib/Box2D)
 include_directories(lib/Box2D)
@@ -30,9 +26,6 @@ add_executable(swarm-box2d ${SOURCES})
 
 # Linking
 target_link_libraries(swarm-box2d PRIVATE box2d)
-
-target_link_libraries(swarm-box2d PRIVATE sfml-system sfml-network sfml-graphics sfml-window)
-
 
 # Include directory
 target_include_directories(swarm-box2d PRIVATE ${PROJECT_SOURCE_DIR}/include)
