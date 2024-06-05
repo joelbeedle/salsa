@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "swarm_behaviour.h"
+#include "behaviours/behaviour.h"
 
 class SwarmBehaviourRegistry {
  private:

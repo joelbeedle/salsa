@@ -1,10 +1,10 @@
 // Drone.cpp
-#include "drone.h"
+#include "drones/drone.h"
 
 #include <cmath>
 #include <valarray>
 
-#include "object_types.h"
+#include "utils/object_types.h"
 
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600

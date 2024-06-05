@@ -1,7 +1,6 @@
-#include "swarm_behaviour.h"
-
+#include "behaviours/behaviour.h"
 #include "box2d/box2d.h"
-#include "drone.h"
+#include "drones/drone.h"
 
 b2Vec2 SwarmBehaviour::avoidDrones(std::vector<b2Body *> &neighbours,
                                    Drone &currentDrone) {

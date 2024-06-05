@@ -15,13 +15,14 @@ set (MY_TESTBED_SOURCE_FILES
 	tests/drone_swarm_test.cpp
 )
 set(MY_PROJECT_SOURCE_FILES
-${PROJECT_SOURCE_DIR}/src/drone.cpp
-${PROJECT_SOURCE_DIR}/src/swarm_behaviour.cpp
-${PROJECT_SOURCE_DIR}/src/flocking_behaviour.cpp
-${PROJECT_SOURCE_DIR}/src/levy_flocking_behaviour.cpp
-${PROJECT_SOURCE_DIR}/src/pheremone_behaviour.cpp
-${PROJECT_SOURCE_DIR}/src/urw_behaviour.cpp
-${PROJECT_SOURCE_DIR}/src/dsp_behaviour.cpp
+${PROJECT_SOURCE_DIR}/src/drones/drone.cpp
+${PROJECT_SOURCE_DIR}/src/behaviours/pheromone_avoidance.cpp
+${PROJECT_SOURCE_DIR}/src/behaviours/behaviour.cpp
+${PROJECT_SOURCE_DIR}/src/behaviours/flocking.cpp
+${PROJECT_SOURCE_DIR}/src/behaviours/levy_flocking.cpp
+${PROJECT_SOURCE_DIR}/src/behaviours/flocking.cpp
+${PROJECT_SOURCE_DIR}/src/behaviours/uniform_random_walk.cpp
+${PROJECT_SOURCE_DIR}/src/behaviours/dsp.cpp
 ${PROJECT_SOURCE_DIR}/src/tree.cpp)
 set(MY_PROJECT_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../include")
 

@@ -1,6 +1,10 @@
-#include "pheremone_behaviour.h"
+#include "behaviours/pheromone_avoidance.h"
 
-#include "drone.h"
+#include <map>
+#include <memory>
+#include <unordered_map>
+
+#include "drones/drone.h"
 
 void PheremoneBehaviour::execute(
     const std::vector<std::unique_ptr<Drone>> &drones, Drone &currentDrone) {

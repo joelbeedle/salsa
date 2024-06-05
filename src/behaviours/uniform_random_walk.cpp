@@ -1,10 +1,10 @@
-#include "urw_behaviour.h"
+#include "behaviours/uniform_random_walk.h"
 
 #include <iostream>
 #include <memory>
 
 #include "box2d/box2d.h"
-#include "drone.h"
+#include "drones/drone.h"
 UniformRandomWalkBehaviour::UniformRandomWalkBehaviour(
     const UniformRandomWalkParameters &params)
     : params(params) {
