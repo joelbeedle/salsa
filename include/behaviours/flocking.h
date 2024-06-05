@@ -7,8 +7,8 @@
 #include <unordered_map>
 #include <vector>
 
-#include "RayCastCallback.h"
-#include "SwarmBehaviour.h"
+#include "behaviours/behaviour.h"
+#include "utils/raycastcallback.h"
 
 class Drone;  // Forward declaration for Drone
 

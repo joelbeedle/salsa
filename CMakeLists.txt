@@ -1,50 +1,35 @@
 cmake_minimum_required(VERSION 3.5)
-project(swarm-box2d)
+project(swarm-box2d VERSION 1.0 DESCRIPTION "Drone Swarm Simulation System")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 option(BUILD_TESTBED "Build the Box2D testbed" ON)
 add_compile_definitions(_USE_MATH_DEFINES)
 
-# Add SFML submodule
-add_subdirectory(lib/SFML)
-include_directories(lib/SFML/include)
+# Add Box2D submodule, and include it
+add_subdirectory(extern/Box2D)
+# include_directories(extern/Box2D)
 
-# Add Box2D submodule
-add_subdirectory(lib/Box2D)
-include_directories(lib/Box2D)
+add_subdirectory(src)
 
-# Source files
-set(SOURCES
-    src/main.cpp
-    src/Drone.cpp
-    src/SwarmBehaviour.cpp
-    src/FlockingBehaviour.cpp
-    src/PheremoneBehaviour.cpp
-    src/UniformRandomWalkBehaviour.cpp
-    src/Tree.cpp)
+# --------------------------------------------------------------------------------
+#                            Build Configuration
+# --------------------------------------------------------------------------------
 
-# Executable
-add_executable(swarm-box2d ${SOURCES})
+# Compile sources into a library
+# Add header files to the library. Set to PUBLIC so users of the library can see these
+target_include_directories(swarm-box2d PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
-# Linking
-target_link_libraries(swarm-box2d PRIVATE box2d)
+# Set the C++ standard to C++17
+target_compile_features(swarm-box2d PUBLIC cxx_std_17)
 
-target_link_libraries(swarm-box2d PRIVATE sfml-system sfml-network sfml-graphics sfml-window)
-
-
-# Include directory
-target_include_directories(swarm-box2d PRIVATE ${PROJECT_SOURCE_DIR}/include)
-target_compile_features(swarm-box2d PRIVATE cxx_std_17)
-
-# Add TestBed
+# Handle building TestBed, if that's what we want
 if(BUILD_TESTBED)
     add_subdirectory(testbed)
-
     if (MSVC)
         set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT testbed)
         set_property(TARGET testbed PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/testbed")
     endif()
-
 endif()

@@ -6,9 +6,9 @@
 
 #include <memory>
 
-#include "DroneConfiguration.h"
-#include "SwarmBehaviour.h"
-#include "Tree.h"
+#include "behaviours/behaviour.h"
+#include "tree.h"
+#include "utils/drone_configuration.h"
 class Drone {
  private:
   std::vector<Tree *> foundDiseasedTrees;

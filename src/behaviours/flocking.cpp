@@ -1,11 +1,10 @@
-#include "FlockingBehaviour.h"
-
 #include <iostream>
 #include <valarray>
 
-#include "Drone.h"
-#include "RayCastCallback.h"
+#include "behaviours/flocking.h"
 #include "box2d/box2d.h"
+#include "drones/drone.h"
+#include "utils/raycastcallback.h"
 
 void FlockingBehaviour::execute(
     const std::vector<std::unique_ptr<Drone>> &drones, Drone &currentDrone) {

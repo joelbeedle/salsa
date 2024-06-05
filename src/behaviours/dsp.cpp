@@ -1,8 +1,7 @@
-#include "DSPBehaviour.h"
-
-#include "Drone.h"
-#include "RayCastCallback.h"
+#include "behaviours/dsp.h"
 #include "box2d/box2d.h"
+#include "drones/drone.h"
+#include "utils/raycastcallback.h"
 
 void DSPBehaviour::execute(const std::vector<std::unique_ptr<Drone>> &drones,
                            Drone &currentDrone) {

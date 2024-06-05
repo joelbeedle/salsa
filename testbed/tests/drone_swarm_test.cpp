@@ -18,22 +18,22 @@
 #include <variant>
 #include <vector>
 
-#include "DSPBehaviour.h"
-#include "Drone.h"
-#include "DroneConfiguration.h"
-#include "DroneContactListener.h"
-#include "DroneFactory.h"
-#include "FlockingBehaviour.h"
-#include "LevyFlockingBehaviour.h"
-#include "ObjectTypes.h"
-#include "PheremoneBehaviour.h"
-#include "SwarmBehaviourRegistry.h"
-#include "Tree.h"
-#include "UniformRandomWalkBehaviour.h"
+#include "behaviours/dsp.h"
+#include "behaviours/flocking.h"
+#include "behaviours/levy_flocking.h"
+#include "behaviours/pheromone_avoidance.h"
+#include "behaviours/uniform_random_walk.h"
 #include "draw.h"
+#include "drones/drone.h"
+#include "drones/drone_factory.h"
 #include "imgui/imgui.h"
 #include "settings.h"
 #include "test.h"
+#include "tree.h"
+#include "utils/behaviour_registry.h"
+#include "utils/drone_configuration.h"
+#include "utils/drone_contact_listener.h"
+#include "utils/object_types.h"
 // TODO: Change drones to use droneDetectionRange when seeing other drones.
 
 #define DRONE_COUNT 50

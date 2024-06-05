@@ -3,8 +3,8 @@
 
 #include <box2d/box2d.h>
 
-#include "RayCastCallback.h"
-#include "SwarmBehaviour.h"
+#include "behaviours/behaviour.h"
+#include "utils/raycastcallback.h"
 
 class Drone;
 
