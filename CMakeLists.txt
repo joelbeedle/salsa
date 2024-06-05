@@ -8,8 +8,8 @@ option(BUILD_TESTBED "Build the Box2D testbed" ON)
 add_compile_definitions(_USE_MATH_DEFINES)
 
 # Add Box2D submodule
-add_subdirectory(lib/Box2D)
-include_directories(lib/Box2D)
+add_subdirectory(external/Box2D)
+include_directories(external/Box2D)
 
 # Source files
 set(SOURCES
