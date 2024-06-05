@@ -1,6 +1,6 @@
 #include "Tree.h"
 
-#include "ObjectTypes.h"
+#include "object_types.h"
 
 Tree::Tree(b2World *world, int treeID, const b2Vec2 &position, bool diseased,
            bool mapped, float radius)

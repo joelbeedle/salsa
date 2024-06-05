@@ -2,9 +2,9 @@
 
 #include <iostream>
 
-#include "Drone.h"
-#include "ObjectTypes.h"
-#include "Tree.h"
+#include "drone.h"
+#include "object_types.h"
+#include "tree.h"
 
 class DroneContactListener : public b2ContactListener {
   bool getDroneAndTree(b2Contact *contact, b2Fixture *&drone,

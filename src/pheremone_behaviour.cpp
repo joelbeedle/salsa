@@ -1,6 +1,6 @@
-#include "PheremoneBehaviour.h"
+#include "pheremone_behaviour.h"
 
-#include "Drone.h"
+#include "drone.h"
 
 void PheremoneBehaviour::execute(
     const std::vector<std::unique_ptr<Drone>> &drones, Drone &currentDrone) {

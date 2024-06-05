@@ -1,12 +1,12 @@
-#include "LevyFlockingBehaviour.h"
+#include "levy_flocking_behaviour.h"
 
 #include <iostream>
 #include <random>
 #include <valarray>
 
-#include "Drone.h"
-#include "RayCastCallback.h"
 #include "box2d/box2d.h"
+#include "drone.h"
+#include "raycastcallback.h"
 
 void LevyFlockingBehaviour::execute(
     const std::vector<std::unique_ptr<Drone>> &drones, Drone &currentDrone) {

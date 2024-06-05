@@ -5,8 +5,8 @@
 
 #include <memory>
 
-#include "Drone.h"
-#include "DroneConfiguration.h"
+#include "drone.h"
+#include "drone_configuration.h"
 
 class DroneFactory {
  public:

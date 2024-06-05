@@ -12,17 +12,17 @@ set (MY_TESTBED_SOURCE_FILES
 	settings.cpp
 	test.cpp
 	test.h
-	tests/DroneSwarmTest.cpp
+	tests/drone_swarm_test.cpp
 )
 set(MY_PROJECT_SOURCE_FILES
-${PROJECT_SOURCE_DIR}/src/Drone.cpp
-${PROJECT_SOURCE_DIR}/src/SwarmBehaviour.cpp
-${PROJECT_SOURCE_DIR}/src/FlockingBehaviour.cpp
-${PROJECT_SOURCE_DIR}/src/LevyFlockingBehaviour.cpp
-${PROJECT_SOURCE_DIR}/src/PheremoneBehaviour.cpp
-${PROJECT_SOURCE_DIR}/src/UniformRandomWalkBehaviour.cpp
-${PROJECT_SOURCE_DIR}/src/DSPBehaviour.cpp
-${PROJECT_SOURCE_DIR}/src/Tree.cpp)
+${PROJECT_SOURCE_DIR}/src/drone.cpp
+${PROJECT_SOURCE_DIR}/src/swarm_behaviour.cpp
+${PROJECT_SOURCE_DIR}/src/flocking_behaviour.cpp
+${PROJECT_SOURCE_DIR}/src/levy_flocking_behaviour.cpp
+${PROJECT_SOURCE_DIR}/src/pheremone_behaviour.cpp
+${PROJECT_SOURCE_DIR}/src/urw_behaviour.cpp
+${PROJECT_SOURCE_DIR}/src/dsp_behaviour.cpp
+${PROJECT_SOURCE_DIR}/src/tree.cpp)
 set(MY_PROJECT_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../include")
 
 add_executable(my_testbed ${MY_TESTBED_SOURCE_FILES} ${MY_PROJECT_SOURCE_FILES})

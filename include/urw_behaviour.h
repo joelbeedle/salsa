@@ -11,8 +11,8 @@
 #include <unordered_map>
 #include <vector>
 
-#include "RayCastCallback.h"
-#include "SwarmBehaviour.h"
+#include "raycastcallback.h"
+#include "swarm_behaviour.h"
 
 class Drone;
 

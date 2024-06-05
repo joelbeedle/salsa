@@ -14,12 +14,12 @@ include_directories(lib/Box2D)
 # Source files
 set(SOURCES
     src/main.cpp
-    src/Drone.cpp
-    src/SwarmBehaviour.cpp
-    src/FlockingBehaviour.cpp
-    src/PheremoneBehaviour.cpp
-    src/UniformRandomWalkBehaviour.cpp
-    src/Tree.cpp)
+    src/drone.cpp
+    src/swarm_behaviour.cpp
+    src/flocking_behaviour.cpp
+    src/pheremone_behaviour.cpp
+    src/urw_behaviour.cpp
+    src/tree.cpp)
 
 # Executable
 add_executable(swarm-box2d ${SOURCES})
