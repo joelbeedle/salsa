@@ -88,6 +88,7 @@ Temporary Items
 
 build/**
 build
+.cache
 .clangd
 .CMakePresets.json
 CMakePresets.json
