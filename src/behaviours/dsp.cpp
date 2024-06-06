@@ -1,8 +1,10 @@
 #include "behaviours/dsp.h"
+
 #include "box2d/box2d.h"
 #include "drones/drone.h"
 #include "utils/raycastcallback.h"
 
+namespace swarm_sim {
 void DSPBehaviour::execute(const std::vector<std::unique_ptr<Drone>> &drones,
                            Drone &currentDrone) {
   if (droneInformation.find(&currentDrone) == droneInformation.end()) {
@@ -126,3 +128,4 @@ void DSPBehaviour::clean(const std::vector<std::unique_ptr<Drone>> &drones) {
   dspPoints.clear();
   droneInformation.clear();
 }
+}  // namespace swarm_sim

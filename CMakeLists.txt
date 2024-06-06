@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(swarm-box2d VERSION 1.0 DESCRIPTION "Drone Swarm Simulation System")
+project(swarm-sim VERSION 1.0 DESCRIPTION "Drone Swarm Simulation System")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -20,10 +20,10 @@ add_subdirectory(src)
 
 # Compile sources into a library
 # Add header files to the library. Set to PUBLIC so users of the library can see these
-target_include_directories(swarm-box2d PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(libswarm-sim PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
 # Set the C++ standard to C++17
-target_compile_features(swarm-box2d PUBLIC cxx_std_17)
+target_compile_features(libswarm-sim PUBLIC cxx_std_17)
 
 # Handle building TestBed, if that's what we want
 if(BUILD_TESTBED)

@@ -23,8 +23,8 @@ Tree::Tree(b2World *world, int treeID, const b2Vec2 &position, bool diseased,
   fixtureDef.isSensor = true;
   fixtureDef.filter.categoryBits = 0x0002;
   fixtureDef.filter.maskBits = 0x0001;
-  UserData *userData = new UserData();
-  userData->type = ObjectType::Tree;
+  swarm_sim::UserData *userData = new swarm_sim::UserData();
+  userData->type = swarm_sim::ObjectType::Tree;
   userData->tree = this;
 
   fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(userData);

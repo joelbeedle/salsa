@@ -42,6 +42,7 @@
 #define BORDER_HEIGHT 2000.0f
 #define MAX_TIME 1200.0f
 
+namespace swarm_sim {
 struct DroneParameters {
   float cameraViewRange;
   float obstacleViewRange;
@@ -65,7 +66,7 @@ class DroneSwarmTest : public Test {
   std::unordered_map<std::string, DroneConfiguration *> droneConfigs;
 
   // Behaviours
-  SwarmBehaviour *behaviour;
+  Behaviour *behaviour;
   std::string currentBehaviourName;
   DroneContactListener droneContactListener;
 
@@ -200,28 +201,28 @@ class DroneSwarmTest : public Test {
         std::make_unique<LevyFlockingBehaviour>(levyFlockingParams);
     auto dspBehaviour = std::make_unique<DSPBehaviour>(dspParams);
 
-    SwarmBehaviourRegistry::getInstance().add("DSPBehaviour",
-                                              std::move(dspBehaviour));
-    SwarmBehaviourRegistry::getInstance().add("PheremoneBehaviour",
-                                              std::move(pheremoneBehaviour));
-    SwarmBehaviourRegistry::getInstance().add("FlockingBehaviour",
-                                              std::move(flockBehaviour));
-    SwarmBehaviourRegistry::getInstance().add(
-        "UniformRandomWalkBehaviour", std::move(uniformRandomWalkBehaviour));
-    SwarmBehaviourRegistry::getInstance().add("LevyFlockingBehaviour",
-                                              std::move(levyFlockBehaviour));
+    BehaviourRegistry::getInstance().add("DSPBehaviour",
+                                         std::move(dspBehaviour));
+    BehaviourRegistry::getInstance().add("PheremoneBehaviour",
+                                         std::move(pheremoneBehaviour));
+    BehaviourRegistry::getInstance().add("FlockingBehaviour",
+                                         std::move(flockBehaviour));
+    BehaviourRegistry::getInstance().add("UniformRandomWalkBehaviour",
+                                         std::move(uniformRandomWalkBehaviour));
+    BehaviourRegistry::getInstance().add("LevyFlockingBehaviour",
+                                         std::move(levyFlockBehaviour));
 
-    auto &registry = SwarmBehaviourRegistry::getInstance();
-    auto behaviourNames = registry.getSwarmBehaviourNames();
+    auto &registry = BehaviourRegistry::getInstance();
+    auto behaviourNames = registry.getBehaviourNames();
     // Set initial behaviour
     if (!behaviourNames.empty()) {
       // Select the first behavior as the default one
       currentBehaviourName = behaviourNames[0];
-      behaviour = registry.getSwarmBehaviour(currentBehaviourName);
+      behaviour = registry.getBehaviour(currentBehaviourName);
     }
   }
 
-  void createDrones(SwarmBehaviour &b, DroneConfiguration &config) {
+  void createDrones(Behaviour &b, DroneConfiguration &config) {
     const float margin = 2.0f;  // Define a margin to prevent spawning exactly
                                 // at the border or outside
     for (int i = 0; i < numDrones; i++) {
@@ -233,7 +234,7 @@ class DroneSwarmTest : public Test {
     }
   }
 
-  void createDronesCircular(SwarmBehaviour &b, DroneConfiguration &config) {
+  void createDronesCircular(Behaviour &b, DroneConfiguration &config) {
     // Calculate the total area needed for all drones
     float droneArea = M_PI * std::pow(config.radius, 2);
     float totalDroneArea = numDrones * droneArea;
@@ -358,8 +359,7 @@ class DroneSwarmTest : public Test {
 
   void RunNextTest() {
     std::string nextName = testStack.top();
-    auto behaviourNames =
-        SwarmBehaviourRegistry::getInstance().getSwarmBehaviourNames();
+    auto behaviourNames = BehaviourRegistry::getInstance().getBehaviourNames();
     auto it = std::find(behaviourNames.begin(), behaviourNames.end(), nextName);
     if (it == behaviourNames.end()) {
       int num = std::stoi(nextName);
@@ -378,8 +378,7 @@ class DroneSwarmTest : public Test {
     iters = 0;
     behaviour->clean(drones);
     currentBehaviourName = behaviourName;
-    behaviour =
-        SwarmBehaviourRegistry::getInstance().getSwarmBehaviour(behaviourName);
+    behaviour = BehaviourRegistry::getInstance().getBehaviour(behaviourName);
     SetBehaviour();
 
     DestroyDrones();
@@ -395,14 +394,13 @@ class DroneSwarmTest : public Test {
 
     if (ImGui::BeginCombo("Behaviours", currentBehaviourName.c_str())) {
       auto behaviourNames =
-          SwarmBehaviourRegistry::getInstance().getSwarmBehaviourNames();
+          BehaviourRegistry::getInstance().getBehaviourNames();
 
       for (auto &name : behaviourNames) {
         bool isSelected = (currentBehaviourName == name);
         if (ImGui::Selectable(name.c_str(), isSelected)) {
           currentBehaviourName = name;
-          behaviour =
-              SwarmBehaviourRegistry::getInstance().getSwarmBehaviour(name);
+          behaviour = BehaviourRegistry::getInstance().getBehaviour(name);
           SetBehaviour();
         }
         if (isSelected) {
@@ -724,3 +722,5 @@ class DroneSwarmTest : public Test {
 
 static int testIndex =
     RegisterTest("Swarm", "DroneSwarmTest", DroneSwarmTest::Create);
+
+}  // namespace swarm_sim

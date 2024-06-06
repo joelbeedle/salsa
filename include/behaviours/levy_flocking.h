@@ -1,5 +1,6 @@
 // FlockingBehaviour.h
-#pragma once
+#ifndef SWARM_SIM_BEHAVIOURS_LEVY_FLOCKING_H
+#define SWARM_SIM_BEHAVIOURS_LEVY_FLOCKING_H
 
 #include <box2d/b2_math.h>
 #include <box2d/box2d.h>
@@ -13,6 +14,9 @@
 #include "utils/raycastcallback.h"
 
 class Drone;
+
+namespace swarm_sim {
+// namespace behaviours {
 struct LevyFlockingParameters {
   float separationDistance;
   float alignmentWeight;
@@ -21,7 +25,7 @@ struct LevyFlockingParameters {
   float levyWeight;
   float obstacleAvoidanceWeight;
 };
-class LevyFlockingBehaviour : public SwarmBehaviour {
+class LevyFlockingBehaviour : public Behaviour {
  private:
   LevyFlockingParameters params;
 
@@ -100,3 +104,8 @@ class LevyFlockingBehaviour : public SwarmBehaviour {
     return b2Vec2(cos(theta), sin(theta));
   }
 };
+
+// }  // namespace behaviours
+}  // namespace swarm_sim
+
+#endif  // SWARM_SIM_BEHAVIOURS_LEVY_FLOCKING_H

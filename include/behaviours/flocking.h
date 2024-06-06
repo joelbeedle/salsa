@@ -1,5 +1,5 @@
-// FlockingBehaviour.h
-#pragma once
+#ifndef SWARM_SIM_BEHAVIOURS_FLOCKING_H
+#define SWARM_SIM_BEHAVIOURS_FLOCKING_H
 
 #include <box2d/b2_math.h>
 #include <box2d/box2d.h>
@@ -12,6 +12,8 @@
 
 class Drone;  // Forward declaration for Drone
 
+namespace swarm_sim {
+// namespace behaviours {
 struct FlockingParameters {
   float separationDistance;
   float alignmentWeight;
@@ -20,7 +22,7 @@ struct FlockingParameters {
   float obstacleAvoidanceWeight;
 };
 
-class FlockingBehaviour : public SwarmBehaviour {
+class FlockingBehaviour : public Behaviour {
  private:
   FlockingParameters params;
 
@@ -51,3 +53,8 @@ class FlockingBehaviour : public SwarmBehaviour {
   b2Vec2 separate(std::vector<b2Body *> &drones, Drone &currentDrone);
   b2Vec2 cohere(std::vector<b2Body *> &drones, Drone &currentDrone);
 };
+
+// }  // namespace behaviours
+}  // namespace swarm_sim
+
+#endif  // SWARM_SIM_BEHAVIOURS_FLOCKING_H

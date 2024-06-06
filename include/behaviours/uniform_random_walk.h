@@ -1,5 +1,6 @@
 // UniformRandomWalkBehaviour.h
-#pragma once
+#ifndef SWARM_SIM_BEHAVIOURS_UNIFORM_RANDOM_WALK_H
+#define SWARM_SIM_BEHAVIOURS_UNIFORM_RANDOM_WALK_H
 
 #include <box2d/box2d.h>
 
@@ -16,6 +17,8 @@
 
 class Drone;
 
+namespace swarm_sim {
+// namespace behaviours {
 struct UniformRandomWalkParameters {
   float maxMagnitude;
   float forceWeight;
@@ -23,7 +26,7 @@ struct UniformRandomWalkParameters {
   float deltaTime = 1.0f / 60.0f;
 };
 
-class UniformRandomWalkBehaviour : public SwarmBehaviour {
+class UniformRandomWalkBehaviour : public Behaviour {
  private:
   UniformRandomWalkParameters params;
   std::unordered_map<std::string, ParameterDefinition> cleanParams = {
@@ -60,3 +63,8 @@ class UniformRandomWalkBehaviour : public SwarmBehaviour {
     return static_cast<float>(std::rand()) / RAND_MAX * 5.0f;
   }
 };
+
+// }  // namespace behaviours
+}  // namespace swarm_sim
+
+#endif  // SWARM_SIM_BEHAVIOURS_UNIFORM_RANDOM_WALK_H

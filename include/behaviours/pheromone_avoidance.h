@@ -1,5 +1,7 @@
 // PheremoneBehaviour.h
-#pragma once
+#ifndef SWARM_SIM_BEHAVIOURS_PHEREMONE_AVOIDANCE_H
+#define SWARM_SIM_BEHAVIOURS_PHEREMONE_AVOIDANCE_H
+
 #include <box2d/b2_math.h>
 #include <box2d/box2d.h>
 
@@ -12,12 +14,14 @@
 
 class Drone;  // Forward declaration
 
+namespace swarm_sim {
+// namespace behaviours {
 struct PheremoneParameters {
   float decayRate;
   float obstacleAvoidanceWeight;
 };
 
-class PheremoneBehaviour : public SwarmBehaviour {
+class PheremoneBehaviour : public Behaviour {
  private:
   struct Pheremone {
     b2Vec2 position;
@@ -50,3 +54,8 @@ class PheremoneBehaviour : public SwarmBehaviour {
   void updatePheremones();
   void layPheremone(const b2Vec2 &position);
 };
+
+// }  // namespace behaviours
+}  // namespace swarm_sim
+
+#endif  // SWARM_SIM_BEHAVIOURS_PHEREMONE_AVOIDANCE_H

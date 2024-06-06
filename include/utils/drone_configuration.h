@@ -1,6 +1,8 @@
 // DroneConfiguration.h
-#pragma once
+#ifndef SWARM_SIM_UTILS_DRONE_CONFIGURATION_H
+#define SWARM_SIM_UTILS_DRONE_CONFIGURATION_H
 
+namespace swarm_sim {
 class DroneConfiguration {
  public:
   float cameraViewRange;
@@ -21,3 +23,7 @@ class DroneConfiguration {
         mass(mss),
         droneDetectionRange(droneDetectRange) {}
 };
+
+}  // namespace swarm_sim
+
+#endif  // SWARM_SIM_UTILS_DRONE_CONFIGURATION_H

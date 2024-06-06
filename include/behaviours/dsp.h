@@ -1,5 +1,5 @@
-// DSPBehaviour.h
-#pragma once
+#ifndef SWARM_SIM_BEHAVIOURS_DSP_H
+#define SWARM_SIM_BEHAVIOURS_DSP_H
 
 #include <box2d/box2d.h>
 
@@ -7,6 +7,9 @@
 #include "utils/raycastcallback.h"
 
 class Drone;
+
+namespace swarm_sim {
+// namespace behaviours {
 
 struct DSPParameters {};
 
@@ -75,7 +78,7 @@ class DSPPoint {
   }
 };
 
-class DSPBehaviour : public SwarmBehaviour {
+class DSPBehaviour : public Behaviour {
  private:
   std::vector<DSPPoint *> dspPoints;
   DSPParameters params;
@@ -126,3 +129,8 @@ class DSPBehaviour : public SwarmBehaviour {
     return static_cast<float>(std::rand()) / RAND_MAX * 15.0f;
   }
 };
+
+}  // namespace swarm_sim
+// }  // namespace swarm_sim
+
+#endif  // SWARM_SIM_BEHAVIOURS_DSP_H

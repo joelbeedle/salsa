@@ -1,5 +1,6 @@
-// SwarmBehaviour.h
-#pragma once
+#ifndef SWARM_SIM_BEHAVIOURS_BEHAVIOUR_H
+#define SWARM_SIM_BEHAVIOURS_BEHAVIOUR_H
+
 #include <box2d/box2d.h>
 
 #include <memory>
@@ -10,15 +11,19 @@
 #include "utils/raycastcallback.h"
 class Drone;
 
+namespace swarm_sim {
+
+class Drone;
+// namespace behaviours {
 struct ParameterDefinition {
   float *value;
   float minSetting;
   float maxSetting;
 };
 
-class SwarmBehaviour {
+class Behaviour {
  public:
-  virtual ~SwarmBehaviour() = default;
+  virtual ~Behaviour() = default;
 
   virtual void execute(const std::vector<std::unique_ptr<Drone>> &drones,
                        Drone &currentDrone) = 0;
@@ -42,3 +47,8 @@ class SwarmBehaviour {
   b2Vec2 steerTo(b2Vec2 target, Drone &currentDrone);
   void performRayCasting(Drone &currentDrone, RayCastCallback &callback);
 };
+
+}  // namespace swarm_sim
+// }  // namespace swarm_sim
+
+#endif  // SWARM_SIM_BEHAVIOURS_BEHAVIOUR_H

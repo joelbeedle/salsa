@@ -1,9 +1,12 @@
 #include "behaviours/behaviour.h"
+
 #include "box2d/box2d.h"
 #include "drones/drone.h"
 
-b2Vec2 SwarmBehaviour::avoidDrones(std::vector<b2Body *> &neighbours,
-                                   Drone &currentDrone) {
+namespace swarm_sim {
+// namespace behaviours {
+b2Vec2 Behaviour::avoidDrones(std::vector<b2Body *> &neighbours,
+                              Drone &currentDrone) {
   b2Vec2 steering(0, 0);
   int32 count = 0;
   b2Body *currentBody = currentDrone.getBody();
@@ -35,8 +38,8 @@ b2Vec2 SwarmBehaviour::avoidDrones(std::vector<b2Body *> &neighbours,
   return steering;
 }
 
-b2Vec2 SwarmBehaviour::avoidObstacles(std::vector<b2Vec2> &obstaclePoints,
-                                      Drone &currentDrone) {
+b2Vec2 Behaviour::avoidObstacles(std::vector<b2Vec2> &obstaclePoints,
+                                 Drone &currentDrone) {
   b2Vec2 steering(0, 0);
   int32 count = 0;
 
@@ -66,8 +69,8 @@ b2Vec2 SwarmBehaviour::avoidObstacles(std::vector<b2Vec2> &obstaclePoints,
   return steering;
 }
 
-void SwarmBehaviour::performRayCasting(Drone &currentDrone,
-                                       RayCastCallback &callback) {
+void Behaviour::performRayCasting(Drone &currentDrone,
+                                  RayCastCallback &callback) {
   float rayRange = currentDrone.getObstacleViewRange();
   float deltaAngle = 45.0f;  // dividing the circle into segments
 
@@ -80,7 +83,7 @@ void SwarmBehaviour::performRayCasting(Drone &currentDrone,
   }
 }
 
-b2Vec2 SwarmBehaviour::steerTo(b2Vec2 target, Drone &currentDrone) {
+b2Vec2 Behaviour::steerTo(b2Vec2 target, Drone &currentDrone) {
   b2Vec2 position = currentDrone.getPosition();
   b2Vec2 desired = target - position;
   float d = desired.Length();
@@ -92,3 +95,5 @@ b2Vec2 SwarmBehaviour::steerTo(b2Vec2 target, Drone &currentDrone) {
   clampMagnitude(steer, currentDrone.getMaxForce());
   return steer;
 }
+// }  // namespace behaviours
+}  // namespace swarm_sim

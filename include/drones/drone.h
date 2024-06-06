@@ -1,5 +1,7 @@
 // Drone.h
-#pragma once
+#ifndef SWARM_SIM_DRONES_DRONE_H
+#define SWARM_SIM_DRONES_DRONE_H
+
 #include <box2d/box2d.h>
 
 // #include <SFML/Graphics.hpp>
@@ -9,6 +11,7 @@
 #include "behaviours/behaviour.h"
 #include "tree.h"
 #include "utils/drone_configuration.h"
+namespace swarm_sim {
 class Drone {
  private:
   std::vector<Tree *> foundDiseasedTrees;
@@ -16,7 +19,7 @@ class Drone {
   std::vector<b2Vec2 *> foundDiseasedTreePositions;
   b2Body *body;
   b2Fixture *viewSensor;  // The view range sensor
-  SwarmBehaviour *behaviour;
+  Behaviour *behaviour;
   float cameraViewRange;
   float obstacleViewRange;
   float droneDetectionRange;
@@ -26,7 +29,7 @@ class Drone {
   float mass;
 
  public:
-  Drone(b2World *world, const b2Vec2 &position, SwarmBehaviour &behaviour,
+  Drone(b2World *world, const b2Vec2 &position, Behaviour &behaviour,
         const DroneConfiguration &config);
   ~Drone();
 
@@ -37,7 +40,7 @@ class Drone {
   void foundTree(Tree *tree);
 
   // Accessors and Mutators
-  void setBehaviour(SwarmBehaviour &newBehaviour) { behaviour = &newBehaviour; }
+  void setBehaviour(Behaviour &newBehaviour) { behaviour = &newBehaviour; }
 
   b2Body *getBody() { return body; }
   b2Vec2 getVelocity() { return body->GetLinearVelocity(); }
@@ -71,3 +74,7 @@ class Drone {
 
   void clearLists();
 };
+
+}  // namespace swarm_sim
+
+#endif  // SWARM_SIM_DRONES_DRONE_H

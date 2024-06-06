@@ -1,3 +1,6 @@
+#ifndef SWARM_SIM_UTILS_DRONE_CONTACT_LISTENER_H
+#define SWARM_SIM_UTILS_DRONE_CONTACT_LISTENER_H
+
 #include <box2d/box2d.h>
 
 #include <iostream>
@@ -6,6 +9,7 @@
 #include "tree.h"
 #include "utils/object_types.h"
 
+namespace swarm_sim {
 class DroneContactListener : public b2ContactListener {
   bool getDroneAndTree(b2Contact *contact, b2Fixture *&drone,
                        b2Fixture *&tree) {
@@ -86,3 +90,7 @@ class DroneContactListener : public b2ContactListener {
     }
   }
 };
+
+}  // namespace swarm_sim
+
+#endif  // SWARM_SIM_UTILS_DRONE_CONTACT_LISTENER_H

@@ -1,5 +1,6 @@
 // BehaviourRegistry.h
-#pragma once
+#ifndef SWARM_SIM_UTILS_BEHAVIOUR_REGISTRY_H
+#define SWARM_SIM_UTILS_BEHAVIOUR_REGISTRY_H
 
 #include <memory>
 #include <unordered_map>
@@ -7,41 +8,44 @@
 
 #include "behaviours/behaviour.h"
 
-class SwarmBehaviourRegistry {
+namespace swarm_sim {
+class BehaviourRegistry {
  private:
-  std::unordered_map<std::string, std::unique_ptr<SwarmBehaviour>>
-      SwarmBehaviours;
+  std::unordered_map<std::string, std::unique_ptr<Behaviour>> Behaviours;
 
  public:
-  static SwarmBehaviourRegistry& getInstance() {
-    static SwarmBehaviourRegistry instance;
+  static BehaviourRegistry& getInstance() {
+    static BehaviourRegistry instance;
     return instance;
   }
 
-  void add(const std::string& name,
-           std::unique_ptr<SwarmBehaviour> SwarmBehaviour) {
-    SwarmBehaviours[name] = std::move(SwarmBehaviour);
+  void add(const std::string& name, std::unique_ptr<Behaviour> Behaviour) {
+    Behaviours[name] = std::move(Behaviour);
   }
 
-  SwarmBehaviour* getSwarmBehaviour(const std::string& name) {
-    if (SwarmBehaviours.find(name) != SwarmBehaviours.end()) {
-      return SwarmBehaviours[name].get();
+  Behaviour* getBehaviour(const std::string& name) {
+    if (Behaviours.find(name) != Behaviours.end()) {
+      return Behaviours[name].get();
     }
     return nullptr;
   }
 
-  std::vector<std::string> getSwarmBehaviourNames() const {
+  std::vector<std::string> getBehaviourNames() const {
     std::vector<std::string> names;
-    for (const auto& pair : SwarmBehaviours) {
+    for (const auto& pair : Behaviours) {
       names.push_back(pair.first);
     }
     return names;
   }
 
   // Prevent copy & assignment
-  SwarmBehaviourRegistry(const SwarmBehaviourRegistry&) = delete;
-  SwarmBehaviourRegistry& operator=(const SwarmBehaviourRegistry&) = delete;
+  BehaviourRegistry(const BehaviourRegistry&) = delete;
+  BehaviourRegistry& operator=(const BehaviourRegistry&) = delete;
 
  private:
-  SwarmBehaviourRegistry() {}
+  BehaviourRegistry() {}
 };
+
+}  // namespace swarm_sim
+
+#endif  // SWARM_SIM_UTILS_BEHAVIOUR_REGISTRY_H
