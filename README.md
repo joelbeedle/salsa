@@ -1,4 +1,4 @@
-# swarm-box2d
+# swarm-sim
 Swarm Intelligence Algorithms in Box2D
 
-`testbed` folder is taken directly from [Box2D](https://github.com/erincatto/box2d), with the testcases written by me.
+`testbed` folder code is adapted from the [Box2D testbed](https://github.com/erincatto/box2d), with modifications. All code attributed to Erin Catto has their license at the top.
