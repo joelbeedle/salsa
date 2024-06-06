@@ -7,12 +7,16 @@ set (MY_TESTBED_SOURCE_FILES
 	imgui_impl_glfw.h
 	imgui_impl_opengl3.cpp
 	imgui_impl_opengl3.h
-	main.cpp
+	run_sim.cpp
+	run_sim.h
 	settings.h
 	settings.cpp
 	test.cpp
 	test.h
-	tests/drone_swarm_test.cpp
+	swarm.h
+	main.cpp
+	# tests/drone_swarm_test.cpp
+	# tests/swarm_test.cpp
 )
 set(MY_PROJECT_SOURCE_FILES
 ${PROJECT_SOURCE_DIR}/src/drones/drone.cpp
@@ -26,7 +30,7 @@ ${PROJECT_SOURCE_DIR}/src/behaviours/dsp.cpp
 ${PROJECT_SOURCE_DIR}/src/tree.cpp)
 set(MY_PROJECT_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../include")
 
-add_executable(my_testbed ${MY_TESTBED_SOURCE_FILES} ${MY_PROJECT_SOURCE_FILES})
+add_executable(my_testbed ${MY_PROJECT_SOURCE_FILES} ${MY_TESTBED_SOURCE_FILES} )
 target_sources(my_testbed PRIVATE ${PROJECT_SOURCES})
 target_include_directories(my_testbed PRIVATE
 ${CMAKE_CURRENT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/include)
