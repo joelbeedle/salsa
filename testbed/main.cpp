@@ -44,6 +44,8 @@
 #define MAX_TIME 1200.0f
 
 int main() {
+  // TODO: Register each behaviour with the registry, when being made, this
+  // removes the need for header files
   swarm_sim::FlockingParameters flockingParams = {250.0f, 1.6f, 1.0f, 3.0f,
                                                   3.0f};
   auto flock = std::make_unique<swarm_sim::FlockingBehaviour>(flockingParams);
