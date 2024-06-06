@@ -48,7 +48,7 @@ class Behaviour {
   void performRayCasting(Drone &currentDrone, RayCastCallback &callback);
 };
 
+// }  // namespace behaviours
 }  // namespace swarm_sim
-// }  // namespace swarm_sim
 
 #endif  // SWARM_SIM_BEHAVIOURS_BEHAVIOUR_H

@@ -7,7 +7,7 @@
 #include "drones/drone.h"
 
 namespace swarm_sim {
-void PheremoneBehaviour::execute(
+void PheromoneBehaviour::execute(
     const std::vector<std::unique_ptr<Drone>> &drones, Drone &currentDrone) {
   // Perform ray casting to detect nearby drones and obstacles
   RayCastCallback callback;
@@ -16,27 +16,27 @@ void PheremoneBehaviour::execute(
   std::vector<b2Vec2> obstaclePoints = callback.obstaclePoints;
   std::vector<b2Body *> neighbours = callback.detectedDrones;
 
-  layPheremone(currentDrone.getPosition());
+  layPheromone(currentDrone.getPosition());
 
-  updatePheremones();
+  updatePheromones();
   b2Vec2 steering = params.obstacleAvoidanceWeight *
                     avoidObstacles(obstaclePoints, currentDrone);
 
   b2Vec2 avoidanceSteering(0, 0);
   int32 count = 0;
 
-  for (auto &pair : pheremones) {
-    Pheremone &pheremone = pair.second;
-    float distance = b2Distance(currentDrone.getPosition(), pheremone.position);
+  for (auto &pair : pheromones) {
+    Pheromone &Pheromone = pair.second;
+    float distance = b2Distance(currentDrone.getPosition(), Pheromone.position);
 
     if (distance < currentDrone.getObstacleViewRange() && distance > 0) {
-      b2Vec2 awayFromPheremone =
-          currentDrone.getPosition() - pheremone.position;
-      awayFromPheremone.Normalize();
+      b2Vec2 awayFromPheromone =
+          currentDrone.getPosition() - Pheromone.position;
+      awayFromPheromone.Normalize();
 
-      awayFromPheremone *= (1.0f / (distance)) * pheremone.intensity;
+      awayFromPheromone *= (1.0f / (distance)) * Pheromone.intensity;
 
-      avoidanceSteering += awayFromPheremone;
+      avoidanceSteering += awayFromPheromone;
       count++;
     }
   }
@@ -73,16 +73,16 @@ void PheremoneBehaviour::execute(
   acceleration.SetZero();
 }
 
-void PheremoneBehaviour::layPheremone(const b2Vec2 &position) {
-  Pheremone pheremone = {position, 500.0f};
-  pheremones[pheremoneCount++] = pheremone;
+void PheromoneBehaviour::layPheromone(const b2Vec2 &position) {
+  Pheromone pheromone = {position, 500.0f};
+  pheromones[pheromoneCount++] = pheromone;
 }
 
-void PheremoneBehaviour::updatePheremones() {
-  for (auto it = pheremones.begin(); it != pheremones.end();) {
+void PheromoneBehaviour::updatePheromones() {
+  for (auto it = pheromones.begin(); it != pheromones.end();) {
     it->second.intensity -= params.decayRate;
     if (it->second.intensity <= 0) {
-      it = pheremones.erase(it);
+      it = pheromones.erase(it);
     } else {
       ++it;
     }

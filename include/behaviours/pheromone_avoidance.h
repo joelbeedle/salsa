@@ -1,6 +1,6 @@
-// PheremoneBehaviour.h
-#ifndef SWARM_SIM_BEHAVIOURS_PHEREMONE_AVOIDANCE_H
-#define SWARM_SIM_BEHAVIOURS_PHEREMONE_AVOIDANCE_H
+// PheromoneBehaviour.h
+#ifndef SWARM_SIM_BEHAVIOURS_Pheromone_AVOIDANCE_H
+#define SWARM_SIM_BEHAVIOURS_Pheromone_AVOIDANCE_H
 
 #include <box2d/b2_math.h>
 #include <box2d/box2d.h>
@@ -16,22 +16,22 @@ class Drone;  // Forward declaration
 
 namespace swarm_sim {
 // namespace behaviours {
-struct PheremoneParameters {
+struct PheromoneParameters {
   float decayRate;
   float obstacleAvoidanceWeight;
 };
 
-class PheremoneBehaviour : public Behaviour {
+class PheromoneBehaviour : public Behaviour {
  private:
-  struct Pheremone {
+  struct Pheromone {
     b2Vec2 position;
     float intensity;
   };
 
-  std::map<int, Pheremone> pheremones;
-  int pheremoneCount = 0;
+  std::map<int, Pheromone> pheromones;
+  int pheromoneCount = 0;
 
-  PheremoneParameters params;
+  PheromoneParameters params;
   // Define the parameter names and their expected min and max values
   // (for the UI)
   std::unordered_map<std::string, ParameterDefinition> cleanParams = {
@@ -40,7 +40,7 @@ class PheremoneBehaviour : public Behaviour {
        {&params.obstacleAvoidanceWeight, 0.0f, 3.0f}}};
 
  public:
-  PheremoneBehaviour(const PheremoneParameters &params) : params(params) {}
+  PheromoneBehaviour(const PheromoneParameters &params) : params(params) {}
 
   void execute(const std::vector<std::unique_ptr<Drone>> &drones,
                Drone &currentDrone) override;
@@ -51,11 +51,11 @@ class PheremoneBehaviour : public Behaviour {
   }
 
  private:
-  void updatePheremones();
-  void layPheremone(const b2Vec2 &position);
+  void updatePheromones();
+  void layPheromone(const b2Vec2 &position);
 };
 
 // }  // namespace behaviours
 }  // namespace swarm_sim
 
-#endif  // SWARM_SIM_BEHAVIOURS_PHEREMONE_AVOIDANCE_H
+#endif  // SWARM_SIM_BEHAVIOURS_Pheromone_AVOIDANCE_H

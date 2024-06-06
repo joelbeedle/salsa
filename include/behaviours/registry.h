@@ -1,4 +1,4 @@
-// BehaviourRegistry.h
+// Registry.h
 #ifndef SWARM_SIM_UTILS_BEHAVIOUR_REGISTRY_H
 #define SWARM_SIM_UTILS_BEHAVIOUR_REGISTRY_H
 
@@ -9,13 +9,14 @@
 #include "behaviours/behaviour.h"
 
 namespace swarm_sim {
-class BehaviourRegistry {
+namespace behaviour {
+class Registry {
  private:
   std::unordered_map<std::string, std::unique_ptr<Behaviour>> Behaviours;
 
  public:
-  static BehaviourRegistry& getInstance() {
-    static BehaviourRegistry instance;
+  static Registry& getInstance() {
+    static Registry instance;
     return instance;
   }
 
@@ -39,13 +40,14 @@ class BehaviourRegistry {
   }
 
   // Prevent copy & assignment
-  BehaviourRegistry(const BehaviourRegistry&) = delete;
-  BehaviourRegistry& operator=(const BehaviourRegistry&) = delete;
+  Registry(const Registry&) = delete;
+  Registry& operator=(const Registry&) = delete;
 
  private:
-  BehaviourRegistry() {}
+  Registry() {}
 };
 
+}  // namespace behaviour
 }  // namespace swarm_sim
 
 #endif  // SWARM_SIM_UTILS_BEHAVIOUR_REGISTRY_H
