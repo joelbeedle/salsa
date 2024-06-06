@@ -13,6 +13,7 @@ set (MY_TESTBED_SOURCE_FILES
 	settings.cpp
 	test.cpp
 	test.h
+	swarm.cpp
 	swarm.h
 	main.cpp
 	# tests/drone_swarm_test.cpp
@@ -20,13 +21,13 @@ set (MY_TESTBED_SOURCE_FILES
 )
 set(MY_PROJECT_SOURCE_FILES
 ${PROJECT_SOURCE_DIR}/src/drones/drone.cpp
-${PROJECT_SOURCE_DIR}/src/behaviours/pheromone_avoidance.cpp
+${PROJECT_SOURCE_DIR}/testbed/behaviours/pheromone_avoidance.cpp
 ${PROJECT_SOURCE_DIR}/src/behaviours/behaviour.cpp
-${PROJECT_SOURCE_DIR}/src/behaviours/flocking.cpp
-${PROJECT_SOURCE_DIR}/src/behaviours/levy_flocking.cpp
-${PROJECT_SOURCE_DIR}/src/behaviours/flocking.cpp
-${PROJECT_SOURCE_DIR}/src/behaviours/uniform_random_walk.cpp
-${PROJECT_SOURCE_DIR}/src/behaviours/dsp.cpp
+${PROJECT_SOURCE_DIR}/testbed/behaviours/flocking.cpp
+${PROJECT_SOURCE_DIR}/testbed/behaviours/levy_flocking.cpp
+${PROJECT_SOURCE_DIR}/testbed/behaviours/flocking.cpp
+${PROJECT_SOURCE_DIR}/testbed/behaviours/uniform_random_walk.cpp
+${PROJECT_SOURCE_DIR}/testbed/behaviours/dsp.cpp
 ${PROJECT_SOURCE_DIR}/src/tree.cpp)
 set(MY_PROJECT_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../include")
 
