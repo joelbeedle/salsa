@@ -4,10 +4,7 @@
 #include <stack>
 
 #include "behaviours/behaviour.h"
-#include "behaviours/flocking.h"
-#include "behaviours/pheromone_avoidance.h"
 #include "behaviours/registry.h"
-#include "behaviours/uniform_random_walk.h"
 #include "utils/drone_contact_listener.h"
 
 namespace swarm_sim {

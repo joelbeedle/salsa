@@ -22,6 +22,7 @@
 #include "behaviours/flocking.h"
 #include "behaviours/levy_flocking.h"
 #include "behaviours/pheromone_avoidance.h"
+#include "behaviours/registry.h"
 #include "behaviours/uniform_random_walk.h"
 #include "draw.h"
 #include "drones/drone.h"
@@ -30,14 +31,13 @@
 #include "settings.h"
 #include "test.h"
 #include "tree.h"
-#include "utils/behaviour_registry.h"
 #include "utils/drone_configuration.h"
 #include "utils/drone_contact_listener.h"
 #include "utils/object_types.h"
 // TODO: Change drones to use droneDetectionRange when seeing other drones.
 
-#define DRONE_COUNT 50
-#define TREE_COUNT 50000
+#define DRONE_COUNT 20
+#define TREE_COUNT 1000
 #define BORDER_WIDTH 2000.0f
 #define BORDER_HEIGHT 2000.0f
 #define MAX_TIME 1200.0f
@@ -72,7 +72,7 @@ class DroneSwarmTest : public Test {
 
   // Parameters
   FlockingParameters flockingParams;
-  PheremoneParameters pheremoneParams;
+  PheromoneParameters pheremoneParams;
   UniformRandomWalkParameters uniformRandomWalkParams;
   LevyFlockingParameters levyFlockingParams;
   DSPParameters dspParams;
@@ -194,25 +194,25 @@ class DroneSwarmTest : public Test {
   void initDefaultBehaviours() {
     auto flockBehaviour = std::make_unique<FlockingBehaviour>(flockingParams);
     auto pheremoneBehaviour =
-        std::make_unique<PheremoneBehaviour>(pheremoneParams);
+        std::make_unique<PheromoneBehaviour>(pheremoneParams);
     auto uniformRandomWalkBehaviour =
         std::make_unique<UniformRandomWalkBehaviour>(uniformRandomWalkParams);
     auto levyFlockBehaviour =
         std::make_unique<LevyFlockingBehaviour>(levyFlockingParams);
     auto dspBehaviour = std::make_unique<DSPBehaviour>(dspParams);
 
-    BehaviourRegistry::getInstance().add("DSPBehaviour",
-                                         std::move(dspBehaviour));
-    BehaviourRegistry::getInstance().add("PheremoneBehaviour",
-                                         std::move(pheremoneBehaviour));
-    BehaviourRegistry::getInstance().add("FlockingBehaviour",
-                                         std::move(flockBehaviour));
-    BehaviourRegistry::getInstance().add("UniformRandomWalkBehaviour",
-                                         std::move(uniformRandomWalkBehaviour));
-    BehaviourRegistry::getInstance().add("LevyFlockingBehaviour",
-                                         std::move(levyFlockBehaviour));
+    behaviour::Registry::getInstance().add("DSPBehaviour",
+                                           std::move(dspBehaviour));
+    behaviour::Registry::getInstance().add("PheremoneBehaviour",
+                                           std::move(pheremoneBehaviour));
+    behaviour::Registry::getInstance().add("FlockingBehaviour",
+                                           std::move(flockBehaviour));
+    behaviour::Registry::getInstance().add(
+        "UniformRandomWalkBehaviour", std::move(uniformRandomWalkBehaviour));
+    behaviour::Registry::getInstance().add("LevyFlockingBehaviour",
+                                           std::move(levyFlockBehaviour));
 
-    auto &registry = BehaviourRegistry::getInstance();
+    auto &registry = behaviour::Registry::getInstance();
     auto behaviourNames = registry.getBehaviourNames();
     // Set initial behaviour
     if (!behaviourNames.empty()) {
@@ -359,7 +359,8 @@ class DroneSwarmTest : public Test {
 
   void RunNextTest() {
     std::string nextName = testStack.top();
-    auto behaviourNames = BehaviourRegistry::getInstance().getBehaviourNames();
+    auto behaviourNames =
+        behaviour::Registry::getInstance().getBehaviourNames();
     auto it = std::find(behaviourNames.begin(), behaviourNames.end(), nextName);
     if (it == behaviourNames.end()) {
       int num = std::stoi(nextName);
@@ -378,7 +379,7 @@ class DroneSwarmTest : public Test {
     iters = 0;
     behaviour->clean(drones);
     currentBehaviourName = behaviourName;
-    behaviour = BehaviourRegistry::getInstance().getBehaviour(behaviourName);
+    behaviour = behaviour::Registry::getInstance().getBehaviour(behaviourName);
     SetBehaviour();
 
     DestroyDrones();
@@ -394,13 +395,13 @@ class DroneSwarmTest : public Test {
 
     if (ImGui::BeginCombo("Behaviours", currentBehaviourName.c_str())) {
       auto behaviourNames =
-          BehaviourRegistry::getInstance().getBehaviourNames();
+          behaviour::Registry::getInstance().getBehaviourNames();
 
       for (auto &name : behaviourNames) {
         bool isSelected = (currentBehaviourName == name);
         if (ImGui::Selectable(name.c_str(), isSelected)) {
           currentBehaviourName = name;
-          behaviour = BehaviourRegistry::getInstance().getBehaviour(name);
+          behaviour = behaviour::Registry::getInstance().getBehaviour(name);
           SetBehaviour();
         }
         if (isSelected) {
