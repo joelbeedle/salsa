@@ -46,10 +46,9 @@
 int main() {
   // TODO: Register each behaviour with the registry, when being made, this
   // removes the need for header files
-  swarm::FlockingParameters flockingParams = {250.0f, 1.6f, 1.0f, 3.0f, 3.0f};
-  auto flock = std::make_unique<swarm::FlockingBehaviour>(flockingParams);
-  auto pheromone = std::make_unique<swarm::PheromoneBehaviour>(
-      swarm::PheromoneParameters{0.1f, 1.0f});
+  auto flock =
+      std::make_unique<swarm::FlockingBehaviour>(250.0, 1.6, 1.0, 3.0, 3.0);
+  auto pheromone = std::make_unique<swarm::PheromoneBehaviour>(0.5, 1.0);
   swarm::DroneConfiguration *smallDrone = new swarm::DroneConfiguration(
       25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f);
   SwarmTest::SetHeight(BORDER_HEIGHT);

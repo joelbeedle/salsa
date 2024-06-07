@@ -1,6 +1,6 @@
 // PheromoneBehaviour.h
-#ifndef swarm_BEHAVIOURS_Pheromone_AVOIDANCE_H
-#define swarm_BEHAVIOURS_Pheromone_AVOIDANCE_H
+#ifndef SWARM_SIM_BEHAVIOURS_Pheromone_AVOIDANCE_H
+#define SWARM_SIM_BEHAVIOURS_Pheromone_AVOIDANCE_H
 
 #include <box2d/b2_math.h>
 #include <box2d/box2d.h>
@@ -16,11 +16,6 @@ class Drone;  // Forward declaration
 
 namespace swarm {
 // namespace behaviours {
-struct PheromoneParameters {
-  float decayRate;
-  float obstacleAvoidanceWeight;
-};
-
 class PheromoneBehaviour : public Behaviour {
  private:
   struct Pheromone {
@@ -30,24 +25,25 @@ class PheromoneBehaviour : public Behaviour {
 
   std::map<int, Pheromone> pheromones;
   int pheromoneCount = 0;
-
-  PheromoneParameters params;
-  // Define the parameter names and their expected min and max values
-  // (for the UI)
-  std::unordered_map<std::string, ParameterDefinition> cleanParams = {
-      {"Decay Rate", {&params.decayRate, 0.0f, 1.0f}},
-      {"Obstacle Avoidance Weight",
-       {&params.obstacleAvoidanceWeight, 0.0f, 3.0f}}};
+  std::unordered_map<std::string, behaviour::Parameter *> parameters_;
+  behaviour::Parameter decay_rate_;
+  behaviour::Parameter obstacle_avoidance_weight_;
 
  public:
-  PheromoneBehaviour(const PheromoneParameters &params) : params(params) {}
+  PheromoneBehaviour(float decayRate, float obstacleAvoidanceWeight)
+      : decay_rate_(decayRate, 0.0f, 50.0f),
+        obstacle_avoidance_weight_(obstacleAvoidanceWeight, 0.0f, 3.0f) {
+    // Register parameters in the map
+    parameters_["Decay Rate"] = &decay_rate_;
+    parameters_["Obstacle Avoidance Weight"] = &obstacle_avoidance_weight_;
+  }
 
   void execute(const std::vector<std::unique_ptr<Drone>> &drones,
                Drone &currentDrone) override;
 
-  std::unordered_map<std::string, ParameterDefinition> getParameters()
+  std::unordered_map<std::string, behaviour::Parameter *> getParameters()
       override {
-    return cleanParams;
+    return parameters_;
   }
 
  private:
@@ -58,4 +54,4 @@ class PheromoneBehaviour : public Behaviour {
 // }  // namespace behaviours
 }  // namespace swarm
 
-#endif  // swarm_BEHAVIOURS_Pheromone_AVOIDANCE_H
+#endif  // SWARM_SIM_BEHAVIOURS_Pheromone_AVOIDANCE_H

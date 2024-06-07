@@ -1,6 +1,6 @@
 // UniformRandomWalkBehaviour.h
-#ifndef swarm_BEHAVIOURS_UNIFORM_RANDOM_WALK_H
-#define swarm_BEHAVIOURS_UNIFORM_RANDOM_WALK_H
+#ifndef SWARM_SIM_BEHAVIOURS_UNIFORM_RANDOM_WALK_H
+#define SWARM_SIM_BEHAVIOURS_UNIFORM_RANDOM_WALK_H
 
 #include <box2d/box2d.h>
 
@@ -19,22 +19,14 @@ class Drone;
 
 namespace swarm {
 // namespace behaviours {
-struct UniformRandomWalkParameters {
-  float maxMagnitude;
-  float forceWeight;
-  float obstacleAvoidanceWeight;
-  float deltaTime = 1.0f / 60.0f;
-};
 
 class UniformRandomWalkBehaviour : public Behaviour {
  private:
-  UniformRandomWalkParameters params;
-  std::unordered_map<std::string, ParameterDefinition> cleanParams = {
-      {"Max Magnitude", {&params.maxMagnitude, 0.0f, 20.0f}},
-      {"Force Weight", {&params.forceWeight, 0.0f, 20.0f}},
-      {"Obstacle Avoidance Weight",
-       {&params.obstacleAvoidanceWeight, 0.0f, 3.0f}}};
-
+  std::unordered_map<std::string, behaviour::Parameter *> parameters_;
+  behaviour::Parameter max_magnitude_;
+  behaviour::Parameter force_weight_;
+  behaviour::Parameter obstacle_avoidance_weight_;
+  behaviour::Parameter delta_time_{1.0f / 60.0f, 0.0f, 1.0f};
   struct DroneTimerInfo {
     float elapsedTimeSinceLastForce = 0.0f;
     float randomTimeInterval;
@@ -46,11 +38,20 @@ class UniformRandomWalkBehaviour : public Behaviour {
   std::unordered_map<Drone *, DroneTimerInfo> droneTimers;
 
  public:
-  UniformRandomWalkBehaviour(const UniformRandomWalkParameters &params);
+  UniformRandomWalkBehaviour(float maxMagnitude, float forceWeight,
+                             float obstacleAvoidanceWeight)
+      : max_magnitude_(maxMagnitude, 0.0f, 20.0f),
+        force_weight_(forceWeight, 0.0f, 20.0f),
+        obstacle_avoidance_weight_(obstacleAvoidanceWeight, 0.0f, 3.0f) {
+    parameters_["Max Magnitude"] = &max_magnitude_;
+    parameters_["Force Weight"] = &force_weight_;
+    parameters_["Obstacle Avoidance Weight"] = &obstacle_avoidance_weight_;
+    std::srand(std::time(nullptr));
+  }
 
-  std::unordered_map<std::string, ParameterDefinition> getParameters()
+  std::unordered_map<std::string, behaviour::Parameter *> getParameters()
       override {
-    return cleanParams;
+    return parameters_;
   }
 
   virtual ~UniformRandomWalkBehaviour() override {}
@@ -67,4 +68,4 @@ class UniformRandomWalkBehaviour : public Behaviour {
 // }  // namespace behaviours
 }  // namespace swarm
 
-#endif  // swarm_BEHAVIOURS_UNIFORM_RANDOM_WALK_H
+#endif  // SWARM_SIM_BEHAVIOURS_UNIFORM_RANDOM_WALK_H

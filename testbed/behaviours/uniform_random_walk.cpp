@@ -7,12 +7,6 @@
 #include "drones/drone.h"
 
 namespace swarm {
-UniformRandomWalkBehaviour::UniformRandomWalkBehaviour(
-    const UniformRandomWalkParameters &params)
-    : params(params) {
-  std::srand(std::time(nullptr));
-}
-
 void UniformRandomWalkBehaviour::execute(
     const std::vector<std::unique_ptr<Drone>> &drones, Drone &currentDrone) {
   if (droneTimers.find(&currentDrone) == droneTimers.end()) {
@@ -26,7 +20,7 @@ void UniformRandomWalkBehaviour::execute(
   std::vector<b2Body *> neighbours = callback.detectedDrones;
 
   DroneTimerInfo &timerInfo = droneTimers[&currentDrone];
-  timerInfo.elapsedTimeSinceLastForce += params.deltaTime;
+  timerInfo.elapsedTimeSinceLastForce += delta_time_;
   b2Vec2 force = b2Vec2(0, 0);
   b2Vec2 steer = b2Vec2(0, 0);
   b2Vec2 obstacleAvoidance = avoidObstacles(obstaclePoints, currentDrone);
@@ -51,8 +45,8 @@ void UniformRandomWalkBehaviour::execute(
 
   b2Vec2 velocity = currentDrone.getVelocity();
   b2Vec2 position = currentDrone.getPosition();
-  b2Vec2 acceleration = (params.forceWeight * steer) +
-                        (params.obstacleAvoidanceWeight * obstacleAvoidance) +
+  b2Vec2 acceleration = (force_weight_ * steer) +
+                        (obstacle_avoidance_weight_ * obstacleAvoidance) +
                         neighbourAvoidance;
 
   velocity += acceleration;

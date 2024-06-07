@@ -11,8 +11,6 @@ class Drone;
 namespace swarm {
 // namespace behaviours {
 
-struct DSPParameters {};
-
 class DSPPoint {
  public:
   float radius = 2.0f;
@@ -81,12 +79,9 @@ class DSPPoint {
 class DSPBehaviour : public Behaviour {
  private:
   std::vector<DSPPoint *> dspPoints;
-  DSPParameters params;
   float firstRun = true;
 
-  std::unordered_map<std::string, ParameterDefinition> cleanParams = {
-
-  };
+  std::unordered_map<std::string, behaviour::Parameter *> cleanParams = {};
 
   struct DroneInfo {
     bool isAtDSPPoint;
@@ -107,12 +102,12 @@ class DSPBehaviour : public Behaviour {
   std::unordered_map<Drone *, DroneInfo> droneInformation;
 
  public:
-  DSPBehaviour(const DSPParameters &params) : params(params) {}
+  DSPBehaviour() {}
 
   void execute(const std::vector<std::unique_ptr<Drone>> &drones,
                Drone &currentDrone) override;
 
-  std::unordered_map<std::string, ParameterDefinition> getParameters()
+  std::unordered_map<std::string, behaviour::Parameter *> getParameters()
       override {
     return cleanParams;
   }

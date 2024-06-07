@@ -216,9 +216,10 @@ class SwarmTest : public Test {
 
     ImGui::Text("Behaviour Settings");
     bool changed = false;
-    for (auto &[name, parameter] : behaviour_->getParameters()) {
-      changed |= ImGui::SliderFloat(name.c_str(), parameter.value,
-                                    parameter.min_value, parameter.max_value);
+    for (auto [name, parameter] : behaviour_->getParameters()) {
+      changed |=
+          ImGui::SliderFloat(name.c_str(), &(parameter->value()),
+                             parameter->min_value(), parameter->max_value());
     }
 
     if (changed) {
