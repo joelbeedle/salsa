@@ -55,7 +55,6 @@ jobs:
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
     - name: Initialise submodules
-      if: matrix.os == 'ubuntu-latest'
       run: git submodule update --init --recursive
 
     - name: Install dependencies
