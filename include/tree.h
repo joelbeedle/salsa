@@ -1,5 +1,6 @@
 // Tree.h
-#pragma once
+#ifndef TREE_H
+#define TREE_H
 #include <box2d/box2d.h>
 
 class Tree {
@@ -36,3 +37,4 @@ class Tree {
   int getNumMapped() { return numMapped; }
   void render();
 };
+#endif // TREE_H
