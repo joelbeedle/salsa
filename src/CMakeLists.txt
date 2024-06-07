@@ -5,11 +5,6 @@ include_directories(${PROJECT_SRC_DIR}/include)
 
 add_library(libswarm-sim STATIC
     behaviours/behaviour.cpp
-    # behaviours/dsp.cpp
-    # behaviours/flocking.cpp
-    # behaviours/levy_flocking.cpp
-    # behaviours/pheromone_avoidance.cpp
-    # behaviours/uniform_random_walk.cpp
     drones/drone.cpp
     core/sim.cpp
     tree.cpp
