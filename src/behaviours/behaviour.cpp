@@ -5,6 +5,14 @@
 
 namespace swarm_sim {
 // namespace behaviours {
+void Behaviour::clampMagnitude(b2Vec2 &vector, const float maxMagnitude) {
+  float lengthSquared = vector.LengthSquared();
+  if (lengthSquared > maxMagnitude * maxMagnitude && lengthSquared > 0) {
+    vector.Normalize();
+    vector *= maxMagnitude;
+  }
+}
+
 b2Vec2 Behaviour::avoidDrones(std::vector<b2Body *> &neighbours,
                               Drone &currentDrone) {
   b2Vec2 steering(0, 0);
