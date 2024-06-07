@@ -1,4 +1,5 @@
-// Registry.h
+/// @file registry.h
+/// @brief Contains the Registry class, for managing Behaviour instances.
 #ifndef SWARM_SIM_UTILS_BEHAVIOUR_REGISTRY_H
 #define SWARM_SIM_UTILS_BEHAVIOUR_REGISTRY_H
 
@@ -10,7 +11,6 @@
 
 namespace swarm {
 namespace behaviour {
-
 /// @brief Singleton class that manages and provides access to Behaviour
 /// instances.
 /// @details This class uses the Singleton design pattern to ensure that there
@@ -57,11 +57,17 @@ class Registry {
     return names;
   }
 
-  // Prevent copy and assignment to enforce singleton pattern
+  /// @brief Prevent copy construction
+  /// @param rhs The Registry instance intended to copy from
   Registry(const Registry&) = delete;
+
+  /// @brief Prevent assignment
+  /// @param rhs The Registry instance intended to assign from
+  /// @return deletes the assigned value
   Registry& operator=(const Registry&) = delete;
 
  private:
+  /// @brief Private constructor to enforce singleton pattern.
   Registry() {}
 };
 

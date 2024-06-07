@@ -1,3 +1,5 @@
+/// @file behaviour.h
+/// @brief Contains the abstract base class for all swarm behaviours to inherit.
 #ifndef SWARM_SIM_BEHAVIOURS_BEHAVIOUR_H
 #define SWARM_SIM_BEHAVIOURS_BEHAVIOUR_H
 

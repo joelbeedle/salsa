@@ -1,10 +1,10 @@
-// Drone.h
+/// @file drone.h
+/// @brief Contains the drone class, whcih represents a single drone in the
+/// simulation.
 #ifndef SWARM_SIM_DRONES_DRONE_H
 #define SWARM_SIM_DRONES_DRONE_H
 
 #include <box2d/box2d.h>
-
-// #include <SFML/Graphics.hpp>
 
 #include <memory>
 
@@ -18,8 +18,9 @@ class Drone {
   std::vector<Tree *> foundTrees;
   std::vector<b2Vec2 *> foundDiseasedTreePositions;
   b2Body *body;
-  b2Fixture *viewSensor;  // The view range sensor
-  Behaviour *behaviour;
+  b2Fixture *viewSensor;  ///< Sensor used for detecting targets
+  Behaviour *behaviour;   ///< Current swarm `Behaviour` of the drone
+
   float cameraViewRange;
   float obstacleViewRange;
   float droneDetectionRange;
@@ -33,6 +34,10 @@ class Drone {
         const DroneConfiguration &config);
   ~Drone();
 
+  /// @brief Updates one step of the simulation for this drone, where the drone
+  /// runs its behaviours' `execute` function, which tells the drone what move
+  /// to make in this step.
+  /// @param drones The list of all drones in the simulation
   void update(const std::vector<std::unique_ptr<Drone>> &drones);
   void updateSensorRange();
 
