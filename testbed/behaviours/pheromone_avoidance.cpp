@@ -19,8 +19,8 @@ void PheromoneBehaviour::execute(
   layPheromone(currentDrone.getPosition());
 
   updatePheromones();
-  b2Vec2 steering = params.obstacleAvoidanceWeight *
-                    avoidObstacles(obstaclePoints, currentDrone);
+  b2Vec2 steering =
+      obstacle_avoidance_weight_ * avoidObstacles(obstaclePoints, currentDrone);
 
   b2Vec2 avoidanceSteering(0, 0);
   int32 count = 0;
@@ -52,7 +52,7 @@ void PheromoneBehaviour::execute(
   }
 
   b2Vec2 acceleration =
-      steering + (params.obstacleAvoidanceWeight *
+      steering + (obstacle_avoidance_weight_ *
                   avoidObstacles(obstaclePoints, currentDrone));
   b2Vec2 velocity = currentDrone.getVelocity();
   b2Vec2 position = currentDrone.getPosition();
@@ -80,7 +80,7 @@ void PheromoneBehaviour::layPheromone(const b2Vec2 &position) {
 
 void PheromoneBehaviour::updatePheromones() {
   for (auto it = pheromones.begin(); it != pheromones.end();) {
-    it->second.intensity -= params.decayRate;
+    it->second.intensity -= decay_rate_;
     if (it->second.intensity <= 0) {
       it = pheromones.erase(it);
     } else {

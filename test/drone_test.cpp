@@ -16,7 +16,7 @@ class MockBehaviour : public swarm::Behaviour {
                swarm::Drone& currentDrone),
               (override));
 
-  MOCK_METHOD((std::unordered_map<std::string, swarm::ParameterDefinition>),
+  MOCK_METHOD((std::unordered_map<std::string, swarm::behaviour::Parameter*>),
               getParameters, (), (override));
   MOCK_METHOD(void, clean,
               (const std::vector<std::unique_ptr<swarm::Drone>>& drones),

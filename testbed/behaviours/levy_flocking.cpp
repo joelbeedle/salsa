@@ -51,8 +51,8 @@ void LevyFlockingBehaviour::execute(
     dir *= currentDrone.getMaxSpeed();
     b2Vec2 steering = dir - currentDrone.getVelocity();
     clampMagnitude(steering, currentDrone.getMaxForce());
-    acceleration = (params.levyWeight * steering) +
-                   (params.obstacleAvoidanceWeight * obstacleAvoidance) +
+    acceleration = (levy_weight_ * steering) +
+                   (obstacle_avoidance_weight_ * obstacleAvoidance) +
                    droneAvoidance;
 
     if (droneInfo.accumulatedDistance >= droneInfo.stepLength) {
@@ -76,16 +76,16 @@ void LevyFlockingBehaviour::execute(
 
     b2Vec2 steering = dir - currentDrone.getVelocity();
     clampMagnitude(steering, currentDrone.getMaxForce());
-    acceleration = (params.levyWeight * steering) +
-                   (params.obstacleAvoidanceWeight * obstacleAvoidance) +
+    acceleration = (levy_weight_ * steering) +
+                   (obstacle_avoidance_weight_ * obstacleAvoidance) +
                    droneAvoidance;
 
   } else {
     // usual flocking behaviour
-    acceleration = (params.alignmentWeight * alignment) +
-                   (params.separationWeight * separation) +
-                   (params.cohesionWeight * cohesion) +
-                   (params.obstacleAvoidanceWeight * obstacleAvoidance);
+    acceleration = (alignment_weight_ * alignment) +
+                   (separation_weight_ * separation) +
+                   (cohesion_weight_ * cohesion) +
+                   (obstacle_avoidance_weight_ * obstacleAvoidance);
   }
   velocity += acceleration;
 
@@ -154,7 +154,7 @@ b2Vec2 LevyFlockingBehaviour::separate(std::vector<b2Body *> &drones,
   for (auto &drone : drones) {
     float distance =
         (currentDrone.getPosition() - drone->GetPosition()).Length();
-    if (distance < params.separationDistance && distance > 0) {
+    if (distance < separation_distance_ && distance > 0) {
       b2Vec2 diff = currentDrone.getPosition() - drone->GetPosition();
       diff.Normalize();
       diff.x /= distance;

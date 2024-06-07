@@ -8,44 +8,49 @@
 #include <vector>
 
 #include "behaviours/behaviour.h"
+#include "behaviours/parameter.h"
 #include "utils/raycastcallback.h"
 
 class Drone;  // Forward declaration for Drone
 
 namespace swarm {
 // namespace behaviours {
-struct FlockingParameters {
-  float separationDistance;
-  float alignmentWeight;
-  float cohesionWeight;
-  float separationWeight;
-  float obstacleAvoidanceWeight;
-};
 
 class FlockingBehaviour : public Behaviour {
  private:
-  FlockingParameters params;
+  std::unordered_map<std::string, behaviour::Parameter *> parameters_;
 
-  // Define the parameter names and their expected min and max values
-  // (for the UI)
-  std::unordered_map<std::string, ParameterDefinition> cleanParams = {
-      {"Separation Distance", {&params.separationDistance, 0.0f, 1000.0f}},
-      {"Alignment Weight", {&params.alignmentWeight, 0.0f, 2.0f}},
-      {"Cohesion Weight", {&params.cohesionWeight, 0.0f, 2.0f}},
-      {"Separation Weight", {&params.separationWeight, 0.0f, 5.0f}},
-      {"Obstacle Avoidance Weight",
-       {&params.obstacleAvoidanceWeight, 0.0f, 5.0f}}};
+  behaviour::Parameter separation_distance_;
+  behaviour::Parameter alignment_weight_;
+  behaviour::Parameter cohesion_weight_;
+  behaviour::Parameter separation_weight_;
+  behaviour::Parameter obstacle_avoidance_weight_;
+
   std::vector<b2Body *> obstacles;
 
  public:
-  FlockingBehaviour(const FlockingParameters &params) : params(params) {}
+  FlockingBehaviour(float separationDistance, float alignmentWeight,
+                    float cohesionWeight, float separationWeight,
+                    float obstacleAvoidanceWeight)
+      : separation_distance_(separationDistance, 0.0f, 1000.0f),
+        alignment_weight_(alignmentWeight, 0.0f, 2.0f),
+        cohesion_weight_(cohesionWeight, 0.0f, 2.0f),
+        separation_weight_(separationWeight, 0.0f, 5.0f),
+        obstacle_avoidance_weight_(obstacleAvoidanceWeight, 0.0f, 5.0f) {
+    // Register parameters in the map
+    parameters_["Separation Distance"] = &separation_distance_;
+    parameters_["Alignment Weight"] = &alignment_weight_;
+    parameters_["Cohesion Weight"] = &cohesion_weight_;
+    parameters_["Separation Weight"] = &separation_weight_;
+    parameters_["Obstacle Avoidance Weight"] = &obstacle_avoidance_weight_;
+  }
 
   void execute(const std::vector<std::unique_ptr<Drone>> &drones,
                Drone &currentDrone) override;
 
-  std::unordered_map<std::string, ParameterDefinition> getParameters()
+  std::unordered_map<std::string, behaviour::Parameter *> getParameters()
       override {
-    return cleanParams;
+    return parameters_;
   }
 
  private:

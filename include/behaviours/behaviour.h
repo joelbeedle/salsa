@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "behaviours/parameter.h"
 #include "utils/raycastcallback.h"
 namespace swarm {
 
@@ -39,7 +40,7 @@ class Behaviour {
   /// in `ParameterDefinition`. This is used in order to dynamically change
   /// behaviour parameters on the fly.
   /// @return Unordered map of parameter names to their settings.
-  virtual std::unordered_map<std::string, ParameterDefinition>
+  virtual std::unordered_map<std::string, behaviour::Parameter*>
   getParameters() = 0;
 
   /// @brief Cleans up any resources or states specific to the behavior.
