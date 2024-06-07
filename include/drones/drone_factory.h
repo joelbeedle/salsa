@@ -9,7 +9,7 @@
 #include "drones/drone.h"
 #include "utils/drone_configuration.h"
 
-namespace swarm_sim {
+namespace swarm {
 class DroneFactory {
  public:
   static std::unique_ptr<Drone> createDrone(b2World* world,
@@ -20,6 +20,6 @@ class DroneFactory {
   }
 };
 
-}  // namespace swarm_sim
+}  // namespace swarm
 
 #endif  // SWARM_SIM_DRONES_DRONE_FACTORY_H

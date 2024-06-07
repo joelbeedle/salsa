@@ -7,7 +7,7 @@
 #include "drones/drone.h"
 #include "utils/raycastcallback.h"
 
-namespace swarm_sim {
+namespace swarm {
 void FlockingBehaviour::execute(
     const std::vector<std::unique_ptr<Drone>> &drones, Drone &currentDrone) {
   // Using ray casting to find neighbours and obstacles
@@ -130,4 +130,4 @@ b2Vec2 FlockingBehaviour::separate(std::vector<b2Body *> &drones,
 
   return steering;
 }
-}  // namespace swarm_sim
+}  // namespace swarm

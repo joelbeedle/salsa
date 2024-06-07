@@ -1,5 +1,7 @@
 #include "tree.h"
+
 #include <cstdlib>
+
 #include "utils/object_types.h"
 
 Tree::Tree(b2World *world, int treeID, const b2Vec2 &position, bool diseased,
@@ -23,8 +25,8 @@ Tree::Tree(b2World *world, int treeID, const b2Vec2 &position, bool diseased,
   fixtureDef.isSensor = true;
   fixtureDef.filter.categoryBits = 0x0002;
   fixtureDef.filter.maskBits = 0x0001;
-  swarm_sim::UserData *userData = new swarm_sim::UserData();
-  userData->type = swarm_sim::ObjectType::Tree;
+  swarm::UserData *userData = new swarm::UserData();
+  userData->type = swarm::ObjectType::Tree;
   userData->tree = this;
 
   fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(userData);
@@ -32,6 +34,7 @@ Tree::Tree(b2World *world, int treeID, const b2Vec2 &position, bool diseased,
 
   // Set diseased status of dree
   float infectionChance = 0.05f;
-  float randomValue = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
+  float randomValue =
+      static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
   this->diseased = randomValue < infectionChance ? true : diseased;
 }

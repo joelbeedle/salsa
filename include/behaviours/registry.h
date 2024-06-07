@@ -8,7 +8,7 @@
 
 #include "behaviours/behaviour.h"
 
-namespace swarm_sim {
+namespace swarm {
 namespace behaviour {
 
 /// @brief Singleton class that manages and provides access to Behaviour
@@ -66,6 +66,6 @@ class Registry {
 };
 
 }  // namespace behaviour
-}  // namespace swarm_sim
+}  // namespace swarm
 
 #endif  // SWARM_SIM_UTILS_BEHAVIOUR_REGISTRY_H

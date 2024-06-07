@@ -7,7 +7,7 @@
 #include "behaviours/registry.h"
 #include "utils/drone_contact_listener.h"
 
-namespace swarm_sim {
+namespace swarm {
 
 struct DroneParameters {
   float cameraViewRange;
@@ -62,6 +62,6 @@ class SwarmSim {
   const DroneParameters* drone_parameters() const { return drone_parameters_; }
 };
 
-}  // namespace swarm_sim
+}  // namespace swarm
 
 #endif  // SWARM_SIM_CORE_SIM_H

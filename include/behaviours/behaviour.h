@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "utils/raycastcallback.h"
-namespace swarm_sim {
+namespace swarm {
 
 // Forward declaration for Drone class
 class Drone;
@@ -17,9 +17,9 @@ class Drone;
 
 /// @brief Structure for behavior parameters with adjustable settings.
 struct ParameterDefinition {
-  float* value;      ///< Pointer to the value of the parameter.
-  float minSetting;  ///< Minimum allowable value for the parameter.
-  float maxSetting;  ///< Maximum allowable value for the parameter.
+  float* value;     ///< Pointer to the value of the parameter.
+  float min_value;  ///< Minimum allowable value for the parameter.
+  float max_value;  ///< Maximum allowable value for the parameter.
 };
 
 /// @brief Abstract base class for all swarm behaviours to inherit from.
@@ -79,6 +79,6 @@ class Behaviour {
 };
 
 // }  // namespace behaviours
-}  // namespace swarm_sim
+}  // namespace swarm
 
 #endif  // SWARM_SIM_BEHAVIOURS_BEHAVIOUR_H

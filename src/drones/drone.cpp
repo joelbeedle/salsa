@@ -9,7 +9,7 @@
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
 
-namespace swarm_sim {
+namespace swarm {
 Drone::Drone(b2World *world, const b2Vec2 &position, Behaviour &behaviour,
              const DroneConfiguration &config)
     : behaviour(&behaviour),
@@ -110,4 +110,4 @@ void Drone::foundDiseasedTree(Tree *tree) {
 }
 
 void Drone::foundTree(Tree *tree) { foundTrees.push_back(tree); }
-}  // namespace swarm_sim
+}  // namespace swarm

@@ -6,7 +6,7 @@
 #include "box2d/box2d.h"
 #include "drones/drone.h"
 
-namespace swarm_sim {
+namespace swarm {
 UniformRandomWalkBehaviour::UniformRandomWalkBehaviour(
     const UniformRandomWalkParameters &params)
     : params(params) {
@@ -69,4 +69,4 @@ void UniformRandomWalkBehaviour::execute(
 
   currentDrone.getBody()->SetLinearVelocity(velocity);
 }
-}  // namespace swarm_sim
+}  // namespace swarm

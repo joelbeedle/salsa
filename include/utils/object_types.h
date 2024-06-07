@@ -5,7 +5,7 @@
 struct Drone;
 struct Tree;
 
-namespace swarm_sim {
+namespace swarm {
 enum class ObjectType {
   Drone,
   Tree,
@@ -19,6 +19,6 @@ struct UserData {
   };
 };
 
-}  // namespace swarm_sim
+}  // namespace swarm
 
 #endif  // SWARM_SIM_UTILS_OBJECT_TYPES_H

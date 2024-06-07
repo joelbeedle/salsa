@@ -1,5 +1,5 @@
-#ifndef SWARM_SIM_BEHAVIOURS_DSP_H
-#define SWARM_SIM_BEHAVIOURS_DSP_H
+#ifndef swarm_BEHAVIOURS_DSP_H
+#define swarm_BEHAVIOURS_DSP_H
 
 #include <box2d/box2d.h>
 
@@ -8,7 +8,7 @@
 
 class Drone;
 
-namespace swarm_sim {
+namespace swarm {
 // namespace behaviours {
 
 struct DSPParameters {};
@@ -130,7 +130,7 @@ class DSPBehaviour : public Behaviour {
   }
 };
 
-}  // namespace swarm_sim
-// }  // namespace swarm_sim
+}  // namespace swarm
+// }  // namespace swarm
 
-#endif  // SWARM_SIM_BEHAVIOURS_DSP_H
+#endif  // swarm_BEHAVIOURS_DSP_H

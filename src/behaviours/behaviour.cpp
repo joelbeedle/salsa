@@ -3,7 +3,7 @@
 #include "box2d/box2d.h"
 #include "drones/drone.h"
 
-namespace swarm_sim {
+namespace swarm {
 // namespace behaviours {
 void Behaviour::clampMagnitude(b2Vec2 &vector, const float maxMagnitude) {
   float lengthSquared = vector.LengthSquared();
@@ -104,4 +104,4 @@ b2Vec2 Behaviour::steerTo(b2Vec2 target, Drone &currentDrone) {
   return steer;
 }
 // }  // namespace behaviours
-}  // namespace swarm_sim
+}  // namespace swarm

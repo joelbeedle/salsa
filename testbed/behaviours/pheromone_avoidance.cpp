@@ -6,7 +6,7 @@
 
 #include "drones/drone.h"
 
-namespace swarm_sim {
+namespace swarm {
 void PheromoneBehaviour::execute(
     const std::vector<std::unique_ptr<Drone>> &drones, Drone &currentDrone) {
   // Perform ray casting to detect nearby drones and obstacles
@@ -88,4 +88,4 @@ void PheromoneBehaviour::updatePheromones() {
     }
   }
 }
-}  // namespace swarm_sim
+}  // namespace swarm

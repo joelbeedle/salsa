@@ -11,7 +11,7 @@
 #include "behaviours/behaviour.h"
 #include "tree.h"
 #include "utils/drone_configuration.h"
-namespace swarm_sim {
+namespace swarm {
 class Drone {
  private:
   std::vector<Tree *> foundDiseasedTrees;
@@ -75,6 +75,6 @@ class Drone {
   void clearLists();
 };
 
-}  // namespace swarm_sim
+}  // namespace swarm
 
 #endif  // SWARM_SIM_DRONES_DRONE_H

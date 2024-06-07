@@ -2,7 +2,7 @@
 #ifndef SWARM_SIM_UTILS_DRONE_CONFIGURATION_H
 #define SWARM_SIM_UTILS_DRONE_CONFIGURATION_H
 
-namespace swarm_sim {
+namespace swarm {
 class DroneConfiguration {
  public:
   float cameraViewRange;
@@ -24,6 +24,6 @@ class DroneConfiguration {
         droneDetectionRange(droneDetectRange) {}
 };
 
-}  // namespace swarm_sim
+}  // namespace swarm
 
 #endif  // SWARM_SIM_UTILS_DRONE_CONFIGURATION_H

@@ -42,7 +42,7 @@
 #define BORDER_HEIGHT 2000.0f
 #define MAX_TIME 1200.0f
 
-namespace swarm_sim {
+namespace swarm {
 struct DroneParameters {
   float cameraViewRange;
   float obstacleViewRange;
@@ -724,4 +724,4 @@ class DroneSwarmTest : public Test {
 static int testIndex =
     RegisterTest("Swarm", "DroneSwarmTest", DroneSwarmTest::Create);
 
-}  // namespace swarm_sim
+}  // namespace swarm

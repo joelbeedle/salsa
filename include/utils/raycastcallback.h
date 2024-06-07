@@ -8,7 +8,7 @@
 
 class Drone;  // Forward declaration
 
-namespace swarm_sim {
+namespace swarm {
 class RayCastCallback : public b2RayCastCallback {
  public:
   std::vector<b2Body*> detectedDrones;
@@ -33,6 +33,6 @@ class RayCastCallback : public b2RayCastCallback {
     return fraction;
   }
 };
-}  // namespace swarm_sim
+}  // namespace swarm
 
 #endif  // SWARM_SIM_UTILS_RAYCASTCALLBACK_H

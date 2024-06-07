@@ -54,19 +54,19 @@ class SwarmTest : public Test {
   static float border_height_;
   static float border_width_;
 
-  swarm_sim::Behaviour *behaviour_;
+  swarm::Behaviour *behaviour_;
   std::string current_behaviour_name_;
-  swarm_sim::DroneContactListener contact_listener_;
+  swarm::DroneContactListener contact_listener_;
 
   // Setup drone parameters and configurations
   std::unordered_map<std::string, DroneParameters> all_drone_parameters_;
-  std::unordered_map<std::string, swarm_sim::DroneConfiguration>
+  std::unordered_map<std::string, swarm::DroneConfiguration>
       all_drone_configurations_;
 
-  static swarm_sim::DroneConfiguration *drone_configuration_;
+  static swarm::DroneConfiguration *drone_configuration_;
   DroneParameters *drone_parameters_;
 
-  std::vector<std::unique_ptr<swarm_sim::Drone>> drones_;
+  std::vector<std::unique_ptr<swarm::Drone>> drones_;
 
   float obstacle_view_range_;
   float camera_view_range_;
@@ -83,7 +83,7 @@ class SwarmTest : public Test {
     g_camera.m_center.x = border_height_ / 2;
     g_camera.m_center.y = border_width_ / 2;
     g_camera.m_zoom = 10.0f;
-    auto &registry = swarm_sim::behaviour::Registry::getInstance();
+    auto &registry = swarm::behaviour::Registry::getInstance();
     auto behaviour_names = registry.getBehaviourNames();
     if (!behaviour_names.empty()) {
       current_behaviour_name_ = behaviour_names[0];
@@ -128,8 +128,7 @@ class SwarmTest : public Test {
     groundBody->CreateFixture(&groundBox, 0.0f);
   }
 
-  void create_drones(swarm_sim::Behaviour &b,
-                     swarm_sim::DroneConfiguration &config) {
+  void create_drones(swarm::Behaviour &b, swarm::DroneConfiguration &config) {
     const float margin = 2.0f;  // Define a margin to prevent spawning exactly
                                 // at the border or outside
     for (int i = 0; i < num_drones_; i++) {
@@ -137,8 +136,8 @@ class SwarmTest : public Test {
           (rand() % static_cast<int>(border_width_ - 2 * margin)) + margin;
       float y =
           (rand() % static_cast<int>(border_height_ - 2 * margin)) + margin;
-      drones_.push_back(swarm_sim::DroneFactory::createDrone(
-          m_world, b2Vec2(x, y), b, config));
+      drones_.push_back(
+          swarm::DroneFactory::createDrone(m_world, b2Vec2(x, y), b, config));
     }
   }
 
@@ -159,9 +158,8 @@ class SwarmTest : public Test {
   }
 
   static void AddBehaviour(const std::string &name,
-                           std::unique_ptr<swarm_sim::Behaviour> behaviour) {
-    swarm_sim::behaviour::Registry::getInstance().add(name,
-                                                      std::move(behaviour));
+                           std::unique_ptr<swarm::Behaviour> behaviour) {
+    swarm::behaviour::Registry::getInstance().add(name, std::move(behaviour));
   }
   auto border_height() const & -> const float & { return border_height_; }
   auto border_height() & -> float & { return border_height_; }
@@ -170,7 +168,7 @@ class SwarmTest : public Test {
   static float GetHeight() { return border_height_; }
   static float GetWidth() { return border_width_; }
 
-  static void SetConfiguration(swarm_sim::DroneConfiguration *configuration) {
+  static void SetConfiguration(swarm::DroneConfiguration *configuration) {
     // Set the drone configuration
     drone_configuration_ = configuration;
   }
@@ -198,14 +196,14 @@ class SwarmTest : public Test {
 
     if (ImGui::BeginCombo("Behaviours", current_behaviour_name_.c_str())) {
       auto behaviourNames =
-          swarm_sim::behaviour::Registry::getInstance().getBehaviourNames();
+          swarm::behaviour::Registry::getInstance().getBehaviourNames();
 
       for (auto &name : behaviourNames) {
         bool isSelected = (current_behaviour_name_ == name);
         if (ImGui::Selectable(name.c_str(), isSelected)) {
           current_behaviour_name_ = name;
           behaviour_ =
-              swarm_sim::behaviour::Registry::getInstance().getBehaviour(name);
+              swarm::behaviour::Registry::getInstance().getBehaviour(name);
           SetBehaviour();
         }
         if (isSelected) {
@@ -220,7 +218,7 @@ class SwarmTest : public Test {
     bool changed = false;
     for (auto &[name, parameter] : behaviour_->getParameters()) {
       changed |= ImGui::SliderFloat(name.c_str(), parameter.value,
-                                    parameter.minSetting, parameter.maxSetting);
+                                    parameter.min_value, parameter.max_value);
     }
 
     if (changed) {
@@ -293,17 +291,16 @@ class SwarmTest : public Test {
         }
 
         if (fixture->GetUserData().pointer != 0) {
-          swarm_sim::UserData *userData =
-              reinterpret_cast<swarm_sim::UserData *>(
-                  fixture->GetUserData().pointer);
+          swarm::UserData *userData = reinterpret_cast<swarm::UserData *>(
+              fixture->GetUserData().pointer);
           if (userData == nullptr) {
             std::cout << "User data is null" << std::endl;
             continue;
           }
           // Depending on the type, draw the object
           switch (userData->type) {
-            case swarm_sim::ObjectType::Drone: {
-              swarm_sim::Drone *drone = userData->drone;
+            case swarm::ObjectType::Drone: {
+              swarm::Drone *drone = userData->drone;
               // Draw drone
               b2Vec2 position = body->GetPosition();
               debugDraw->DrawSolidCircle(position, drone->getRadius(),
@@ -311,7 +308,7 @@ class SwarmTest : public Test {
                                          b2Color(0.7f, 0.5f, 0.5f));
               break;
             }
-            case swarm_sim::ObjectType::Tree: {
+            case swarm::ObjectType::Tree: {
               break;
             }
           }

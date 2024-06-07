@@ -1,6 +1,6 @@
 // FlockingBehaviour.h
-#ifndef SWARM_SIM_BEHAVIOURS_LEVY_FLOCKING_H
-#define SWARM_SIM_BEHAVIOURS_LEVY_FLOCKING_H
+#ifndef swarm_BEHAVIOURS_LEVY_FLOCKING_H
+#define swarm_BEHAVIOURS_LEVY_FLOCKING_H
 
 #include <box2d/b2_math.h>
 #include <box2d/box2d.h>
@@ -15,7 +15,7 @@
 
 class Drone;
 
-namespace swarm_sim {
+namespace swarm {
 // namespace behaviours {
 struct LevyFlockingParameters {
   float separationDistance;
@@ -106,6 +106,6 @@ class LevyFlockingBehaviour : public Behaviour {
 };
 
 // }  // namespace behaviours
-}  // namespace swarm_sim
+}  // namespace swarm
 
-#endif  // SWARM_SIM_BEHAVIOURS_LEVY_FLOCKING_H
+#endif  // swarm_BEHAVIOURS_LEVY_FLOCKING_H

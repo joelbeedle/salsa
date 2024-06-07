@@ -1,6 +1,6 @@
 // UniformRandomWalkBehaviour.h
-#ifndef SWARM_SIM_BEHAVIOURS_UNIFORM_RANDOM_WALK_H
-#define SWARM_SIM_BEHAVIOURS_UNIFORM_RANDOM_WALK_H
+#ifndef swarm_BEHAVIOURS_UNIFORM_RANDOM_WALK_H
+#define swarm_BEHAVIOURS_UNIFORM_RANDOM_WALK_H
 
 #include <box2d/box2d.h>
 
@@ -17,7 +17,7 @@
 
 class Drone;
 
-namespace swarm_sim {
+namespace swarm {
 // namespace behaviours {
 struct UniformRandomWalkParameters {
   float maxMagnitude;
@@ -65,6 +65,6 @@ class UniformRandomWalkBehaviour : public Behaviour {
 };
 
 // }  // namespace behaviours
-}  // namespace swarm_sim
+}  // namespace swarm
 
-#endif  // SWARM_SIM_BEHAVIOURS_UNIFORM_RANDOM_WALK_H
+#endif  // swarm_BEHAVIOURS_UNIFORM_RANDOM_WALK_H

@@ -1,6 +1,6 @@
 // PheromoneBehaviour.h
-#ifndef SWARM_SIM_BEHAVIOURS_Pheromone_AVOIDANCE_H
-#define SWARM_SIM_BEHAVIOURS_Pheromone_AVOIDANCE_H
+#ifndef swarm_BEHAVIOURS_Pheromone_AVOIDANCE_H
+#define swarm_BEHAVIOURS_Pheromone_AVOIDANCE_H
 
 #include <box2d/b2_math.h>
 #include <box2d/box2d.h>
@@ -14,7 +14,7 @@
 
 class Drone;  // Forward declaration
 
-namespace swarm_sim {
+namespace swarm {
 // namespace behaviours {
 struct PheromoneParameters {
   float decayRate;
@@ -56,6 +56,6 @@ class PheromoneBehaviour : public Behaviour {
 };
 
 // }  // namespace behaviours
-}  // namespace swarm_sim
+}  // namespace swarm
 
-#endif  // SWARM_SIM_BEHAVIOURS_Pheromone_AVOIDANCE_H
+#endif  // swarm_BEHAVIOURS_Pheromone_AVOIDANCE_H
