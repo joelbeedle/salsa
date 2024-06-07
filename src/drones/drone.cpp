@@ -68,14 +68,7 @@ Drone::Drone(b2World *world, const b2Vec2 &position, Behaviour &behaviour,
   std::vector<b2Body *> obstacles;
 }
 
-Drone::~Drone() {
-  if (body) {
-    b2World *world = body->GetWorld();
-    if (world) {
-      world->DestroyBody(body);
-    }
-  }
-}
+Drone::~Drone() {}
 
 void Drone::updateSensorRange() {
   b2CircleShape sCircleShape;
@@ -101,7 +94,7 @@ void Drone::clearLists() {
   this->foundTrees.clear();
 }
 
-void Drone::update(std::vector<std::unique_ptr<Drone>> &drones) {
+void Drone::update(const std::vector<std::unique_ptr<Drone>> &drones) {
   if (behaviour) {
     behaviour->execute(drones, *this);
   }

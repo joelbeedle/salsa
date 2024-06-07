@@ -9,7 +9,6 @@
 #include <vector>
 
 #include "utils/raycastcallback.h"
-class Drone;
 namespace swarm_sim {
 
 class Drone;

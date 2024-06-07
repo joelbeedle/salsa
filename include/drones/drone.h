@@ -33,7 +33,7 @@ class Drone {
         const DroneConfiguration &config);
   ~Drone();
 
-  void update(std::vector<std::unique_ptr<Drone>> &drones);
+  void update(const std::vector<std::unique_ptr<Drone>> &drones);
   void updateSensorRange();
 
   void foundDiseasedTree(Tree *tree);

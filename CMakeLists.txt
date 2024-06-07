@@ -8,9 +8,19 @@ option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 option(BUILD_TESTBED "Build the Box2D testbed" ON)
 add_compile_definitions(_USE_MATH_DEFINES)
 
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+)
+# For Windows: Prevent overriding the parent project's compiler/linker settings
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+
 # Add Box2D submodule, and include it
 add_subdirectory(extern/Box2D)
 # include_directories(extern/Box2D)
+
 
 add_subdirectory(src)
 
@@ -24,6 +34,9 @@ target_include_directories(libswarm-sim PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
 # Set the C++ standard to C++17
 target_compile_features(libswarm-sim PUBLIC cxx_std_17)
+
+enable_testing()
+add_subdirectory(test)
 
 # Handle building TestBed, if that's what we want
 if(BUILD_TESTBED)
