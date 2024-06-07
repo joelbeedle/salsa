@@ -14,16 +14,9 @@
 #include "utils/raycastcallback.h"
 namespace swarm {
 
-// Forward declaration for Drone class
+// Forward declaration for `Drone` class
 class Drone;
 // namespace behaviours {
-
-/// @brief Structure for behavior parameters with adjustable settings.
-struct ParameterDefinition {
-  float* value;     ///< Pointer to the value of the parameter.
-  float min_value;  ///< Minimum allowable value for the parameter.
-  float max_value;  ///< Maximum allowable value for the parameter.
-};
 
 /// @brief Abstract base class for all swarm behaviours to inherit from.
 class Behaviour {

@@ -1,5 +1,5 @@
 /// @file drone.h
-/// @brief Contains the drone class, whcih represents a single drone in the
+/// @brief Contains the `Drone` class, which represents a single drone in the
 /// simulation.
 #ifndef SWARM_SIM_DRONES_DRONE_H
 #define SWARM_SIM_DRONES_DRONE_H

@@ -1,5 +1,5 @@
 /// @file registry.h
-/// @brief Contains the Registry class, for managing Behaviour instances.
+/// @brief Contains the `Registry` class, for managing `Behaviour` instances.
 #ifndef SWARM_SIM_UTILS_BEHAVIOUR_REGISTRY_H
 #define SWARM_SIM_UTILS_BEHAVIOUR_REGISTRY_H
 
