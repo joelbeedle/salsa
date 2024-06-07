@@ -58,6 +58,7 @@ jobs:
       run: git submodule update --init --recursive
 
     - name: Install dependencies
+      if: matrix.os == 'ubuntu-latest'
       run: |
         sudo apt-get update
         sudo apt-get install -y libx11-dev libxrandr-dev libxcursor-dev libudev-dev libopenal-dev libflac-dev libogg-dev libvorbis-dev libopenal-dev libpthread-stubs0-dev libxinerama-dev libglfw3 libglfw3-dev libxi-dev
