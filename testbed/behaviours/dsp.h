@@ -81,7 +81,7 @@ class DSPBehaviour : public Behaviour {
   std::vector<DSPPoint *> dspPoints;
   float firstRun = true;
 
-  std::unordered_map<std::string, behaviour::Parameter *> cleanParams = {};
+  std::unordered_map<std::string, behaviour::Parameter *> parameters_ = {};
 
   struct DroneInfo {
     bool isAtDSPPoint;
@@ -109,7 +109,7 @@ class DSPBehaviour : public Behaviour {
 
   std::unordered_map<std::string, behaviour::Parameter *> getParameters()
       override {
-    return cleanParams;
+    return parameters_;
   }
 
   void clean(const std::vector<std::unique_ptr<Drone>> &drones) override;
