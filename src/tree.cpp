@@ -1,5 +1,5 @@
 #include "tree.h"
-
+#include <cstdlib>
 #include "utils/object_types.h"
 
 Tree::Tree(b2World *world, int treeID, const b2Vec2 &position, bool diseased,
@@ -32,6 +32,6 @@ Tree::Tree(b2World *world, int treeID, const b2Vec2 &position, bool diseased,
 
   // Set diseased status of dree
   float infectionChance = 0.05f;
-  float randomValue = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+  float randomValue = static_cast<float>(rand()) / static_cast<float>(std::RAND_MAX);
   this->diseased = randomValue < infectionChance ? true : diseased;
 }
