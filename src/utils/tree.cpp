@@ -2,8 +2,8 @@
 
 #include <cstdlib>
 
+#include "core/entity.h"
 #include "utils/collision_manager.h"
-#include "utils/entity.h"
 #include "utils/object_types.h"
 namespace swarm {
 Tree::Tree(b2World *world, int treeID, const b2Vec2 &position, bool diseased,

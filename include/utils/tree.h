@@ -3,8 +3,8 @@
 #define TREE_H
 #include <box2d/box2d.h>
 
+#include "core/entity.h"
 #include "utils/collision_manager.h"
-#include "utils/entity.h"
 
 namespace swarm {
 class Tree : public Entity {

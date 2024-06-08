@@ -3,8 +3,8 @@
 
 #include <typeindex>
 
+#include "core/entity.h"
 #include "utils/collision_manager.h"
-#include "utils/entity.h"
 
 namespace swarm {
 class Target : public Entity {

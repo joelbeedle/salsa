@@ -2,9 +2,9 @@
 #ifndef SWARM_SIM_UTILS_OBJECT_TYPES_H
 #define SWARM_SIM_UTILS_OBJECT_TYPES_H
 
+#include "core/entity.h"
 #include "drones/drone.h"
 #include "utils/tree.h"
-#include "utils/entity.h"
 
 namespace swarm {
 enum class ObjectType {
