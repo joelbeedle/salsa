@@ -2,8 +2,9 @@
 #ifndef SWARM_SIM_UTILS_OBJECT_TYPES_H
 #define SWARM_SIM_UTILS_OBJECT_TYPES_H
 
-struct Drone;
-struct Tree;
+#include "drones/drone.h"
+#include "utils/tree.h"
+#include "utils/entity.h"
 
 namespace swarm {
 enum class ObjectType {
@@ -13,10 +14,15 @@ enum class ObjectType {
 
 struct UserData {
   ObjectType type;
-  union {
-    Drone* drone;
-    Tree* tree;
-  };
+  Entity* object;  // Point to any object derived from EnvironmentObject
+
+  UserData() : object(nullptr) {}
+  explicit UserData(Entity* obj) : object(obj) {}
+
+  template <typename T>
+  T* as() {
+    return static_cast<T*>(object);  // Safely cast to the requested type
+  }
 };
 
 }  // namespace swarm

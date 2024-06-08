@@ -33,12 +33,12 @@
 #include "run_sim.h"
 #include "settings.h"
 #include "test.h"
-#include "tree.h"
+#include "utils/base_contact_listener.h"
 #include "utils/drone_configuration.h"
-#include "utils/drone_contact_listener.h"
 #include "utils/object_types.h"
+#include "utils/tree.h"
 
-#define TREE_COUNT 50000
+#define TREE_COUNT 10000
 #define MAX_TIME 1200.0f
 struct DroneParameters {
   float cameraViewRange;
@@ -56,7 +56,6 @@ class SwarmTest : public Test {
 
   swarm::Behaviour *behaviour_;
   std::string current_behaviour_name_;
-  swarm::DroneContactListener contact_listener_;
 
   // Setup drone parameters and configurations
   std::unordered_map<std::string, DroneParameters> all_drone_parameters_;
@@ -67,6 +66,9 @@ class SwarmTest : public Test {
   DroneParameters *drone_parameters_;
 
   std::vector<std::unique_ptr<swarm::Drone>> drones_;
+  std::vector<swarm::Tree *> trees;
+
+  static swarm::BaseContactListener *contactListener_;
 
   float obstacle_view_range_;
   float camera_view_range_;
@@ -76,6 +78,15 @@ class SwarmTest : public Test {
   static float num_drones_;
 
   bool draw_visual_range_ = true;
+  bool draw_trees_ = true;
+  bool first_run_ = true;
+  std::vector<b2Vec2> treePositions;
+  std::vector<b2Color> treeColors;
+
+  b2Color falseColour =
+      b2Color(0.5f * 0.95294f, 0.5f * 0.50588f, 0.5f * 0.50588f, 0.5f * 0.25f);
+  b2Color trueColour =
+      b2Color(0.5f * 0.77f, 0.5f * 0.92f, 0.5f * 0.66f, 0.5f * 0.25f);
 
  public:
   SwarmTest() {
@@ -91,6 +102,8 @@ class SwarmTest : public Test {
     }
     std::cout << num_drones_ << std::endl;
     create_drones(*behaviour_, *drone_configuration_);
+    createTrees();
+    m_world->SetContactListener(contactListener_);
   }
 
   void init_world() {
@@ -141,6 +154,25 @@ class SwarmTest : public Test {
     }
   }
 
+  void createTrees() {
+    // Seed for reproducability
+    auto seed =
+        std::chrono::high_resolution_clock::now().time_since_epoch().count();
+
+    srand(seed);
+    const float margin = 2.0f;
+    for (int i = 0; i < TREE_COUNT; i++) {
+      float x =
+          (rand() % static_cast<int>(border_width_ - 2 * margin)) + margin;
+      float y =
+          (rand() % static_cast<int>(border_height_ - 2 * margin)) + margin;
+      trees.push_back(
+          new swarm::Tree(m_world, i, b2Vec2(x, y), false, false, 2.5f));
+      treePositions.push_back(trees[i]->getBody()->GetPosition());
+      treeColors.push_back(falseColour);
+    }
+  }
+
   void SetBehaviour() {
     for (auto &drone : drones_) {
       drone->setBehaviour(*behaviour_);
@@ -173,6 +205,10 @@ class SwarmTest : public Test {
     drone_configuration_ = configuration;
   }
 
+  static void SetContactListener(swarm::BaseContactListener &listener) {
+    contactListener_ = &listener;
+  }
+
   static void SetNumDrones(float num_drones) { num_drones_ = num_drones; }
   static Test *Create() {
     // Generate a new version of this test with the user defined settings
@@ -181,12 +217,20 @@ class SwarmTest : public Test {
   void Step(Settings &settings) override {
     // Run simulation steps here
     Test::Step(settings);
+    std::vector<int> foundTreeIDs;
 
     for (auto &drone : drones_) {
       drone->update(drones_);
     }
 
-    Draw(m_world, &g_debugDraw, std::vector<int>());
+    for (auto &tree : trees) {
+      if (tree->isMapped()) {
+        std::cout << "Tree " << tree->getID() << " is mapped" << std::endl;
+        treeColors[tree->getID()] = trueColour;
+        foundTreeIDs.push_back(tree->getID());
+      }
+    }
+    Draw(m_world, &g_debugDraw, foundTreeIDs);
   }
   void UpdateUI() override {
     ImGui::SetNextWindowPos(ImVec2(10.0f, 100.0f));
@@ -228,6 +272,7 @@ class SwarmTest : public Test {
     ImGui::Separator();
     ImGui::Text("Visual Settings");
     ImGui::Checkbox("Draw Drone visual range", &draw_visual_range_);
+    ImGui::Checkbox("Draw Trees", &draw_trees_);
 
     if (ImGui::Button("Reset Simulation")) {
       drones_.clear();
@@ -265,6 +310,14 @@ class SwarmTest : public Test {
   }
   void Draw(b2World *world, DebugDraw *debugDraw,
             std::vector<int> foundTreeIDs) {
+    if (draw_trees_) {
+      if (first_run_) {
+        debugDraw->DrawAllTrees(treePositions, treeColors);
+        first_run_ = false;
+      } else {
+        debugDraw->DrawTrees(treePositions, treeColors, foundTreeIDs);
+      }
+    }
     for (b2Body *body = world->GetBodyList(); body; body = body->GetNext()) {
       const b2Transform &transform = body->GetTransform();
 
@@ -301,7 +354,7 @@ class SwarmTest : public Test {
           // Depending on the type, draw the object
           switch (userData->type) {
             case swarm::ObjectType::Drone: {
-              swarm::Drone *drone = userData->drone;
+              swarm::Drone *drone = userData->as<swarm::Drone>();
               // Draw drone
               b2Vec2 position = body->GetPosition();
               debugDraw->DrawSolidCircle(position, drone->getRadius(),
