@@ -45,7 +45,7 @@
 static void setupInteractions(swarm::BaseContactListener &listener) {
   listener.addCollisionHandler(
       typeid(swarm::Drone), typeid(swarm::Tree),
-      [](b2Fixture *droneFixture, b2Fixture *treeFixture) {
+      [](b2Fixture *droneFixture, b2Fixture *treeFixture) -> void {
         swarm::Tree *tree = reinterpret_cast<swarm::UserData *>(
                                 treeFixture->GetUserData().pointer)
                                 ->as<swarm::Tree>();
@@ -61,8 +61,6 @@ static void setupInteractions(swarm::BaseContactListener &listener) {
 }
 
 int main() {
-  // TODO: Register each behaviour with the registry, when being made, this
-  // removes the need for header files
   auto flock =
       std::make_unique<swarm::FlockingBehaviour>(250.0, 1.6, 1.0, 3.0, 3.0);
   auto pheromone = std::make_unique<swarm::PheromoneBehaviour>(0.5, 1.0);
@@ -74,21 +72,6 @@ int main() {
                                         {typeid(swarm::Tree)});
   swarm::CollisionManager::registerType(typeid(swarm::Tree),
                                         {typeid(swarm::Drone)});
-  swarm::CollisionConfig config =
-      swarm::CollisionManager::getCollisionConfig(typeid(swarm::Drone));
-  std::bitset<16> catBits(config.categoryBits);
-  std::cout << catBits << std::endl;
-  std::bitset<16> maskBits(config.maskBits);
-  std::cout << maskBits << std::endl;
-
-  std::cout << config.categoryBits << std::endl;
-  std::cout << config.maskBits << std::endl;
-  swarm::CollisionConfig treeConfig =
-      swarm::CollisionManager::getCollisionConfig(typeid(swarm::Tree));
-  std::bitset<16> c(treeConfig.categoryBits);
-  std::cout << c << std::endl;
-  std::bitset<16> m(treeConfig.maskBits);
-  std::cout << m << std::endl;
   auto contactListener = std::make_shared<swarm::BaseContactListener>();
   setupInteractions(*contactListener);
   SwarmTest::SetContactListener(*contactListener);
