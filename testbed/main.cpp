@@ -24,7 +24,6 @@
 #include "behaviours/pheromone_avoidance.h"
 #include "behaviours/registry.h"
 #include "behaviours/uniform_random_walk.h"
-#include "core/sim.h"
 #include "draw.h"
 #include "drones/drone.h"
 #include "drones/drone_factory.h"
@@ -32,10 +31,10 @@
 #include "settings.h"
 #include "swarm.h"
 #include "test.h"
-#include "tree.h"
+#include "utils/collision_manager.h"
 #include "utils/drone_configuration.h"
-#include "utils/drone_contact_listener.h"
 #include "utils/object_types.h"
+#include "utils/tree.h"
 
 #define DRONE_COUNT 50
 #define TREE_COUNT 50000
@@ -43,9 +42,25 @@
 #define BORDER_HEIGHT 2000.0f
 #define MAX_TIME 1200.0f
 
+static void setupInteractions(swarm::BaseContactListener &listener) {
+  listener.addCollisionHandler(
+      typeid(swarm::Drone), typeid(swarm::Tree),
+      [](b2Fixture *droneFixture, b2Fixture *treeFixture) -> void {
+        swarm::Tree *tree = reinterpret_cast<swarm::UserData *>(
+                                treeFixture->GetUserData().pointer)
+                                ->as<swarm::Tree>();
+        swarm::Drone *drone = reinterpret_cast<swarm::UserData *>(
+                                  droneFixture->GetUserData().pointer)
+                                  ->as<swarm::Drone>();
+
+        if (drone && tree) {
+          tree->setMapped(true);
+          tree->addNumMapped();
+        }
+      });
+}
+
 int main() {
-  // TODO: Register each behaviour with the registry, when being made, this
-  // removes the need for header files
   auto flock =
       std::make_unique<swarm::FlockingBehaviour>(250.0, 1.6, 1.0, 3.0, 3.0);
   auto pheromone = std::make_unique<swarm::PheromoneBehaviour>(0.5, 1.0);
@@ -53,6 +68,13 @@ int main() {
       25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f);
   SwarmTest::SetHeight(BORDER_HEIGHT);
   SwarmTest::SetWidth(BORDER_WIDTH);
+  swarm::CollisionManager::registerType(typeid(swarm::Drone),
+                                        {typeid(swarm::Tree)});
+  swarm::CollisionManager::registerType(typeid(swarm::Tree),
+                                        {typeid(swarm::Drone)});
+  auto contactListener = std::make_shared<swarm::BaseContactListener>();
+  setupInteractions(*contactListener);
+  SwarmTest::SetContactListener(*contactListener);
   SwarmTest::AddBehaviour("Flocking", std::move(flock));
   SwarmTest::AddBehaviour("Pheromone", std::move(pheromone));
   SwarmTest::SetConfiguration(smallDrone);

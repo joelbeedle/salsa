@@ -3,9 +3,12 @@
 #define TREE_H
 #include <box2d/box2d.h>
 
-class Tree {
+#include "utils/collision_manager.h"
+#include "utils/entity.h"
+
+namespace swarm {
+class Tree : public Entity {
  private:
-  b2Body *body;
   bool diseased;
   bool mapped;
   bool currentlyMapped = false;
@@ -18,12 +21,14 @@ class Tree {
        bool mapped = false, float radius = 1.0f);
   ~Tree();
 
+  void create_fixture() override;
+
   // Accessors and Mutators
   bool isDiseased() { return diseased; }
   void setDiseased(bool isDiseased) { diseased = isDiseased; }
   bool isMapped() { return mapped; }
   void setMapped(bool isMapped) { mapped = isMapped; }
-  b2Body *getBody() { return body; }
+  b2Body *getBody() { return body_; }
   void setID(int newID) { treeID = newID; }
   int getID() { return treeID; }
   void addNumMapped() {
@@ -37,4 +42,6 @@ class Tree {
   int getNumMapped() { return numMapped; }
   void render();
 };
-#endif // TREE_H
+
+}  // namespace swarm
+#endif  // TREE_H

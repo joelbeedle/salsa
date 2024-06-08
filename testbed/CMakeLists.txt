@@ -16,19 +16,18 @@ set (MY_TESTBED_SOURCE_FILES
 	swarm.cpp
 	swarm.h
 	main.cpp
-	# tests/drone_swarm_test.cpp
-	# tests/swarm_test.cpp
-)
-set(MY_PROJECT_SOURCE_FILES
-${PROJECT_SOURCE_DIR}/src/drones/drone.cpp
-${PROJECT_SOURCE_DIR}/testbed/behaviours/pheromone_avoidance.cpp
-${PROJECT_SOURCE_DIR}/src/behaviours/behaviour.cpp
+	${PROJECT_SOURCE_DIR}/testbed/behaviours/pheromone_avoidance.cpp
 ${PROJECT_SOURCE_DIR}/testbed/behaviours/flocking.cpp
 ${PROJECT_SOURCE_DIR}/testbed/behaviours/levy_flocking.cpp
 ${PROJECT_SOURCE_DIR}/testbed/behaviours/flocking.cpp
 ${PROJECT_SOURCE_DIR}/testbed/behaviours/uniform_random_walk.cpp
 ${PROJECT_SOURCE_DIR}/testbed/behaviours/dsp.cpp
-${PROJECT_SOURCE_DIR}/src/tree.cpp)
+	# tests/drone_swarm_test.cpp
+	# tests/swarm_test.cpp
+)
+set(MY_PROJECT_SOURCE_FILES
+
+)
 set(MY_PROJECT_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../include")
 
 add_executable(my_testbed ${MY_PROJECT_SOURCE_FILES} ${MY_TESTBED_SOURCE_FILES} )
@@ -36,7 +35,7 @@ target_sources(my_testbed PRIVATE ${PROJECT_SOURCES})
 target_include_directories(my_testbed PRIVATE
 ${CMAKE_CURRENT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/include)
 
-target_link_libraries(my_testbed PRIVATE glfw imgui sajson glad box2d)
+target_link_libraries(my_testbed PRIVATE glfw imgui sajson glad box2d libswarm-sim)
 
 set_target_properties(my_testbed PROPERTIES
 	CXX_STANDARD 17

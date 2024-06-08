@@ -9,15 +9,13 @@
 #include <memory>
 
 #include "behaviours/behaviour.h"
-#include "tree.h"
+#include "utils/collision_manager.h"
 #include "utils/drone_configuration.h"
+#include "utils/entity.h"
 namespace swarm {
-class Drone {
+class Drone : public Entity {
  private:
-  std::vector<Tree *> foundDiseasedTrees;
-  std::vector<Tree *> foundTrees;
   std::vector<b2Vec2 *> foundDiseasedTreePositions;
-  b2Body *body;
   b2Fixture *viewSensor;  ///< Sensor used for detecting targets
   Behaviour *behaviour;   ///< Current swarm `Behaviour` of the drone
 
@@ -26,13 +24,15 @@ class Drone {
   float droneDetectionRange;
   float maxSpeed;
   float maxForce;
-  float radius;
+  float radius_;
   float mass;
 
  public:
   Drone(b2World *world, const b2Vec2 &position, Behaviour &behaviour,
         const DroneConfiguration &config);
   ~Drone();
+
+  void create_fixture() override;
 
   /// @brief Updates one step of the simulation for this drone, where the drone
   /// runs its behaviours' `execute` function, which tells the drone what move
@@ -41,15 +41,12 @@ class Drone {
   void update(const std::vector<std::unique_ptr<Drone>> &drones);
   void updateSensorRange();
 
-  void foundDiseasedTree(Tree *tree);
-  void foundTree(Tree *tree);
-
   // Accessors and Mutators
   void setBehaviour(Behaviour &newBehaviour) { behaviour = &newBehaviour; }
 
-  b2Body *getBody() { return body; }
-  b2Vec2 getVelocity() { return body->GetLinearVelocity(); }
-  b2Vec2 getPosition() { return body->GetPosition(); }
+  b2Body *getBody() { return body_; }
+  b2Vec2 getVelocity() { return body_->GetLinearVelocity(); }
+  b2Vec2 getPosition() { return body_->GetPosition(); }
 
   float getViewRange() { return cameraViewRange; }
   void setViewRange(float newRange) { cameraViewRange = newRange; }
@@ -68,14 +65,11 @@ class Drone {
   float getMaxForce() { return maxForce; }
   void setMaxForce(float newForce) { maxForce = newForce; }
 
-  float getRadius() { return radius; }
+  float getRadius() { return radius_; }
 
-  std::vector<Tree *> &getFoundDiseasedTrees() { return foundDiseasedTrees; }
   std::vector<b2Vec2 *> getFoundDiseasedTreePositions() {
     return foundDiseasedTreePositions;
   }
-
-  std::vector<Tree *> getFoundTrees() { return foundTrees; }
 
   void clearLists();
 };

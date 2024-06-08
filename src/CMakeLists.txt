@@ -6,8 +6,9 @@ include_directories(${PROJECT_SRC_DIR}/include)
 add_library(libswarm-sim STATIC
     behaviours/behaviour.cpp
     drones/drone.cpp
-    core/sim.cpp
-    tree.cpp
+    utils/tree.cpp
+    utils/base_contact_listener.cpp
+    utils/collision_manager.cpp
 )
 target_include_directories(libswarm-sim PUBLIC ${PROJECT_SRC_DIR}/include)
 target_link_libraries(libswarm-sim PUBLIC box2d)
