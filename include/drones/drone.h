@@ -37,6 +37,7 @@ class Drone : public Entity {
   /// @brief Updates one step of the simulation for this drone, where the drone
   /// runs its behaviours' `execute` function, which tells the drone what move
   /// to make in this step.
+  ///
   /// @param drones The list of all drones in the simulation
   void update(const std::vector<std::unique_ptr<Drone>> &drones);
   void updateSensorRange();

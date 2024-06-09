@@ -10,7 +10,7 @@ namespace swarm {
 namespace behaviour {
 /// @brief Represents a bounded numerical parameter, to be used for behaviors.
 ///
-/// @details This class defines a parameter as a value that must be
+/// This class defines a parameter as a value that must be
 /// maintained within specified minimum and maximum bounds. It includes
 /// mechanisms to enforce these bounds.
 ///
@@ -30,6 +30,7 @@ class Parameter {
 
  public:
   /// @brief Constructs a Parameter with initial and boundary values.
+  ///
   /// @param initial_value The initial value of the parameter.
   /// @param min_value The minimum value the parameter can take.
   /// @param max_value The maximum value the parameter can take.
@@ -44,6 +45,7 @@ class Parameter {
 
   /// @brief Assigns a new value to the parameter, ensuring it remains within
   /// bounds.
+  ///
   /// @param newValue The new value to assign to the parameter.
   /// @return Reference to the updated value of the parameter.
   /// @details If newValue is out of bounds, an error message is printed and the

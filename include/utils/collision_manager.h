@@ -27,18 +27,18 @@ struct CollisionConfig {
 
 /// @brief Manages collision configurations for different object types.
 ///
-/// CollisionManager uses singleton pattern to maintain a consistent state
-/// across the system. It offers functionality to register new types with
+/// CollisionManager uses singleton pattern to maintain a consistent
+/// state across the system. It offers functionality to register new types with
 /// collision partners and update collision masks dynamically based on
 /// registered types and their partners.
 class CollisionManager {
  private:
-  /// \brief Stores collision configuration for each registered type.
+  /// @brief Stores collision configuration for each registered type.
   static std::map<std::type_index, CollisionConfig> configurations_;
-  /// \brief Maps each type to its collision partners.
+  /// @brief Maps each type to its collision partners.
   static std::map<std::type_index, std::vector<std::type_index>>
       collision_partners_;
-  /// \brief Tracks the next available category bit for registering new types.
+  /// @brief Tracks the next available category bit for registering new types.
   static uint16_t next_category_bit_;
 
   /// @brief Updates the mask bits for all registered types based on their
@@ -57,15 +57,15 @@ class CollisionManager {
   /// for the type.
   static CollisionConfig getCollisionConfig(std::type_index type);
 
-  /// \brief Registers a new type and its collision partners in the system.
+  /// @brief Registers a new type and its collision partners in the system.
   ///
   /// This method registers a new type with its collision category bit and
   /// partners. It prints details about the registration process and ensures
   /// that the type is added with a unique category bit, which is then left
   /// shifted for the next registration.
   ///
-  /// \param type The type_index of the new type to register.
-  /// \param partners A vector of type_index specifying the collision partners
+  /// @param type The type_index of the new type to register.
+  /// @param partners A vector of type_index specifying the collision partners
   /// for the new type.
   static void registerType(std::type_index type,
                            const std::vector<std::type_index>& partners);

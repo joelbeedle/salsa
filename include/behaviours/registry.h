@@ -13,7 +13,8 @@ namespace swarm {
 namespace behaviour {
 /// @brief Singleton class that manages and provides access to Behaviour
 /// instances.
-/// @details This class uses the Singleton design pattern to ensure that there
+///
+/// This class uses the Singleton design pattern to ensure that there
 /// is only one instance of the Registry throughout the application. It provides
 /// methods to add, retrieve, and list behaviours dynamically at runtime.
 class Registry {
@@ -30,6 +31,7 @@ class Registry {
   }
 
   /// @brief Adds a Behaviour instance to the registry.
+  ///
   /// @param name The name key under which the Behaviour will be stored.
   /// @param Behaviour Pointer to the Behaviour instance to be stored.
   void add(const std::string& name, std::unique_ptr<Behaviour> Behaviour) {
@@ -37,6 +39,7 @@ class Registry {
   }
 
   /// @brief Retrieves a Behaviour by name.
+  ///
   /// @param name The name key of the Behaviour to retrieve.
   /// @return Pointer to the Behaviour, or nullptr if not found.
   Behaviour* getBehaviour(const std::string& name) {
@@ -47,6 +50,7 @@ class Registry {
   }
 
   /// @brief Returns a list of all Behaviour names stored in the Registry.
+  ///
   /// @return Vector of strings containing the names of all registered
   /// Behaviours.
   std::vector<std::string> getBehaviourNames() const {
