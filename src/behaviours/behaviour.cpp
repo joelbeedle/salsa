@@ -80,7 +80,7 @@ b2Vec2 Behaviour::avoidObstacles(std::vector<b2Vec2> &obstaclePoints,
 void Behaviour::performRayCasting(Drone &currentDrone,
                                   RayCastCallback &callback) {
   float rayRange = currentDrone.getObstacleViewRange();
-  float deltaAngle = 45.0f;  // dividing the circle into segments
+  float deltaAngle = 90.0f;  // dividing the circle into segments
 
   for (float angle = 0; angle < 360; angle += deltaAngle) {
     b2Vec2 start = currentDrone.getPosition();

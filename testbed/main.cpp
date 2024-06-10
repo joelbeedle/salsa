@@ -36,7 +36,7 @@
 #include "utils/object_types.h"
 #include "utils/tree.h"
 
-#define DRONE_COUNT 50
+#define DRONE_COUNT 512
 #define TREE_COUNT 50000
 #define BORDER_WIDTH 2000.0f
 #define BORDER_HEIGHT 2000.0f
@@ -75,8 +75,8 @@ int main() {
   auto contactListener = std::make_shared<swarm::BaseContactListener>();
   setupInteractions(*contactListener);
   SwarmTest::SetContactListener(*contactListener);
-  SwarmTest::AddBehaviour("Flocking", std::move(flock));
   SwarmTest::AddBehaviour("Pheromone", std::move(pheromone));
+  SwarmTest::AddBehaviour("Flocking", std::move(flock));
   SwarmTest::SetConfiguration(smallDrone);
   SwarmTest::SetNumDrones(DRONE_COUNT);
   SwarmTest::Run();

@@ -13,17 +13,11 @@ void FlockingBehaviour::execute(
   // Using ray casting to find neighbours and obstacles
   RayCastCallback callback;
   performRayCasting(currentDrone, callback);
-  std::vector<b2Body *> bodies;
-  for (auto &drone : drones) {
-    bodies.push_back(drone.get()->getBody());
-  }
-
-  std::vector<b2Body *> neighbours = bodies;
   std::vector<b2Vec2> obstaclePoints = callback.obstaclePoints;
 
-  b2Vec2 alignment = align(neighbours, currentDrone);
-  b2Vec2 separation = separate(neighbours, currentDrone);
-  b2Vec2 cohesion = cohere(neighbours, currentDrone);
+  b2Vec2 alignment = align(drones, currentDrone);
+  b2Vec2 separation = separate(drones, currentDrone);
+  b2Vec2 cohesion = cohere(drones, currentDrone);
   b2Vec2 obstacleAvoidance = avoidObstacles(obstaclePoints, currentDrone);
 
   b2Vec2 acceleration = (alignment_weight_ * alignment) +
@@ -49,14 +43,14 @@ void FlockingBehaviour::execute(
   acceleration.SetZero();
 }
 
-b2Vec2 FlockingBehaviour::align(std::vector<b2Body *> &drones,
-                                Drone &currentDrone) {
+b2Vec2 FlockingBehaviour::align(
+    const std::vector<std::unique_ptr<Drone>> &drones, Drone &currentDrone) {
   b2Vec2 steering(0, 0);
   b2Vec2 avgVec(0, 0);
   int32 neighbours = 0;
 
   for (auto &drone : drones) {
-    avgVec += drone->GetLinearVelocity();
+    avgVec += drone->getBody()->GetLinearVelocity();
     neighbours++;
   }
 
@@ -72,14 +66,14 @@ b2Vec2 FlockingBehaviour::align(std::vector<b2Body *> &drones,
   return steering;
 }
 
-b2Vec2 FlockingBehaviour::cohere(std::vector<b2Body *> &drones,
-                                 Drone &currentDrone) {
+b2Vec2 FlockingBehaviour::cohere(
+    const std::vector<std::unique_ptr<Drone>> &drones, Drone &currentDrone) {
   b2Vec2 steering(0, 0);
   b2Vec2 centreOfMass(0, 0);
   int32 neighbours = 0;
 
   for (auto &drone : drones) {
-    centreOfMass += drone->GetPosition();
+    centreOfMass += drone->getBody()->GetPosition();
     neighbours++;
   }
 
@@ -97,17 +91,18 @@ b2Vec2 FlockingBehaviour::cohere(std::vector<b2Body *> &drones,
   return steering;
 }
 
-b2Vec2 FlockingBehaviour::separate(std::vector<b2Body *> &drones,
-                                   Drone &currentDrone) {
+b2Vec2 FlockingBehaviour::separate(
+    const std::vector<std::unique_ptr<Drone>> &drones, Drone &currentDrone) {
   b2Vec2 steering(0, 0);
   b2Vec2 avgVec(0, 0);
   int32 neighbours = 0;
 
   for (auto &drone : drones) {
     float distance =
-        b2Distance(currentDrone.getPosition(), drone->GetPosition());
+        b2Distance(currentDrone.getPosition(), drone->getBody()->GetPosition());
     if (distance < separation_distance_ && distance > 0) {
-      b2Vec2 diff = currentDrone.getPosition() - drone->GetPosition();
+      b2Vec2 diff =
+          currentDrone.getPosition() - drone->getBody()->GetPosition();
       diff.Normalize();
       diff.x /= distance;
       diff.y /= distance;

@@ -38,7 +38,7 @@
 #include "utils/object_types.h"
 #include "utils/tree.h"
 
-#define TREE_COUNT 10000
+#define TREE_COUNT 0
 #define MAX_TIME 1200.0f
 struct DroneParameters {
   float cameraViewRange;
@@ -77,8 +77,8 @@ class SwarmTest : public Test {
 
   static float num_drones_;
 
-  bool draw_visual_range_ = true;
-  bool draw_trees_ = true;
+  bool draw_visual_range_ = false;
+  bool draw_trees_ = false;
   bool first_run_ = true;
   std::vector<b2Vec2> treePositions;
   std::vector<b2Color> treeColors;
@@ -103,7 +103,7 @@ class SwarmTest : public Test {
     std::cout << num_drones_ << std::endl;
     create_drones(*behaviour_, *drone_configuration_);
     createTrees();
-    m_world->SetContactListener(contactListener_);
+    // m_world->SetContactListener(contactListener_);
   }
 
   void init_world() {
@@ -225,7 +225,6 @@ class SwarmTest : public Test {
 
     for (auto &tree : trees) {
       if (tree->isMapped()) {
-        std::cout << "Tree " << tree->getID() << " is mapped" << std::endl;
         treeColors[tree->getID()] = trueColour;
         foundTreeIDs.push_back(tree->getID());
       }

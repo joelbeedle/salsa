@@ -54,9 +54,12 @@ class FlockingBehaviour : public Behaviour {
   }
 
  private:
-  b2Vec2 align(std::vector<b2Body *> &drones, Drone &currentDrone);
-  b2Vec2 separate(std::vector<b2Body *> &drones, Drone &currentDrone);
-  b2Vec2 cohere(std::vector<b2Body *> &drones, Drone &currentDrone);
+  b2Vec2 align(const std::vector<std::unique_ptr<Drone>> &drones,
+               Drone &currentDrone);
+  b2Vec2 separate(const std::vector<std::unique_ptr<Drone>> &drones,
+                  Drone &currentDrone);
+  b2Vec2 cohere(const std::vector<std::unique_ptr<Drone>> &drones,
+                Drone &currentDrone);
 };
 
 // }  // namespace behaviours
