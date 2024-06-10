@@ -6,6 +6,7 @@
 
 #include <box2d/box2d.h>
 
+#include <bitset>
 #include <cstdint>
 #include <map>
 #include <typeindex>
