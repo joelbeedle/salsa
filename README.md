@@ -49,7 +49,7 @@ SwarmTest::AddTargetType(typeid(Tree));
 SwarmTest::SetNumDrones(DRONE_COUNT);
 SwarmTest::SetNumTargets(typeid(Tree), TREE_COUNT);
 
-// TODO: IMPLEMENT
+// TODO: IMPLEMENT and redesign?
 // Use a test stack, and point to a file that defines it, in the format:
 // {Behaviour Name},{Behaviour Parameters},{Drone Count},{DroneConfig},{Target Type},{Target Count},{Max time}
 SwarmTest::SetTestStack("path/to/test/stack.txt");
@@ -68,7 +68,6 @@ test_stack.addTest()
 
 // Begin the simulation
 SwarmTest::Run();
-
 ```
 
 ## Installation
@@ -78,7 +77,7 @@ SwarmTest::Run();
 - CMake
 - A C/C++ compiler (gcc, clang, cl)
 - Box2D (packaged with directory)
-- OpenGL
+- OpenGL and GLFW
 
 ### Steps
 
