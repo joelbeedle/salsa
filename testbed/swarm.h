@@ -109,7 +109,6 @@ class SwarmTest : public Test {
     delete old_sim;
     return true;
   }
-
   void SetHeight(float height) { sim_builder->setWorldHeight(height); }
   void SetWidth(float width) { sim_builder->setWorldWidth(width); }
   float GetHeight() { return sim->world_height(); }
