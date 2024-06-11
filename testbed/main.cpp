@@ -77,13 +77,26 @@ int main() {
   swarm::behaviour::Registry::getInstance().add("Pheromone Avoidance",
                                                 std::move(pheromone));
 
+  auto new_flock_params = std::unordered_map<std::string, float>({
+      {"Separation Distance", 300.0},
+      {"Alignment Weight", 1.6},
+      {"Cohesion Weight", 1.0},
+      {"Separation Weight", 1.0},
+      {"Obstacle Avoidance Weight", 1.0},
+  });
   swarm::TestConfig config = {
-      "Flocking", flock_params, smallDrone, BORDER_HEIGHT, BORDER_WIDTH, 1,
+      "Flocking", new_flock_params, smallDrone, BORDER_HEIGHT, BORDER_WIDTH, 1,
       0,          1200.0f,
   };
   swarm::TestConfig config2 = {
-      "Pheromone Avoidance", flock_params, smallDrone, BORDER_HEIGHT,
-      BORDER_WIDTH,          100,          0,          1200.0f,
+      "Pheromone Avoidance",
+      new_flock_params,
+      smallDrone,
+      BORDER_HEIGHT,
+      BORDER_WIDTH,
+      100,
+      0,
+      1200.0f,
   };
 
   swarm::TestStack stack;

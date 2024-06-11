@@ -15,8 +15,11 @@
 namespace swarm {
 
 struct TestConfig {
+  typedef std::unordered_map<std::string, behaviour::Parameter *> Parameters;
+  typedef std::unordered_map<std::string, float> FloatParameters;
+
   const std::string &behaviour_name;
-  std::unordered_map<std::string, behaviour::Parameter *> parameters;
+  std::variant<Parameters, FloatParameters> parameters;
   DroneConfiguration *drone_config;
   float world_height;
   float world_width;

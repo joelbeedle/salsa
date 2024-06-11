@@ -32,6 +32,10 @@ Sim::Sim(b2World* world, TestConfig& config)
   world_->SetGravity(gravity);
   createBounds();
   current_behaviour_name_ = config.behaviour_name;
+  auto behaviour_pointer =
+      behaviour::Registry::getInstance().getBehaviour(current_behaviour_name_);
+  auto visitor = [&](auto&& arg) { behaviour_pointer->setParameters(arg); };
+  std::visit(visitor, config.parameters);
   createDrones(*behaviour_, *drone_configuration_);
 }
 

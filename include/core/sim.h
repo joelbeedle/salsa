@@ -3,6 +3,8 @@
 
 #include <box2d/box2d.h>
 
+#include <variant>
+
 #include "behaviours/behaviour.h"
 #include "behaviours/registry.h"
 #include "core/test_stack.h"
@@ -11,6 +13,7 @@
 #include "target.h"
 #include "utils/base_contact_listener.h"
 #include "utils/drone_configuration.h"
+
 namespace swarm {
 
 struct DroneParameters {
