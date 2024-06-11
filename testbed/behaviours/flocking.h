@@ -22,13 +22,13 @@ class FlockingBehaviour : public Behaviour {
 
   std::vector<b2Body *> obstacles;
 
- public:
   behaviour::Parameter separation_distance_;
   behaviour::Parameter alignment_weight_;
   behaviour::Parameter cohesion_weight_;
   behaviour::Parameter separation_weight_;
   behaviour::Parameter obstacle_avoidance_weight_;
 
+ public:
   FlockingBehaviour(float separationDistance, float alignmentWeight,
                     float cohesionWeight, float separationWeight,
                     float obstacleAvoidanceWeight)
