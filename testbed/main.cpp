@@ -64,26 +64,41 @@ static void setupInteractions(swarm::BaseContactListener &listener) {
 int main() {
   auto flock =
       std::make_unique<swarm::FlockingBehaviour>(250.0, 1.6, 1.0, 3.0, 3.0);
+  auto flock_params = flock.get()->getParameters();
+
   auto pheromone = std::make_unique<swarm::PheromoneBehaviour>(0.5, 1.0);
   swarm::DroneConfiguration *smallDrone = new swarm::DroneConfiguration(
       25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f);
-  SwarmTest *test = new SwarmTest(2000.0f, 2000.0f, smallDrone);
-
-  test->SetConfiguration(smallDrone);
-  test->GetConfiguration()->cameraViewRange = 50.0f;
-
-  test->SetHeight(BORDER_HEIGHT);
-  test->SetWidth(BORDER_WIDTH);
   swarm::CollisionManager::registerType(typeid(swarm::Drone),
                                         {typeid(swarm::Tree)});
   swarm::CollisionManager::registerType(typeid(swarm::Tree),
                                         {typeid(swarm::Drone)});
+  swarm::behaviour::Registry::getInstance().add("Flocking", std::move(flock));
+  swarm::behaviour::Registry::getInstance().add("Pheromone Avoidance",
+                                                std::move(pheromone));
+
+  swarm::TestConfig config = {
+      "Flocking", flock_params, smallDrone, BORDER_HEIGHT, BORDER_WIDTH, 1,
+      0,          1200.0f,
+  };
+  swarm::TestConfig config2 = {
+      "Pheromone Avoidance", flock_params, smallDrone, BORDER_HEIGHT,
+      BORDER_WIDTH,          100,          0,          1200.0f,
+  };
+
+  swarm::TestStack stack;
+  stack.push(config);
+  stack.push(config2);
+
+  std::unique_ptr<SwarmTest> test = std::make_unique<SwarmTest>();
+  test->UseStack(stack);
+  test->SetStackSim();
+
   auto contactListener = std::make_shared<swarm::BaseContactListener>();
   setupInteractions(*contactListener);
   test->SetContactListener(*contactListener);
-  test->AddBehaviour("Pheremone", std::move(pheromone));
-  test->AddBehaviour("Flocking", std::move(flock));
-  test->SetDroneCount(DRONE_COUNT);
-  test->Run();
+  test->Build();
+  RegisterTest("SwarmTest", "Swarm_Test", std::move(test));
+  run_sim();
   return 0;
 }

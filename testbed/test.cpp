@@ -430,16 +430,17 @@ void Test::ShiftOrigin(const b2Vec2& newOrigin) {
   m_world->ShiftOrigin(newOrigin);
 }
 
-TestEntry g_testEntries[MAX_TESTS] = {{nullptr}};
+std::vector<TestEntry> g_testEntries;
 int g_testCount = 0;
 
-int RegisterTest(const char* category, const char* name, TestCreateFcn* fcn) {
+int RegisterTest(const char* category, const char* name, TestCreateFcn fcn) {
   int index = g_testCount;
   if (index < MAX_TESTS) {
-    g_testEntries[index] = {category, name, fcn};
+    g_testEntries.push_back(
+        {category, name,
+         std::move(fcn)});  // Using vector's push_back for dynamic sizing
     ++g_testCount;
     return index;
   }
-
-  return -1;
+  return -1;  // Return -1 if unable to register the test
 }
