@@ -46,6 +46,7 @@ class Sim {
 
   std::vector<std::unique_ptr<swarm::Drone>> drones_;
   std::vector<swarm::Target *> targets_;
+  std::vector<b2Body *> obstacles_;
 
   swarm::BaseContactListener *contact_listener_;
 
@@ -69,7 +70,7 @@ class Sim {
       DroneConfiguration *config, float border_width, float border_height,
       float time_limit);
   Sim(b2World *world, swarm::TestConfig &config);
-  // ~Sim();
+  ~Sim();
   void run();
   void init();
   void update();

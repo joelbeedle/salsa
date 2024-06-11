@@ -84,16 +84,23 @@ int main() {
       {"Separation Weight", 1.0},
       {"Obstacle Avoidance Weight", 1.0},
   });
+
+  auto pheromone_params = std::unordered_map<std::string, float>({
+      {"Decay Rate", 0.5},
+      {"Obstacle Avoidance Weight", 1.0},
+  });
+
   swarm::TestConfig config = {
       "Flocking", new_flock_params, smallDrone, BORDER_HEIGHT, BORDER_WIDTH, 1,
       0,          1200.0f,
   };
+
   swarm::TestConfig config2 = {
       "Pheromone Avoidance",
-      new_flock_params,
+      pheromone_params,
       smallDrone,
-      BORDER_HEIGHT,
-      BORDER_WIDTH,
+      500.0f,
+      500.0f,
       100,
       0,
       1200.0f,
@@ -102,6 +109,8 @@ int main() {
   swarm::TestStack stack;
   stack.push(config);
   stack.push(config2);
+  config.num_drones = 2048;
+  stack.push(config);
 
   std::unique_ptr<SwarmTest> test = std::make_unique<SwarmTest>();
   test->UseStack(stack);

@@ -39,6 +39,12 @@ Sim::Sim(b2World* world, TestConfig& config)
   createDrones(*behaviour_, *drone_configuration_);
 }
 
+Sim::~Sim() {
+  for (auto& obstacle : obstacles_) {
+    world_->DestroyBody(obstacle);
+  }
+}
+
 void Sim::update() {
   for (auto& drone : drones_) {
     drone->update(drones_);
@@ -121,6 +127,8 @@ void Sim::createBounds() {
   groundBox.SetTwoSided(b2Vec2(border_width_, 0.0f),
                         b2Vec2(border_width_, border_height_));
   groundBody->CreateFixture(&groundBox, 0.0f);
+
+  obstacles_.push_back(groundBody);
 }
 
 }  // namespace swarm
