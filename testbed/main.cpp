@@ -67,9 +67,7 @@ int main() {
   auto pheromone = std::make_unique<swarm::PheromoneBehaviour>(0.5, 1.0);
   swarm::DroneConfiguration *smallDrone = new swarm::DroneConfiguration(
       25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f);
-  swarm::SimBuilder *sim_builder = new swarm::SimBuilder();
   SwarmTest *test = new SwarmTest();
-  test->SetBuilder(sim_builder);
   test->SetConfiguration(smallDrone);
   test->SetHeight(BORDER_HEIGHT);
   test->SetWidth(BORDER_WIDTH);
@@ -81,7 +79,7 @@ int main() {
   auto contactListener = std::make_shared<swarm::BaseContactListener>();
   setupInteractions(*contactListener);
   test->SetContactListener(*contactListener);
-  test->SetDroneCount(10);
+  test->SetDroneCount(50);
   test->AddBehaviour("Flocking", std::move(flock));
   test->AddBehaviour("Pheromone", std::move(pheromone));
 
