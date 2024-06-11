@@ -44,7 +44,7 @@ class Sim {
   std::vector<std::unique_ptr<swarm::Drone>> drones_;
   std::vector<swarm::Target *> targets_;
 
-  swarm::BaseContactListener *contactListener_;
+  swarm::BaseContactListener *contact_listener_;
 
   float obstacle_view_range_;
   float camera_view_range_;
@@ -93,6 +93,8 @@ class Sim {
 
   b2World *getWorld() { return world_; }
 
+  std::string getBehaviourName() { return current_behaviour_name_; }
+
   std::string &current_behaviour_name() { return current_behaviour_name_; }
   const std::string &current_behaviour_name() const {
     return current_behaviour_name_;
@@ -123,20 +125,32 @@ class SimBuilder {
  private:
   b2World *world_;
   Behaviour *behaviour_;
-  int drone_count_;
-  int target_count_;
+  int drone_count_ = 0;
+  int target_count_ = 0;
+  float world_height_ = 0;
+  float world_width_ = 0;
   DroneConfiguration *config_;
+  BaseContactListener *contact_listener_;
 
  public:
-  SimBuilder(b2World *world, int drone_count, int target_count,
-             DroneConfiguration *config)
-      : world_(world),
-        drone_count_(drone_count),
-        target_count_(target_count),
-        config_(config) {}
+  SimBuilder &setWorld(b2World *world) {
+    world_ = world;
+    return *this;
+  }
 
-  SimBuilder &setBehaviour(const std::string &name) {
-    behaviour_ = behaviour::Registry::getInstance().getBehaviour(name);
+  SimBuilder &setDroneCount(int count) {
+    drone_count_ = count;
+    return *this;
+  }
+
+  SimBuilder &setTargetCount(int count) {
+    target_count_ = count;
+    return *this;
+  }
+
+  SimBuilder &setContactListener(BaseContactListener &listener) {
+    contact_listener_ = &listener;
+    world_->SetContactListener(&listener);
     return *this;
   }
 
@@ -145,7 +159,24 @@ class SimBuilder {
     return *this;
   }
 
-  Sim build() { return Sim(world_, drone_count_, target_count_, config_); }
+  SimBuilder &setWorldHeight(float height) {
+    world_height_ = height;
+    return *this;
+  }
+
+  SimBuilder &setWorldWidth(float width) {
+    world_width_ = width;
+    return *this;
+  }
+
+  Sim *build() {
+    std::cout << "Building sim with:\nDrone count: " << drone_count_
+              << "\nTarget Count: " << target_count_
+              << "\nWorld Height: " << world_height_
+              << "\nWorld Width: " << world_width_
+              << "\nConfig: " << (config_ != nullptr) << std::endl;
+    return new Sim(world_, drone_count_, target_count_, config_);
+  }
 };
 
 }  // namespace swarm

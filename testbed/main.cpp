@@ -67,13 +67,13 @@ int main() {
   auto pheromone = std::make_unique<swarm::PheromoneBehaviour>(0.5, 1.0);
   swarm::DroneConfiguration *smallDrone = new swarm::DroneConfiguration(
       25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f);
-  SwarmTest *test = new SwarmTest(2000.0f, 2000.0f, smallDrone);
-
+  swarm::SimBuilder *builder = new swarm::SimBuilder();
+  SwarmTest *test = new SwarmTest();
+  test->SetBuilder(builder);
   test->SetConfiguration(smallDrone);
-  test->GetConfiguration()->cameraViewRange = 50.0f;
-
   test->SetHeight(BORDER_HEIGHT);
   test->SetWidth(BORDER_WIDTH);
+
   swarm::CollisionManager::registerType(typeid(swarm::Drone),
                                         {typeid(swarm::Tree)});
   swarm::CollisionManager::registerType(typeid(swarm::Tree),
@@ -83,7 +83,7 @@ int main() {
   test->SetContactListener(*contactListener);
   test->AddBehaviour("Pheremone", std::move(pheromone));
   test->AddBehaviour("Flocking", std::move(flock));
-  test->SetDroneCount(DRONE_COUNT);
+  test->SetDroneCount(10);
   test->Run();
   return 0;
 }

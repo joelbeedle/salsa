@@ -4,7 +4,10 @@ namespace swarm {
 
 Sim::Sim(b2World* world, int drone_count, int target_count,
          DroneConfiguration* configuration)
-    : world_(world), num_drones_(drone_count), num_targets_(target_count) {
+    : world_(world),
+      num_drones_(drone_count),
+      num_targets_(target_count),
+      drone_configuration_(configuration) {
   b2Vec2 gravity(0.0f, 0.0f);
   world_->SetGravity(gravity);
 }
@@ -14,6 +17,9 @@ void Sim::init() {
 
   auto& registry = swarm::behaviour::Registry::getInstance();
   auto behaviour_names = registry.getBehaviourNames();
+  for (auto& name : behaviour_names) {
+    std::cout << name << std::endl;
+  }
   if (!behaviour_names.empty()) {
     current_behaviour_name_ = behaviour_names[0];
     behaviour_ = registry.getBehaviour(current_behaviour_name_);
@@ -75,8 +81,8 @@ void Sim::applyCurrentBehaviour() {
 }
 
 void Sim::setContactListener(BaseContactListener& listener) {
-  contactListener_ = &listener;
-  world_->SetContactListener(contactListener_);
+  contact_listener_ = &listener;
+  world_->SetContactListener(contact_listener_);
 }
 
 void Sim::createBounds() {
