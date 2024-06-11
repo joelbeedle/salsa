@@ -119,6 +119,35 @@ class Sim {
   void createBounds();
 };
 
+class SimBuilder {
+ private:
+  b2World *world_;
+  Behaviour *behaviour_;
+  int drone_count_;
+  int target_count_;
+  DroneConfiguration *config_;
+
+ public:
+  SimBuilder(b2World *world, int drone_count, int target_count,
+             DroneConfiguration *config)
+      : world_(world),
+        drone_count_(drone_count),
+        target_count_(target_count),
+        config_(config) {}
+
+  SimBuilder &setBehaviour(const std::string &name) {
+    behaviour_ = behaviour::Registry::getInstance().getBehaviour(name);
+    return *this;
+  }
+
+  SimBuilder &setDroneConfiguration(DroneConfiguration *config) {
+    config_ = config;
+    return *this;
+  }
+
+  Sim build() { return Sim(world_, drone_count_, target_count_, config_); }
+};
+
 }  // namespace swarm
 
 #endif  // SWARM_SIM_CORE_SIM_H
