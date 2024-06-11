@@ -9,6 +9,8 @@ add_library(libswarm-sim STATIC
     utils/tree.cpp
     utils/base_contact_listener.cpp
     utils/collision_manager.cpp
+    core/test_stack.cpp
+    core/sim.cpp
 )
 target_include_directories(libswarm-sim PUBLIC ${PROJECT_SRC_DIR}/include)
 target_link_libraries(libswarm-sim PUBLIC box2d)
