@@ -63,7 +63,7 @@ static inline bool CompareTests(const TestEntry& a, const TestEntry& b) {
 }
 
 static void RestartTest() {
-  s_test = g_testEntries[s_settings.m_testIndex].createFcn();
+  s_test = std::move(g_testEntries[s_settings.m_testIndex].instance);
 }
 
 static void CreateUI(GLFWwindow* window, const char* glslVersion = NULL) {
@@ -486,7 +486,7 @@ int run_sim() {
 
   s_settings.m_testIndex = b2Clamp(s_settings.m_testIndex, 0, g_testCount - 1);
   s_testSelection = s_settings.m_testIndex;
-  s_test = g_testEntries[s_settings.m_testIndex].createFcn();
+  s_test = std::move(g_testEntries[s_settings.m_testIndex].instance);
 
   // Control the frame rate. One draw per monitor refresh.
   // glfwSwapInterval(1);
@@ -546,7 +546,7 @@ int run_sim() {
 
     if (s_testSelection != s_settings.m_testIndex) {
       s_settings.m_testIndex = s_testSelection;
-      s_test = g_testEntries[s_settings.m_testIndex].createFcn();
+      s_test = std::move(g_testEntries[s_settings.m_testIndex].instance);
       g_camera.ResetView();
     }
 

@@ -437,7 +437,8 @@ int RegisterTest(const char* category, const char* name, TestCreateFcn fcn) {
   int index = g_testCount;
   if (index < MAX_TESTS) {
     g_testEntries.push_back(
-        {category, name, fcn});  // Using vector's push_back for dynamic sizing
+        {category, name,
+         std::move(fcn)});  // Using vector's push_back for dynamic sizing
     ++g_testCount;
     return index;
   }
