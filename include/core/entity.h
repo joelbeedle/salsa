@@ -2,7 +2,6 @@
 #define SWARM_ENTITY_H
 
 #include <box2d/box2d.h>
-
 namespace swarm {
 class Entity {
  protected:
