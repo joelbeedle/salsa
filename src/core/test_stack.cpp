@@ -3,10 +3,13 @@
 
 namespace swarm {
 
-void TestStack::pushTest(BehaviourWrapper *behaviour,
-                         DroneConfiguration *config) {
-  Test test = {behaviour, config};
-  tests_.push(test);
-}
+std::stack<TestConfig> TestStack::tests_;
 
+void TestStack::push(TestConfig test) { tests_.push(test); }
+
+TestConfig TestStack::pop() {
+  TestConfig test = tests_.top();
+  tests_.pop();
+  return test;
+}
 }  // namespace swarm

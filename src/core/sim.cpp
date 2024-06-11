@@ -4,17 +4,34 @@ namespace swarm {
 
 Sim::Sim(b2World* world, int drone_count, int target_count,
          DroneConfiguration* configuration, float border_width,
-         float border_height)
+         float border_height, float time_limit)
     : world_(world),
       num_drones_(drone_count),
       num_targets_(target_count),
       drone_configuration_(configuration),
       border_width_(border_width),
-      border_height_(border_height) {
+      border_height_(border_height),
+      time_limit_(time_limit) {
   b2Vec2 gravity(0.0f, 0.0f);
   world_->SetGravity(gravity);
   createBounds();
 
+  createDrones(*behaviour_, *drone_configuration_);
+}
+
+Sim::Sim(b2World* world, TestConfig& config)
+    : world_(world),
+      num_drones_(config.num_drones),
+      num_targets_(config.num_targets),
+      drone_configuration_(config.drone_config),
+      border_width_(config.world_width),
+      border_height_(config.world_height),
+      time_limit_(config.time_limit) {
+  is_stack_test_ = true;
+  b2Vec2 gravity(0.0f, 0.0f);
+  world_->SetGravity(gravity);
+  createBounds();
+  current_behaviour_name_ = config.behaviour_name;
   createDrones(*behaviour_, *drone_configuration_);
 }
 

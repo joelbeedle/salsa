@@ -14,23 +14,26 @@
 
 namespace swarm {
 
-struct BehaviourWrapper {
-  Behaviour *behaviour;
-  std::vector<behaviour::Parameter *> parameters;
-};
-
-struct Test {
-  BehaviourWrapper *behaviourWrapper;
-  DroneConfiguration *config;
+struct TestConfig {
+  const std::string &behaviour_name;
+  std::unordered_map<std::string, behaviour::Parameter *> parameters;
+  DroneConfiguration *drone_config;
+  float world_height;
+  float world_width;
+  int num_drones;
+  int num_targets;
+  float time_limit;
+  // FUTURE: std::function<void()> drone_setup;
+  // FUTURE: std::function<void()> target_setup;
 };
 
 class TestStack {
  private:
-  static std::stack<Test> tests_;
+  static std::stack<TestConfig> tests_;
 
  public:
-  static void pushTest(BehaviourWrapper *wrapped_behaviour,
-                       DroneConfiguration *config);
+  static void push(TestConfig test);
+  static TestConfig pop();
 };
 
 }  // namespace swarm

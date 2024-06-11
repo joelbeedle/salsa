@@ -27,6 +27,7 @@
 #include "behaviours/registry.h"
 #include "behaviours/uniform_random_walk.h"
 #include "core/sim.h"
+#include "core/test_stack.h"
 #include "draw.h"
 #include "drones/drone.h"
 #include "drones/drone_factory.h"
@@ -39,7 +40,6 @@
 #include "utils/drone_configuration.h"
 #include "utils/object_types.h"
 #include "utils/tree.h"
-
 #define TREE_COUNT 0
 #define MAX_TIME 1200.0f
 struct DroneParameters {
@@ -58,6 +58,8 @@ class SwarmTest : public Test {
   bool draw_visual_range_ = true;
   bool draw_trees_ = false;
   bool first_run_ = true;
+  bool using_stack_ = true;
+  swarm::TestStack stack_;
   std::vector<swarm::Tree *> trees;
   std::vector<b2Vec2> treePositions;
   std::vector<b2Color> treeColors;
@@ -85,17 +87,27 @@ class SwarmTest : public Test {
 
     // m_world->SetContactListener(contactListener_);
   }
-
-  void Run() {
-    sim = sim_builder->build();
-    RegisterTest("SwarmTest", "Swarm_Test",
-                 []() { return std::make_unique<SwarmTest>(); });
-    run_sim();
-  }
-
+  void Build() { sim_builder->build(); }
   void SetBuilder(swarm::SimBuilder *builder) {
     sim_builder = builder;
     builder->setWorld(m_world);
+  }
+
+  void UseStack(swarm::TestStack stack) {
+    using_stack_ = true;
+    stack_ = stack;
+  }
+
+  bool SetStackSim() {
+    auto config = stack_.pop();
+    auto temp_sim = new swarm::Sim(m_world, config);
+    if (temp_sim == nullptr) {
+      return false;
+    }
+    auto old_sim = sim;
+    sim = temp_sim;
+    delete old_sim;
+    return true;
   }
 
   void SetHeight(float height) { sim_builder->setWorldHeight(height); }
@@ -148,7 +160,14 @@ class SwarmTest : public Test {
     Test::Step(settings);
     std::vector<int> foundTreeIDs;
     sim->update();
+    sim->current_time() += 1.0f / settings.m_hertz;
     Draw(sim->getWorld(), &g_debugDraw, foundTreeIDs);
+    if (using_stack_) {
+      if (sim->current_time() >= sim->time_limit()) {
+        // This sim is finished, get the next one from the stack
+        SetStackSim();
+      }
+    }
   }
   void UpdateUI() override {
     ImGui::SetNextWindowPos(ImVec2(10.0f, 100.0f));
@@ -178,9 +197,9 @@ class SwarmTest : public Test {
 
     ImGui::Text("Behaviour Settings");
     bool changed = false;
-    auto parameters = swarm::behaviour::Registry::getInstance().getBehaviour(
+    auto behaviour = swarm::behaviour::Registry::getInstance().getBehaviour(
         sim->getBehaviourName());
-    for (auto [name, parameter] : sim->getBehaviour()->getParameters()) {
+    for (auto [name, parameter] : behaviour->getParameters()) {
       changed |=
           ImGui::SliderFloat(name.c_str(), &(parameter->value()),
                              parameter->min_value(), parameter->max_value());
@@ -196,6 +215,10 @@ class SwarmTest : public Test {
 
     if (ImGui::Button("Reset Simulation")) {
       sim->reset();
+    }
+
+    if (ImGui::Button("Next Test in Stack")) {
+      SetStackSim();
     }
 
     ImGui::End();
@@ -264,8 +287,8 @@ class SwarmTest : public Test {
             continue;
           }
           if (categoryBits == 0x0002) {
-            // This is fixture tree sensor, but we deal with trees individually
-            // later
+            // This is fixture tree sensor, but we deal with trees
+            // individually later
           }
         }
 

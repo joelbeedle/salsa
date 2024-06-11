@@ -5,12 +5,12 @@
 
 #include "behaviours/behaviour.h"
 #include "behaviours/registry.h"
+#include "core/test_stack.h"
 #include "drones/drone.h"
 #include "drones/drone_factory.h"
 #include "target.h"
 #include "utils/base_contact_listener.h"
 #include "utils/drone_configuration.h"
-
 namespace swarm {
 
 struct DroneParameters {
@@ -53,6 +53,9 @@ class Sim {
 
   float num_drones_;
   float num_targets_;
+  float is_stack_test_ = false;
+  float time_limit_ = -1.0f;
+  float current_time_ = 0.0f;
 
   bool draw_visual_range_ = false;
   bool draw_targets_ = false;
@@ -60,7 +63,9 @@ class Sim {
 
  public:
   Sim(b2World *world, int drone_count, int target_count,
-      DroneConfiguration *config, float border_width, float border_height);
+      DroneConfiguration *config, float border_width, float border_height,
+      float time_limit);
+  Sim(b2World *world, swarm::TestConfig &config);
   // ~Sim();
   void run();
   void init();
@@ -91,6 +96,10 @@ class Sim {
   float &world_width() { return border_width_; }
   const float &world_width() const { return border_width_; }
 
+  float &current_time() { return current_time_; }
+  const float &current_time() const { return current_time_; }
+
+  float &time_limit() { return time_limit_; }
   b2World *getWorld() { return world_; }
 
   std::string getBehaviourName() { return current_behaviour_name_; }
@@ -131,6 +140,7 @@ class SimBuilder {
   int target_count_ = 0;
   float world_height_ = 0;
   float world_width_ = 0;
+  float time_limit_ = -1.0f;
   DroneConfiguration *config_;
   BaseContactListener *contact_listener_;
 
@@ -171,6 +181,11 @@ class SimBuilder {
     return *this;
   }
 
+  SimBuilder &setTimeLimit(float time_limit) {
+    time_limit_ = time_limit;
+    return *this;
+  }
+
   Sim *build() {
     std::cout << "Building sim with:\nDrone count: " << drone_count_
               << "\nTarget Count: " << target_count_
@@ -178,7 +193,7 @@ class SimBuilder {
               << "\nWorld Width: " << world_width_
               << "\nConfig: " << (config_ != nullptr) << std::endl;
     return new Sim(world_, drone_count_, target_count_, config_, world_width_,
-                   world_height_);
+                   world_height_, time_limit_);
   }
 };
 
