@@ -13,13 +13,9 @@ Sim::Sim(b2World* world, int drone_count, int target_count,
       border_height_(border_height) {
   b2Vec2 gravity(0.0f, 0.0f);
   world_->SetGravity(gravity);
-}
-
-void Sim::init() {
   createBounds();
 
   createDrones(*behaviour_, *drone_configuration_);
-  // createTargets();
 }
 
 void Sim::update() {

@@ -72,7 +72,6 @@ class SwarmTest : public Test {
     g_debugDraw.SetFlags(b2Draw::e_shapeBit | b2Draw::e_jointBit);
     sim_builder->setWorld(m_world);
     sim = sim_builder->build();
-    sim->init();
 
     auto &registry = swarm::behaviour::Registry::getInstance();
     auto behaviour_names = registry.getBehaviourNames();
@@ -89,8 +88,9 @@ class SwarmTest : public Test {
 
   void Run() {
     sim = sim_builder->build();
-
-    RunStatic();
+    RegisterTest("SwarmTest", "Swarm_Test",
+                 []() { return std::make_unique<SwarmTest>(); });
+    run_sim();
   }
 
   void SetBuilder(swarm::SimBuilder *builder) {
@@ -345,12 +345,6 @@ class SwarmTest : public Test {
         }
       }
     }
-  }
-
-  static void RunStatic() {
-    RegisterTest("SwarmTest", "Swarm_Test",
-                 []() { return std::make_unique<SwarmTest>(); });
-    run_sim();
   }
 };
 
