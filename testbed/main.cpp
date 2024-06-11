@@ -24,6 +24,7 @@
 #include "behaviours/pheromone_avoidance.h"
 #include "behaviours/registry.h"
 #include "behaviours/uniform_random_walk.h"
+#include "core/test_stack.h"
 #include "draw.h"
 #include "drones/drone.h"
 #include "drones/drone_factory.h"
@@ -66,19 +67,23 @@ int main() {
   auto pheromone = std::make_unique<swarm::PheromoneBehaviour>(0.5, 1.0);
   swarm::DroneConfiguration *smallDrone = new swarm::DroneConfiguration(
       25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f);
-  SwarmTest::SetHeight(BORDER_HEIGHT);
-  SwarmTest::SetWidth(BORDER_WIDTH);
+  SwarmTest *test = new SwarmTest(2000.0f, 2000.0f, smallDrone);
+
+  test->SetConfiguration(smallDrone);
+  test->GetConfiguration()->cameraViewRange = 50.0f;
+
+  test->SetHeight(BORDER_HEIGHT);
+  test->SetWidth(BORDER_WIDTH);
   swarm::CollisionManager::registerType(typeid(swarm::Drone),
                                         {typeid(swarm::Tree)});
   swarm::CollisionManager::registerType(typeid(swarm::Tree),
                                         {typeid(swarm::Drone)});
   auto contactListener = std::make_shared<swarm::BaseContactListener>();
   setupInteractions(*contactListener);
-  SwarmTest::SetContactListener(*contactListener);
-  SwarmTest::AddBehaviour("Pheromone", std::move(pheromone));
-  SwarmTest::AddBehaviour("Flocking", std::move(flock));
-  SwarmTest::SetConfiguration(smallDrone);
-  SwarmTest::SetNumDrones(DRONE_COUNT);
-  SwarmTest::Run();
+  test->SetContactListener(*contactListener);
+  test->AddBehaviour("Pheremone", std::move(pheromone));
+  test->AddBehaviour("Flocking", std::move(flock));
+  test->SetDroneCount(DRONE_COUNT);
+  test->Run();
   return 0;
 }
