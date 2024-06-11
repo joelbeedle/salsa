@@ -3,11 +3,14 @@
 namespace swarm {
 
 Sim::Sim(b2World* world, int drone_count, int target_count,
-         DroneConfiguration* configuration)
+         DroneConfiguration* configuration, float border_width,
+         float border_height)
     : world_(world),
       num_drones_(drone_count),
       num_targets_(target_count),
-      drone_configuration_(configuration) {
+      drone_configuration_(configuration),
+      border_width_(border_width),
+      border_height_(border_height) {
   b2Vec2 gravity(0.0f, 0.0f);
   world_->SetGravity(gravity);
 }
@@ -15,15 +18,6 @@ Sim::Sim(b2World* world, int drone_count, int target_count,
 void Sim::init() {
   createBounds();
 
-  auto& registry = swarm::behaviour::Registry::getInstance();
-  auto behaviour_names = registry.getBehaviourNames();
-  for (auto& name : behaviour_names) {
-    std::cout << name << std::endl;
-  }
-  if (!behaviour_names.empty()) {
-    current_behaviour_name_ = behaviour_names[0];
-    behaviour_ = registry.getBehaviour(current_behaviour_name_);
-  }
   createDrones(*behaviour_, *drone_configuration_);
   // createTargets();
 }
@@ -52,7 +46,6 @@ void Sim::createDrones(Behaviour& behaviour,
 }
 
 void Sim::setDroneCount(int count) { num_drones_ = count; }
-
 void Sim::updateDroneSettings() {
   for (auto& drone : drones_) {
     drone->setMaxForce(drone_configuration_->maxForce);

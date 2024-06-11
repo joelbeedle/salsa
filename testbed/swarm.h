@@ -69,18 +69,26 @@ class SwarmTest : public Test {
 
  public:
   SwarmTest() {
-    sim_builder = new swarm::SimBuilder();
-    sim_builder->setWorld(m_world);
     g_debugDraw.SetFlags(b2Draw::e_shapeBit | b2Draw::e_jointBit);
+    sim_builder->setWorld(m_world);
+    sim = sim_builder->build();
+    sim->init();
+
+    auto &registry = swarm::behaviour::Registry::getInstance();
+    auto behaviour_names = registry.getBehaviourNames();
+    if (!behaviour_names.empty()) {
+      sim->current_behaviour_name() = behaviour_names[0];
+      sim->setBehaviour(registry.getBehaviour(sim->current_behaviour_name()));
+    }
+    g_camera.m_center.x = sim->world_height() / 2;
+    g_camera.m_center.y = sim->world_width() / 2;
+    g_camera.m_zoom = 10.0f;
+
     // m_world->SetContactListener(contactListener_);
   }
 
   void Run() {
-    auto names = swarm::behaviour::Registry::getInstance().getBehaviourNames();
     sim = sim_builder->build();
-    g_camera.m_center.x = sim->world_height() / 2;
-    g_camera.m_center.y = sim->world_width() / 2;
-    g_camera.m_zoom = 10.0f;
 
     RunStatic();
   }
@@ -89,6 +97,7 @@ class SwarmTest : public Test {
     sim_builder = builder;
     builder->setWorld(m_world);
   }
+
   void SetHeight(float height) { sim_builder->setWorldHeight(height); }
   void SetWidth(float width) { sim_builder->setWorldWidth(width); }
   float GetHeight() { return sim->world_height(); }
@@ -138,9 +147,8 @@ class SwarmTest : public Test {
     // Run simulation steps here
     Test::Step(settings);
     std::vector<int> foundTreeIDs;
-
-    // sim->update();
-    Draw(m_world, &g_debugDraw, foundTreeIDs);
+    sim->update();
+    Draw(sim->getWorld(), &g_debugDraw, foundTreeIDs);
   }
   void UpdateUI() override {
     ImGui::SetNextWindowPos(ImVec2(10.0f, 100.0f));
@@ -148,7 +156,6 @@ class SwarmTest : public Test {
     ImGui::Begin("Swarm Controls", nullptr,
                  ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 
-    std::cout << sim->getBehaviourName() << std::endl;
     if (ImGui::BeginCombo("Behaviours",
                           sim->current_behaviour_name().c_str())) {
       auto behaviourNames =
@@ -171,7 +178,9 @@ class SwarmTest : public Test {
 
     ImGui::Text("Behaviour Settings");
     bool changed = false;
-    for (auto [name, parameter] : sim->behaviour()->getParameters()) {
+    auto parameters = swarm::behaviour::Registry::getInstance().getBehaviour(
+        sim->getBehaviourName());
+    for (auto [name, parameter] : sim->getBehaviour()->getParameters()) {
       changed |=
           ImGui::SliderFloat(name.c_str(), &(parameter->value()),
                              parameter->min_value(), parameter->max_value());
@@ -339,7 +348,8 @@ class SwarmTest : public Test {
   }
 
   static void RunStatic() {
-    RegisterTest("SwarmTest", "Swarm_Test", SwarmTest::Create);
+    RegisterTest("SwarmTest", "Swarm_Test",
+                 []() { return std::make_unique<SwarmTest>(); });
     run_sim();
   }
 };

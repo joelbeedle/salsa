@@ -42,7 +42,7 @@
 
 GLFWwindow* g_mainWindow = nullptr;
 static int32 s_testSelection = 0;
-static Test* s_test = nullptr;
+static std::unique_ptr<Test> s_test = nullptr;
 static Settings s_settings;
 static bool s_rightMouseDown = false;
 static b2Vec2 s_clickPointWS = b2Vec2_zero;
@@ -62,12 +62,7 @@ static inline bool CompareTests(const TestEntry& a, const TestEntry& b) {
   return result < 0;
 }
 
-static void SortTests() {
-  std::sort(g_testEntries, g_testEntries + g_testCount, CompareTests);
-}
-
 static void RestartTest() {
-  delete s_test;
   s_test = g_testEntries[s_settings.m_testIndex].createFcn();
 }
 
@@ -427,7 +422,6 @@ int run_sim() {
   char buffer[128];
 
   s_settings.Load();
-  SortTests();
 
   glfwSetErrorCallback(glfwErrorCallback);
 
@@ -552,7 +546,6 @@ int run_sim() {
 
     if (s_testSelection != s_settings.m_testIndex) {
       s_settings.m_testIndex = s_testSelection;
-      delete s_test;
       s_test = g_testEntries[s_settings.m_testIndex].createFcn();
       g_camera.ResetView();
     }
@@ -577,7 +570,6 @@ int run_sim() {
     sleepAdjust = 0.9 * sleepAdjust + 0.1 * (target - frameTime);
   }
 
-  delete s_test;
   s_test = nullptr;
 
   g_debugDraw.Destroy();

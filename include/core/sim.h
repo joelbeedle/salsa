@@ -60,8 +60,8 @@ class Sim {
 
  public:
   Sim(b2World *world, int drone_count, int target_count,
-      DroneConfiguration *config);
-  ~Sim();
+      DroneConfiguration *config, float border_width, float border_height);
+  // ~Sim();
   void run();
   void init();
   void update();
@@ -99,13 +99,15 @@ class Sim {
   const std::string &current_behaviour_name() const {
     return current_behaviour_name_;
   }
-
+  void setBehaviour(Behaviour *behaviour) { behaviour_ = behaviour; }
+  Behaviour *getBehaviour() { return behaviour_; }
   Behaviour *behaviour() { return behaviour_; }
   const Behaviour *behaviour() const { return behaviour_; }
   void setCurrentBehaviour(const std::string &name) {
     behaviour_ = behaviour::Registry::getInstance().getBehaviour(name);
     current_behaviour_name_ = name;
   }
+  int getDroneCount() { return num_drones_; }
 
   DroneConfiguration *getDroneConfiguration() { return drone_configuration_; }
   void setCurrentDroneConfiguration(DroneConfiguration &configuration) {
@@ -175,7 +177,8 @@ class SimBuilder {
               << "\nWorld Height: " << world_height_
               << "\nWorld Width: " << world_width_
               << "\nConfig: " << (config_ != nullptr) << std::endl;
-    return new Sim(world_, drone_count_, target_count_, config_);
+    return new Sim(world_, drone_count_, target_count_, config_, world_width_,
+                   world_height_);
   }
 };
 
