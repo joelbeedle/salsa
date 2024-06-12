@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include "box2d/b2_math.h"
 #include "imgui/imgui.h"
 #include "test.h"
 
@@ -9,6 +10,7 @@ class MapCreator : public Test {
  private:
   enum DrawMode {
     DRAW_NONE,
+    DRAW_DRONE_SPAWN,
     DRAW_LINE,
     DRAW_POLYGON,
     DRAW_HOLLOW_POLYGON,
@@ -20,17 +22,19 @@ class MapCreator : public Test {
   std::vector<b2Vec2> points;
   float circle_radius = 0.0f;
 
+  b2Vec2 drone_spawn_point;
+
  public:
   MapCreator() {}
   void CreateHollowPolygon(const std::vector<b2Vec2> &vertices) {
     if (vertices.size() < 3)
       return;  // Need at least two points to start drawing edges
-
     for (size_t i = 0; i < vertices.size() - 1; i++) {
       CreateEdge(vertices[i], vertices[i + 1]);
     }
     // Optionally close the polygon
     CreateEdge(vertices.back(), vertices.front());
+    line_drawing = false;
   }
 
   void CreateEdge(const b2Vec2 &start, const b2Vec2 &end) {
@@ -54,7 +58,7 @@ class MapCreator : public Test {
     b2PolygonShape shape;
     shape.Set(&vertices[0], (int32)vertices.size());
 
-    body->CreateFixture(&shape, 1.0f);
+    body->CreateFixture(&shape, 0.0f);
     line_drawing = false;
   }
 
@@ -66,7 +70,6 @@ class MapCreator : public Test {
     b2CircleShape shape;
     shape.m_p = center;
     shape.m_radius = radius;
-
     body->CreateFixture(&shape, 0.0f);
     line_drawing = false;
   }
@@ -111,6 +114,11 @@ class MapCreator : public Test {
       line_spawn_point = p;
       line_drawing = true;
     }
+
+    if (current_mode == DRAW_DRONE_SPAWN) {
+      line_drawing = false;
+      drone_spawn_point = p;
+    }
   }
 
   void MouseUp(const b2Vec2 &p) override {
@@ -127,19 +135,19 @@ class MapCreator : public Test {
         points.push_back(p);
       }
     } else if (current_mode == DRAW_HOLLOW_POLYGON) {
-      if (points.size() > 3 && (p - points.front()).Length() < 5.0f) {
-        // Close the shape by connecting the last point to the first
-        CreateEdge(points.back(), points.front());
+      if (points.size() > 1 && (p - points.front()).Length() < 5.0f) {
+        CreateHollowPolygon(points);
+        points.clear();
       } else {
         // Create an edge to the current point
-        CreateEdge(line_spawn_point, p);
-        line_spawn_point = p;  // Update start point for the next line
+        points.push_back(p);
       }
     } else if (current_mode == DRAW_LINE && line_drawing) {
       CompleteLine(p);
     } else if (current_mode == DRAW_CIRCLE && line_drawing) {
       circle_radius = (p - line_spawn_point).Length();
       CreateCircle(line_spawn_point, circle_radius);
+    } else if (current_mode == DRAW_DRONE_SPAWN) {
     }
   }
 
@@ -168,6 +176,9 @@ class MapCreator : public Test {
   void Step(Settings &settings) override {
     Test::Step(settings);
     m_world->DebugDraw();
+    g_debugDraw.DrawText(10, 10, "Drone Spawn Point");
+    // g_debugDraw.DrawString(drone_spawn_point, "Drone Spawn Point");
+    g_debugDraw.DrawCircle(drone_spawn_point, 5.0f, b2Color(0.0f, 1.0f, 0.0f));
     if (line_drawing) {
       b2Color c(0.9f, 0.9f, 0.9f);
       switch (current_mode) {
@@ -183,6 +194,11 @@ class MapCreator : public Test {
         case DRAW_CIRCLE:
           g_debugDraw.DrawSegment(line_spawn_point, m_mouseWorld, c);
 
+          g_debugDraw.DrawCircle(line_spawn_point,
+                                 (m_mouseWorld - line_spawn_point).Length(), c);
+          break;
+        case DRAW_DRONE_SPAWN:
+          g_debugDraw.DrawSegment(line_spawn_point, m_mouseWorld, c);
           g_debugDraw.DrawCircle(line_spawn_point,
                                  (m_mouseWorld - line_spawn_point).Length(), c);
           break;
@@ -203,6 +219,9 @@ class MapCreator : public Test {
         break;
       case DRAW_CIRCLE:
         g_debugDraw.DrawString(5, m_textLine, "Draw Mode: Circle");
+        break;
+      case DRAW_DRONE_SPAWN:
+        g_debugDraw.DrawString(5, m_textLine, "Draw Mode: Drone Spawn");
         break;
       default:
         g_debugDraw.DrawString(5, m_textLine, "Draw Mode: None");
@@ -259,6 +278,13 @@ class MapCreator : public Test {
       points.clear();
       line_drawing = false;
       current_mode = DRAW_NONE;
+    }
+
+    ImGui::Separator();
+    if (ImGui::Button("Drone Spawn")) {
+      points.clear();
+      line_drawing = false;
+      current_mode = DRAW_DRONE_SPAWN;
     }
 
     ImGui::End();

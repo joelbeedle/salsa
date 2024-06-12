@@ -35,6 +35,7 @@ struct GLRenderPoints;
 struct GLRenderLines;
 struct GLRenderTriangles;
 struct GLRenderTrees;
+struct GLRenderText;
 struct GLFWwindow;
 
 //
@@ -92,6 +93,7 @@ class DebugDraw : public b2Draw {
                  const std::vector<int>& changedIDs);
   void DrawAllTrees(const std::vector<b2Vec2>& positions,
                     const std::vector<b2Color>& colors);
+  void DrawText(int x, int y, const char* string);
 
   void Flush();
 
@@ -100,6 +102,7 @@ class DebugDraw : public b2Draw {
   GLRenderLines* m_lines;
   GLRenderTriangles* m_triangles;
   GLRenderTrees* m_trees;
+  GLRenderText* m_text;
 };
 
 extern DebugDraw g_debugDraw;
