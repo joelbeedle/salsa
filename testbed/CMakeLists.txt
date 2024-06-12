@@ -38,7 +38,7 @@ ${CMAKE_CURRENT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/include)
 target_link_libraries(my_testbed PRIVATE glfw imgui sajson glad box2d libswarm-sim)
 
 set_target_properties(my_testbed PROPERTIES
-	CXX_STANDARD 17
+	CXX_STANDARD 20
     CXX_STANDARD_REQUIRED YES
     CXX_EXTENSIONS NO
 )
