@@ -29,6 +29,7 @@
 #include "drones/drone.h"
 #include "drones/drone_factory.h"
 #include "imgui/imgui.h"
+#include "map.h"
 #include "settings.h"
 #include "swarm.h"
 #include "test.h"
@@ -121,6 +122,7 @@ int main() {
   test->SetContactListener(*contactListener);
   test->Build();
   RegisterTest("SwarmTest", "Swarm_Test", std::move(test));
+  RegisterTest("MapCreator", "Map_Creator", std::make_unique<MapCreator>());
   run_sim();
   return 0;
 }
