@@ -236,6 +236,10 @@ static void MouseButtonCallback(GLFWwindow* window, int32 button, int32 action,
                                 int32 mods) {
   ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
 
+  if (ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow)) {
+    return;
+  }
+
   double xd, yd;
   glfwGetCursorPos(g_mainWindow, &xd, &yd);
   b2Vec2 ps((float)xd, (float)yd);
@@ -264,6 +268,13 @@ static void MouseButtonCallback(GLFWwindow* window, int32 button, int32 action,
 
     if (action == GLFW_RELEASE) {
       s_rightMouseDown = false;
+    }
+  }
+  if (button == GLFW_MOUSE_BUTTON_RIGHT) {
+    b2Vec2 pw = g_camera.ConvertScreenToWorld(ps);
+
+    if (action == GLFW_PRESS) {
+      s_test->RightMouseDown(pw);
     }
   }
 }

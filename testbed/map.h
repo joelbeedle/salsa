@@ -2,19 +2,29 @@
 
 #include <iostream>
 
+#include "box2d/b2_body.h"
 #include "box2d/b2_math.h"
 #include "imgui/imgui.h"
 #include "test.h"
-
+class myQueryCallback : public b2QueryCallback {
+ public:
+  std::vector<b2Body *> bodies;
+  bool ReportFixture(b2Fixture *fixture) override {
+    b2Body *body = fixture->GetBody();
+    bodies.push_back(body);
+    // Continue the query.
+    return true;
+  }
+};
 class MapCreator : public Test {
  private:
   enum DrawMode {
-    DRAW_NONE,
-    DRAW_DRONE_SPAWN,
     DRAW_LINE,
     DRAW_POLYGON,
     DRAW_HOLLOW_POLYGON,
-    DRAW_CIRCLE
+    DRAW_CIRCLE,
+    DRAW_NONE,
+    DRAW_DRONE_SPAWN,
   };
   DrawMode current_mode = DRAW_NONE;
   bool line_drawing = false;
@@ -24,8 +34,52 @@ class MapCreator : public Test {
 
   b2Vec2 drone_spawn_point;
 
+  bool draw_boundary = false;
+  std::vector<b2Body *> boundary_bodies;
+  float boundary_side_length = 0.0f;
+
+  bool body_popup = false;
+  b2Body *selected_body = nullptr;
+
  public:
   MapCreator() {}
+  void DeleteBoundary() {
+    for (b2Body *body : boundary_bodies) {
+      m_world->DestroyBody(body);
+    }
+    boundary_bodies.clear();
+  }
+
+  void CreateBoundary() {
+    b2BodyDef groundBodyDef;
+    groundBodyDef.position.Set(0.0f, 0.0f);
+
+    b2Body *groundBody = m_world->CreateBody(&groundBodyDef);
+
+    b2EdgeShape groundBox;
+
+    // bottom
+    groundBox.SetTwoSided(b2Vec2(0.0f, 0.0f),
+                          b2Vec2(boundary_side_length, 0.0f));
+    groundBody->CreateFixture(&groundBox, 0.0f);
+
+    // top
+    groundBox.SetTwoSided(b2Vec2(0.0f, boundary_side_length),
+                          b2Vec2(boundary_side_length, boundary_side_length));
+    groundBody->CreateFixture(&groundBox, 0.0f);
+
+    // left
+    groundBox.SetTwoSided(b2Vec2(0.0f, 0.0f),
+                          b2Vec2(0.0f, boundary_side_length));
+    groundBody->CreateFixture(&groundBox, 0.0f);
+
+    // right
+    groundBox.SetTwoSided(b2Vec2(boundary_side_length, 0.0f),
+                          b2Vec2(boundary_side_length, boundary_side_length));
+    groundBody->CreateFixture(&groundBox, 0.0f);
+
+    boundary_bodies.push_back(groundBody);
+  }
   void CreateHollowPolygon(const std::vector<b2Vec2> &vertices) {
     if (vertices.size() < 3)
       return;  // Need at least two points to start drawing edges
@@ -63,14 +117,23 @@ class MapCreator : public Test {
   }
 
   void CreateCircle(const b2Vec2 &center, float radius) {
-    b2BodyDef bd;
-    bd.type = b2_staticBody;
-    b2Body *body = m_world->CreateBody(&bd);
+    b2BodyDef bodyDef;
+    bodyDef.type = b2_staticBody;
+    bodyDef.position =
+        center;  // Set the body's position to the center parameter
 
-    b2CircleShape shape;
-    shape.m_p = center;
-    shape.m_radius = radius;
-    body->CreateFixture(&shape, 0.0f);
+    // Create the body using the definition in the world
+    b2Body *body = m_world->CreateBody(&bodyDef);
+
+    // Define a circle shape
+    b2CircleShape circleShape;
+    circleShape.m_p.Set(0.0f,
+                        0.0f);  // Position the shape at the body's local origin
+    circleShape.m_radius = radius;  // Set the radius of the circle
+
+    // Create a fixture with the shape. Density is set to 0.0f because it's a
+    // static body
+    body->CreateFixture(&circleShape, 0.0f);
     line_drawing = false;
   }
 
@@ -121,21 +184,46 @@ class MapCreator : public Test {
     }
   }
 
+  void RightMouseDown(const b2Vec2 &p) override {
+    m_mouseWorld = p;
+    std::cout << "RightMouseDown\n";
+    if (m_mouseJoint != NULL) {
+      return;
+    }
+    b2AABB aabb;
+    b2Vec2 d;
+
+    d.Set(0.001f, 0.001f);
+    aabb.lowerBound = p - d;
+    aabb.upperBound = p - d;
+
+    // Query the world for overlapping shapes.
+    myQueryCallback callback;
+    m_world->QueryAABB(&callback, aabb);
+    for (auto body : callback.bodies) {
+      std::cout << "Body: " << body << std::endl;
+      body_popup = true;
+      selected_body = body;
+    }
+  }
+
   void MouseUp(const b2Vec2 &p) override {
     if (m_mouseJoint) {
       m_world->DestroyJoint(m_mouseJoint);
       m_mouseJoint = NULL;
     }
 
-    if (current_mode == DRAW_POLYGON) {
-      if (points.size() > 1 && (p - points.front()).Length() < 5.0f) {
+    if (current_mode == DRAW_POLYGON && line_drawing) {
+      if (points.size() > 1 &&
+          (p - points.front()).Length() < g_camera.m_zoom * 1.0f) {
         CreatePolygon(points);
         points.clear();  // Clear the points to start a new shape
       } else {
         points.push_back(p);
       }
     } else if (current_mode == DRAW_HOLLOW_POLYGON) {
-      if (points.size() > 1 && (p - points.front()).Length() < 5.0f) {
+      if (points.size() > 1 &&
+          (p - points.front()).Length() < g_camera.m_zoom * 1.0f) {
         CreateHollowPolygon(points);
         points.clear();
       } else {
@@ -233,18 +321,10 @@ class MapCreator : public Test {
         g_debugDraw.DrawSegment(points[i], points[i + 1],
                                 b2Color(0.9f, 0.9f, 0.9f));
       }
-      if (line_drawing) {
-        g_debugDraw.DrawSegment(points.back(), m_mouseWorld,
-                                b2Color(0.9f, 0.9f, 0.9f));
-      }
     }
     if (current_mode == DRAW_HOLLOW_POLYGON && points.size() > 1) {
       for (size_t i = 0; i < points.size() - 1; ++i) {
         g_debugDraw.DrawSegment(points[i], points[i + 1],
-                                b2Color(0.9f, 0.9f, 0.9f));
-      }
-      if (line_drawing) {
-        g_debugDraw.DrawSegment(points.back(), m_mouseWorld,
                                 b2Color(0.9f, 0.9f, 0.9f));
       }
     }
@@ -253,40 +333,65 @@ class MapCreator : public Test {
     ImGui::SetNextWindowPos(ImVec2(10.0f, 100.0f));
     ImGui::SetNextWindowSize(ImVec2(285.0f, 285.0f));
     ImGui::Begin("Map Creator Controls", nullptr, ImGuiWindowFlags_NoResize);
+    ImGui::Text("Camera Zoom: %f", g_camera.m_zoom);
 
-    if (ImGui::Button("Draw Polygon")) {
-      points.clear();
-      line_drawing = false;
-      current_mode = DRAW_POLYGON;
-    }
-    if (ImGui::Button("Draw Line")) {
-      points.clear();
-      line_drawing = false;
-      current_mode = DRAW_LINE;
-    }
-    if (ImGui::Button("Draw Hollow Polygon")) {
-      points.clear();
-      line_drawing = false;
-      current_mode = DRAW_HOLLOW_POLYGON;
-    }
-    if (ImGui::Button("Draw Circle")) {
-      points.clear();
-      line_drawing = false;
-      current_mode = DRAW_CIRCLE;
-    }
-    if (ImGui::Button("Draw None")) {
-      points.clear();
-      line_drawing = false;
-      current_mode = DRAW_NONE;
-    }
+    // Drawing Controls
 
+    static int selected = -1;
+    ImGui::SetNextTreeNodeOpen(true, ImGuiCond_Once);
+    if (ImGui::TreeNode("Drawing Controls")) {
+      if (ImGui::Selectable("Line", selected == 0)) selected = 0;
+      if (ImGui::Selectable("Polygon", selected == 1)) selected = 1;
+      if (ImGui::Selectable("Hollow Polygon", selected == 2)) selected = 2;
+      if (ImGui::Selectable("Circle", selected == 3)) selected = 3;
+      if (ImGui::Selectable("None", selected == 4)) selected = 4;
+      ImGui::TreePop();
+    }
     ImGui::Separator();
-    if (ImGui::Button("Drone Spawn")) {
-      points.clear();
-      line_drawing = false;
-      current_mode = DRAW_DRONE_SPAWN;
+    ImGui::SetNextTreeNodeOpen(true, ImGuiCond_Once);
+    if (ImGui::TreeNode("Drone Spawn Controls")) {
+      if (ImGui::Button("Drone Spawn")) {
+        points.clear();
+        line_drawing = false;
+        selected = 5;
+      }
+      ImGui::TreePop();
     }
 
+    current_mode = (DrawMode)selected;
+    ImGui::End();
+
+    ImGui::SetNextWindowPos(ImVec2(10.0f, 400.0f));
+    ImGui::SetNextWindowSize(ImVec2(285.0f, 285.0f));
+    ImGui::Begin("Boundary Settings", nullptr,
+                 ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+    ImGui::Checkbox("Draw Boundary", &draw_boundary);
+    bool changed = false;
+    if (draw_boundary) {
+      ImGui::Text("Boundary Length");
+      changed = ImGui::SliderFloat("", &boundary_side_length, 0.0f, 4000.0f);
+      if (changed) {
+        DeleteBoundary();
+        CreateBoundary();
+      }
+    }
+
+    if (body_popup) {
+      ImGui::OpenPopup("Body Popup");
+      body_popup = false;
+    }
+
+    if (ImGui::BeginPopup("Body Popup")) {
+      if (selected_body) {
+        ImGui::Text("BodyID: %p", selected_body);
+        if (ImGui::Button("Delete")) {
+          m_world->DestroyBody(selected_body);
+          selected_body = nullptr;
+          ImGui::CloseCurrentPopup();
+        }
+      }
+      ImGui::EndPopup();
+    }
     ImGui::End();
   }
 };
