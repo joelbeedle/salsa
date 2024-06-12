@@ -26,6 +26,7 @@
 #include <stdlib.h>
 
 #include <functional>
+#include <memory>
 
 #include "box2d/box2d.h"
 #include "draw.h"
