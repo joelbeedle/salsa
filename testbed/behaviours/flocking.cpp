@@ -1,4 +1,4 @@
-#include "behaviours/flocking.h"
+#include "flocking.h"
 
 #include <iostream>
 #include <valarray>

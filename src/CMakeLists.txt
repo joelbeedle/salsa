@@ -1,16 +1,16 @@
-project(swarm-sim)
+file(GLOB_RECURSE HEADER_LIST CONFIGURE_DEPENDS "${SwarmSim_SOURCE_DIR}/include/*.h")
+file(GLOB_RECURSE SOURCE_LIST CONFIGURE_DEPENDS "${SwarmSim_SOURCE_DIR}/src/*.cpp")
 
-include_directories(${PROJECT_SRC_DIR}extern/Box2D)
-include_directories(${PROJECT_SRC_DIR}/include)
 
-add_library(libswarm-sim STATIC
-    behaviours/behaviour.cpp
-    drones/drone.cpp
-    utils/tree.cpp
-    utils/base_contact_listener.cpp
-    utils/collision_manager.cpp
-    core/test_stack.cpp
-    core/sim.cpp
+add_library(swarm-sim ${SOURCE_LIST} ${HEADER_LIST})
+
+target_link_libraries(swarm-sim PRIVATE box2d)
+target_include_directories(swarm-sim PUBLIC ${FREETYPE_INCLUDE_DIRS} ../include)
+
+target_compile_features(swarm-sim PUBLIC cxx_std_17)
+
+source_group(
+    TREE "${PROJECT_SOURCE_DIR}/include"
+    PREFIX "Header Files"
+    FILES ${HEADER_LIST}
 )
-target_include_directories(libswarm-sim PUBLIC ${PROJECT_SRC_DIR}/include)
-target_link_libraries(libswarm-sim PUBLIC box2d)

@@ -1,4 +1,4 @@
-#include "behaviours/pheromone_avoidance.h"
+#include "pheromone_avoidance.h"
 
 #include <map>
 #include <memory>

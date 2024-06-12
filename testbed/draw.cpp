@@ -22,7 +22,6 @@
 
 #include "draw.h"
 
-#include <ft2build.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,13 +30,9 @@
 #include <vector>
 
 #include "imgui/imgui.h"
-#include FT_FREETYPE_H
 
 #define BUFFER_OFFSET(x) ((const void*)(x))
 #define MAX_VERTICES_BASE 2048
-
-FT_Library ft;
-FT_Face face;
 
 DebugDraw g_debugDraw;
 Camera g_camera;
@@ -463,158 +458,6 @@ struct GLRenderLines {
   GLint m_colorAttribute;
 };
 
-struct GLRenderText {
-  GLuint m_vaoId;
-  GLuint m_vboIds[1];
-  GLuint m_programId;
-  GLint m_projectionUniform;
-  GLint m_vertexAttribute;
-  GLint m_textureAttribute;
-  GLint m_colorUniform;
-  GLint m_textureUniform;
-  struct point {
-    GLfloat x;
-    GLfloat y;
-    GLfloat s;
-    GLfloat t;
-  };
-
-  void Create() {
-    const char* vs =
-        "#version 330\n"
-        "in vec4 coord;\n"
-        "out vec2 texcoord;\n"
-        "uniform mat4 projectionMatrix;\n"
-        "void main(void) {\n"
-        "gl_Position = vec4(coord.xy, 0, 1);\n"
-        "texcoord = coord.zw;\n"
-        "}\n";
-
-    const char* fs =
-        "#version 330\n"
-        "in vec2 texcoord;\n"
-        "uniform sampler2D tex;\n"
-        "uniform vec4 color;\n"
-        "out vec4 FragColor;\n"
-        "void main(void) {\n"
-        "FragColor = vec4(1.0, 1.0, 1.0, texture(tex, texcoord).r) * color;\n"
-        "}\n";
-    /* Initialize the FreeType2 library */
-    if (FT_Init_FreeType(&ft)) {
-      fprintf(stderr, "Could not init freetype library\n");
-    }
-
-    /* Load a font */
-    if (FT_New_Face(ft, "/Users/joelbeedle/swarm-sim/testbed/data/FreeSans.ttf",
-                    0, &face)) {
-      fprintf(stderr, "Could not open font.\n");
-    }
-
-    m_programId = sCreateShaderProgram(vs, fs);
-    m_projectionUniform = glGetUniformLocation(m_programId, "projectionMatrix");
-    m_textureUniform = glGetUniformLocation(m_programId, "tex");
-    m_colorUniform = glGetUniformLocation(m_programId, "color");
-    m_vertexAttribute = glGetAttribLocation(m_programId, "coord");
-
-    // Create the vertex buffer object
-    glGenBuffers(1, m_vboIds);
-    glGenVertexArrays(1, &m_vaoId);
-    glBindVertexArray(m_vaoId);
-    glEnableVertexAttribArray(m_vertexAttribute);
-  }
-
-  void RenderText(const char* text, float x, float y, float sx, float sy) {
-    const char* p;
-    FT_GlyphSlot g = face->glyph;
-
-    /* Create a texture that will be used to hold one "glyph" */
-    GLuint tex;
-
-    glActiveTexture(GL_TEXTURE0);
-    glGenTextures(1, &tex);
-    glBindTexture(GL_TEXTURE_2D, tex);
-    glUniform1i(m_textureUniform, 0);
-
-    /* We require 1 byte alignment when uploading texture data */
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-    /* Clamping to edges is important to prevent artifacts when scaling */
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-    /* Linear filtering usually looks best for text */
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    /* Set up the VBO for our vertex data */
-    glBindVertexArray(m_vaoId);
-    glEnableVertexAttribArray(m_vertexAttribute);
-    glBindBuffer(GL_ARRAY_BUFFER, m_vboIds[0]);
-    glVertexAttribPointer(m_vertexAttribute, 4, GL_FLOAT, GL_FALSE, 0, 0);
-
-    /* Loop through all characters */
-    for (p = text; *p; p++) {
-      /* Try to load and render the character */
-      if (FT_Load_Char(face, *p, FT_LOAD_RENDER)) continue;
-
-      /* Upload the "bitmap", which contains an 8-bit grayscale image, as an
-       * alpha texture */
-      glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, g->bitmap.width, g->bitmap.rows, 0,
-                   GL_RED, GL_UNSIGNED_BYTE, g->bitmap.buffer);
-
-      /* Calculate the vertex and texture coordinates */
-      float x2 = x + g->bitmap_left * sx;
-      float y2 = -y - g->bitmap_top * sy;
-      float w = g->bitmap.width * sx;
-      float h = g->bitmap.rows * sy;
-
-      point box[4] = {
-          {x2, -y2, 0, 0},
-          {x2 + w, -y2, 1, 0},
-          {x2, -y2 - h, 0, 1},
-          {x2 + w, -y2 - h, 1, 1},
-      };
-
-      /* Draw the character on the screen */
-      glBufferData(GL_ARRAY_BUFFER, sizeof box, box, GL_DYNAMIC_DRAW);
-      glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-      /* Advance the cursor to the start of the next character */
-      x += (g->advance.x >> 6) * sx;
-      y += (g->advance.y >> 6) * sy;
-    }
-
-    glDisableVertexAttribArray(m_vertexAttribute);
-    glDeleteTextures(1, &tex);
-  }
-  void Flush(int x, int y, const char* string) {
-    int width, height;
-
-    // Get the current window size
-    glfwGetWindowSize(g_mainWindow, &width, &height);
-
-    float sx = 2.0 / width;
-    float sy = 2.0 / height;
-    glUseProgram(m_programId);
-    float proj[16] = {0.0f};
-    g_camera.BuildProjectionMatrix(proj, 0.2f);
-
-    glUniformMatrix4fv(m_projectionUniform, 1, GL_FALSE, proj);
-
-    /* Enable blending, necessary for our alpha texture */
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    GLfloat black[4] = {0, 0, 0, 1};
-    GLfloat red[4] = {1, 0, 0, 1};
-    GLfloat transparent_green[4] = {0, 1, 0, 0.5};
-
-    /* Set font size to 48 pixels, color to black */
-    FT_Set_Pixel_Sizes(face, 0, 48);
-    glUniform4fv(m_colorUniform, 1, black);
-    RenderText(string, -1 + x * sx, -1 * y + sy, sx, sy);
-  }
-};
 //
 struct GLRenderTriangles {
   void Create() {
@@ -931,8 +774,6 @@ void DebugDraw::Create() {
   m_triangles->Create();
   m_trees = new GLRenderTrees;
   m_trees->Create();
-  m_text = new GLRenderText;
-  m_text->Create();
 }
 
 //
@@ -951,11 +792,6 @@ void DebugDraw::Destroy() {
 
   delete m_text;
   m_text = NULL;
-}
-
-//
-void DebugDraw::DrawText(int x, int y, const char* string) {
-  m_text->Flush(x, y, string);
 }
 
 //

@@ -1,4 +1,4 @@
-#include "behaviours/levy_flocking.h"
+#include "levy_flocking.h"
 
 #include <iostream>
 #include <random>

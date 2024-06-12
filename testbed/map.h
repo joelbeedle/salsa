@@ -264,7 +264,6 @@ class MapCreator : public Test {
   void Step(Settings &settings) override {
     Test::Step(settings);
     m_world->DebugDraw();
-    g_debugDraw.DrawText(10, 10, "Drone Spawn Point");
     // g_debugDraw.DrawString(drone_spawn_point, "Drone Spawn Point");
     g_debugDraw.DrawCircle(drone_spawn_point, 5.0f, b2Color(0.0f, 1.0f, 0.0f));
     if (line_drawing) {
