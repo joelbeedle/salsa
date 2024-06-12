@@ -7,6 +7,7 @@
 #include <box2d/box2d.h>
 
 #include <stack>
+#include <variant>
 
 #include "behaviours/behaviour.h"
 #include "behaviours/parameter.h"
