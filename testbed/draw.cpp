@@ -31,7 +31,7 @@
 
 #include "imgui/imgui.h"
 
-#define BUFFER_OFFSET(x) ((const void*)(x))
+#define BUFFER_OFFSET(x) ((const void *)(x))
 #define MAX_VERTICES_BASE 2048
 
 DebugDraw g_debugDraw;
@@ -51,7 +51,7 @@ void Camera::ResetView() {
 }
 
 //
-b2Vec2 Camera::ConvertScreenToWorld(const b2Vec2& ps) {
+b2Vec2 Camera::ConvertScreenToWorld(const b2Vec2 &ps) {
   float w = float(m_width);
   float h = float(m_height);
   float u = ps.x / w;
@@ -71,7 +71,7 @@ b2Vec2 Camera::ConvertScreenToWorld(const b2Vec2& ps) {
 }
 
 //
-b2Vec2 Camera::ConvertWorldToScreen(const b2Vec2& pw) {
+b2Vec2 Camera::ConvertWorldToScreen(const b2Vec2 &pw) {
   float w = float(m_width);
   float h = float(m_height);
   float ratio = w / h;
@@ -92,7 +92,7 @@ b2Vec2 Camera::ConvertWorldToScreen(const b2Vec2& pw) {
 
 // Convert from world coordinates to normalized device coordinates.
 // http://www.songho.ca/opengl/gl_projectionmatrix.html
-void Camera::BuildProjectionMatrix(float* m, float zBias) {
+void Camera::BuildProjectionMatrix(float *m, float zBias) {
   float w = float(m_width);
   float h = float(m_height);
   float ratio = w / h;
@@ -144,7 +144,7 @@ static void sPrintLog(GLuint object) {
     return;
   }
 
-  char* log = (char*)malloc(log_length);
+  char *log = (char *)malloc(log_length);
 
   if (glIsShader(object))
     glGetShaderInfoLog(object, log_length, NULL, log);
@@ -156,9 +156,9 @@ static void sPrintLog(GLuint object) {
 }
 
 //
-static GLuint sCreateShaderFromString(const char* source, GLenum type) {
+static GLuint sCreateShaderFromString(const char *source, GLenum type) {
   GLuint res = glCreateShader(type);
-  const char* sources[] = {source};
+  const char *sources[] = {source};
   glShaderSource(res, 1, sources, NULL);
   glCompileShader(res);
   GLint compile_ok = GL_FALSE;
@@ -174,7 +174,7 @@ static GLuint sCreateShaderFromString(const char* source, GLenum type) {
 }
 
 //
-static GLuint sCreateShaderProgram(const char* vs, const char* fs) {
+static GLuint sCreateShaderProgram(const char *vs, const char *fs) {
   GLuint vsId = sCreateShaderFromString(vs, GL_VERTEX_SHADER);
   GLuint fsId = sCreateShaderFromString(fs, GL_FRAGMENT_SHADER);
   assert(vsId != 0 && fsId != 0);
@@ -198,7 +198,7 @@ static GLuint sCreateShaderProgram(const char* vs, const char* fs) {
 //
 struct GLRenderPoints {
   void Create() {
-    const char* vs =
+    const char *vs =
         "#version 330\n"
         "uniform mat4 projectionMatrix;\n"
         "layout(location = 0) in vec2 v_position;\n"
@@ -213,7 +213,7 @@ struct GLRenderPoints {
         "   gl_PointSize = v_size;\n"
         "}\n";
 
-    const char* fs =
+    const char *fs =
         "#version 330\n"
         "in vec4 f_color;\n"
         "out vec4 color;\n"
@@ -276,7 +276,7 @@ struct GLRenderPoints {
     }
   }
 
-  void Vertex(const b2Vec2& v, const b2Color& c, float size) {
+  void Vertex(const b2Vec2 &v, const b2Color &c, float size) {
     if (m_count == e_maxVertices) Flush();
 
     m_vertices[m_count] = v;
@@ -338,7 +338,7 @@ struct GLRenderPoints {
 //
 struct GLRenderLines {
   void Create() {
-    const char* vs =
+    const char *vs =
         "#version 330\n"
         "uniform mat4 projectionMatrix;\n"
         "layout(location = 0) in vec2 v_position;\n"
@@ -351,7 +351,7 @@ struct GLRenderLines {
         "1.0f);\n"
         "}\n";
 
-    const char* fs =
+    const char *fs =
         "#version 330\n"
         "in vec4 f_color;\n"
         "out vec4 color;\n"
@@ -407,7 +407,7 @@ struct GLRenderLines {
     }
   }
 
-  void Vertex(const b2Vec2& v, const b2Color& c) {
+  void Vertex(const b2Vec2 &v, const b2Color &c) {
     if (m_count == e_maxVertices) Flush();
 
     m_vertices[m_count] = v;
@@ -461,7 +461,7 @@ struct GLRenderLines {
 //
 struct GLRenderTriangles {
   void Create() {
-    const char* vs =
+    const char *vs =
         "#version 330\n"
         "uniform mat4 projectionMatrix;\n"
         "layout(location = 0) in vec2 v_position;\n"
@@ -474,7 +474,7 @@ struct GLRenderTriangles {
         "1.0f);\n"
         "}\n";
 
-    const char* fs =
+    const char *fs =
         "#version 330\n"
         "in vec4 f_color;\n"
         "out vec4 color;\n"
@@ -530,7 +530,7 @@ struct GLRenderTriangles {
     }
   }
 
-  void Vertex(const b2Vec2& v, const b2Color& c) {
+  void Vertex(const b2Vec2 &v, const b2Color &c) {
     if (m_count == e_maxVertices) Flush();
 
     m_vertices[m_count] = v;
@@ -603,7 +603,7 @@ struct GLRenderTrees {
   GLint m_instanceColorAttribute;
 
   void Create() {
-    const char* vs = R"(
+    const char *vs = R"(
             #version 330 core
             uniform mat4 projectionMatrix;
             layout(location = 0) in vec2 v_position; // Base circle vertex position
@@ -620,7 +620,7 @@ struct GLRenderTrees {
             }
         )";
 
-    const char* fs = R"(
+    const char *fs = R"(
             #version 330 core
             in vec4 f_color;
             out vec4 color;
@@ -656,7 +656,7 @@ struct GLRenderTrees {
     glBufferData(GL_ARRAY_BUFFER, sizeof(circleVertices), circleVertices,
                  GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (void *)0);
 
     // // Instance positions
     // glBindBuffer(GL_ARRAY_BUFFER, m_buffers[1]);
@@ -675,20 +675,20 @@ struct GLRenderTrees {
     // sCheckGLError();
   }
 
-  void setBuffers(const std::vector<b2Vec2>& positions,
-                  const std::vector<b2Color>& colors) {
+  void setBuffers(const std::vector<b2Vec2> &positions,
+                  const std::vector<b2Color> &colors) {
     // Instance positions - Set once since positions are static
     glBindBuffer(GL_ARRAY_BUFFER, m_buffers[1]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(b2Vec2) * positions.size(),
                  positions.data(), GL_STATIC_DRAW);
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void *)0);
     glVertexAttribDivisor(1, 1);
 
     // Instance colors - Initially empty, updated dynamically
     glBindBuffer(GL_ARRAY_BUFFER, m_buffers[2]);
     glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 0, (void *)0);
     glVertexAttribDivisor(2, 1);
 
     glBindVertexArray(0);  // Unbind VAO
@@ -709,7 +709,7 @@ struct GLRenderTrees {
     }
   }
 
-  void UpdateTree(int index, const b2Vec2& position, const b2Color& color) {
+  void UpdateTree(int index, const b2Vec2 &position, const b2Color &color) {
     // Update only the specified tree
     glBindBuffer(GL_ARRAY_BUFFER, m_buffers[2]);  // Colors buffer
     glBufferSubData(GL_ARRAY_BUFFER, sizeof(b2Color) * index, sizeof(b2Color),
@@ -717,8 +717,8 @@ struct GLRenderTrees {
     glBindBuffer(GL_ARRAY_BUFFER, 0);  // Unbind after update
   }
 
-  void UpdateTrees(const std::vector<b2Vec2>& positions,
-                   const std::vector<b2Color>& colors) {
+  void UpdateTrees(const std::vector<b2Vec2> &positions,
+                   const std::vector<b2Color> &colors) {
     m_count = positions.size();  // Assume colors and positions are synchronized
 
     glBindBuffer(GL_ARRAY_BUFFER, m_buffers[2]);
@@ -795,8 +795,8 @@ void DebugDraw::Destroy() {
 }
 
 //
-void DebugDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount,
-                            const b2Color& color) {
+void DebugDraw::DrawPolygon(const b2Vec2 *vertices, int32 vertexCount,
+                            const b2Color &color) {
   b2Vec2 p1 = vertices[vertexCount - 1];
   for (int32 i = 0; i < vertexCount; ++i) {
     b2Vec2 p2 = vertices[i];
@@ -807,8 +807,8 @@ void DebugDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount,
 }
 
 //
-void DebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount,
-                                 const b2Color& color) {
+void DebugDraw::DrawSolidPolygon(const b2Vec2 *vertices, int32 vertexCount,
+                                 const b2Color &color) {
   b2Color fillColor(0.5f * color.r, 0.5f * color.g, 0.5f * color.b, 0.5f);
 
   for (int32 i = 1; i < vertexCount - 1; ++i) {
@@ -827,8 +827,8 @@ void DebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount,
 }
 
 //
-void DebugDraw::DrawCircle(const b2Vec2& center, float radius,
-                           const b2Color& color) {
+void DebugDraw::DrawCircle(const b2Vec2 &center, float radius,
+                           const b2Color &color) {
   const float k_segments = 16.0f;
   const float k_increment = 2.0f * b2_pi / k_segments;
   float sinInc = sinf(k_increment);
@@ -849,8 +849,8 @@ void DebugDraw::DrawCircle(const b2Vec2& center, float radius,
 }
 
 //
-void DebugDraw::DrawSolidCircle(const b2Vec2& center, float radius,
-                                const b2Vec2& axis, const b2Color& color) {
+void DebugDraw::DrawSolidCircle(const b2Vec2 &center, float radius,
+                                const b2Vec2 &axis, const b2Color &color) {
   glDisable(GL_DEPTH_TEST);
   const float k_segments = 16.0f;
   const float k_increment = 2.0f * b2_pi / k_segments;
@@ -894,14 +894,14 @@ void DebugDraw::DrawSolidCircle(const b2Vec2& center, float radius,
 }
 
 //
-void DebugDraw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2,
-                            const b2Color& color) {
+void DebugDraw::DrawSegment(const b2Vec2 &p1, const b2Vec2 &p2,
+                            const b2Color &color) {
   m_lines->Vertex(p1, color);
   m_lines->Vertex(p2, color);
 }
 
 //
-void DebugDraw::DrawTransform(const b2Transform& xf) {
+void DebugDraw::DrawTransform(const b2Transform &xf) {
   const float k_axisScale = 0.4f;
   b2Color red(1.0f, 0.0f, 0.0f);
   b2Color green(0.0f, 1.0f, 0.0f);
@@ -917,12 +917,12 @@ void DebugDraw::DrawTransform(const b2Transform& xf) {
 }
 
 //
-void DebugDraw::DrawPoint(const b2Vec2& p, float size, const b2Color& color) {
+void DebugDraw::DrawPoint(const b2Vec2 &p, float size, const b2Color &color) {
   m_points->Vertex(p, color, size);
 }
 
 //
-void DebugDraw::DrawString(int x, int y, const char* string, ...) {
+void DebugDraw::DrawString(int x, int y, const char *string, ...) {
   if (m_showUI == false) {
     return;
   }
@@ -940,7 +940,7 @@ void DebugDraw::DrawString(int x, int y, const char* string, ...) {
 }
 
 //
-void DebugDraw::DrawString(const b2Vec2& pw, const char* string, ...) {
+void DebugDraw::DrawString(const b2Vec2 &pw, const char *string, ...) {
   b2Vec2 ps = g_camera.ConvertWorldToScreen(pw);
   va_list arg;
   va_start(arg, string);
@@ -957,7 +957,7 @@ void DebugDraw::DrawString(const b2Vec2& pw, const char* string, ...) {
 }
 
 //
-void DebugDraw::DrawAABB(b2AABB* aabb, const b2Color& c) {
+void DebugDraw::DrawAABB(b2AABB *aabb, const b2Color &c) {
   b2Vec2 p1 = aabb->lowerBound;
   b2Vec2 p2 = b2Vec2(aabb->upperBound.x, aabb->lowerBound.y);
   b2Vec2 p3 = aabb->upperBound;
@@ -976,9 +976,9 @@ void DebugDraw::DrawAABB(b2AABB* aabb, const b2Color& c) {
   m_lines->Vertex(p1, c);
 }
 
-void DebugDraw::DrawTrees(const std::vector<b2Vec2>& positions,
-                          const std::vector<b2Color>& colors,
-                          const std::vector<int>& changedIDs) {
+void DebugDraw::DrawTrees(const std::vector<b2Vec2> &positions,
+                          const std::vector<b2Color> &colors,
+                          const std::vector<int> &changedIDs) {
   // Update the tree data. This could be optimized to only happen if data has
   // changed.
   m_trees->UpdateTrees(positions, colors);
@@ -988,8 +988,8 @@ void DebugDraw::DrawTrees(const std::vector<b2Vec2>& positions,
   glDepthMask(GL_TRUE);
 }
 
-void DebugDraw::DrawAllTrees(const std::vector<b2Vec2>& positions,
-                             const std::vector<b2Color>& colors) {
+void DebugDraw::DrawAllTrees(const std::vector<b2Vec2> &positions,
+                             const std::vector<b2Color> &colors) {
   m_trees->setBuffers(positions, colors);
   m_trees->UpdateTrees(positions, colors);
   glDepthMask(GL_FALSE);

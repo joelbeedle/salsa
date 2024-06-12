@@ -2,35 +2,18 @@
 #define SWARM_H
 #include <box2d/box2d.h>
 #include <stdio.h>
-#include <time.h>
 
-#include <algorithm>
 #include <chrono>
-#include <filesystem>  // C++17 header for directory operations
-#include <fstream>
-#include <iomanip>
 #include <iostream>
 #include <memory>
-#include <set>
-#include <sstream>
-#include <stack>
-#include <stdexcept>
 #include <string>
-#include <unordered_map>
-#include <variant>
 #include <vector>
 
-#include "behaviours/dsp.h"
-#include "behaviours/flocking.h"
-#include "behaviours/levy_flocking.h"
-#include "behaviours/pheromone_avoidance.h"
 #include "behaviours/registry.h"
-#include "behaviours/uniform_random_walk.h"
 #include "core/sim.h"
 #include "core/test_stack.h"
 #include "draw.h"
 #include "drones/drone.h"
-#include "drones/drone_factory.h"
 #include "imgui/imgui.h"
 #include "run_sim.h"
 #include "settings.h"
@@ -40,8 +23,10 @@
 #include "utils/drone_configuration.h"
 #include "utils/object_types.h"
 #include "utils/tree.h"
+
 #define TREE_COUNT 0
 #define MAX_TIME 1200.0f
+
 struct DroneParameters {
   float cameraViewRange;
   float obstacleViewRange;

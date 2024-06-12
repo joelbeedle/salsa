@@ -5,11 +5,11 @@
 namespace swarm {
 class Entity {
  protected:
-  b2Body* body_;
-  b2World* world_;
+  b2Body *body_;
+  b2World *world_;
 
  public:
-  Entity(b2World* world, const b2Vec2& position, bool is_static)
+  Entity(b2World *world, const b2Vec2 &position, bool is_static)
       : world_(world) {
     b2BodyDef bodyDef;
     if (is_static) {

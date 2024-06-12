@@ -26,7 +26,7 @@
 
 #include "settings.h"
 
-void DestructionListener::SayGoodbye(b2Joint* joint) {
+void DestructionListener::SayGoodbye(b2Joint *joint) {
   if (test->m_mouseJoint == joint) {
     test->m_mouseJoint = NULL;
   } else {
@@ -66,15 +66,15 @@ Test::~Test() {
   m_world = NULL;
 }
 
-void Test::PreSolve(b2Contact* contact, const b2Manifold* oldManifold) {
-  const b2Manifold* manifold = contact->GetManifold();
+void Test::PreSolve(b2Contact *contact, const b2Manifold *oldManifold) {
+  const b2Manifold *manifold = contact->GetManifold();
 
   if (manifold->pointCount == 0) {
     return;
   }
 
-  b2Fixture* fixtureA = contact->GetFixtureA();
-  b2Fixture* fixtureB = contact->GetFixtureB();
+  b2Fixture *fixtureA = contact->GetFixtureA();
+  b2Fixture *fixtureB = contact->GetFixtureB();
 
   b2PointState state1[b2_maxManifoldPoints], state2[b2_maxManifoldPoints];
   b2GetPointStates(state1, state2, oldManifold, manifold);
@@ -84,7 +84,7 @@ void Test::PreSolve(b2Contact* contact, const b2Manifold* oldManifold) {
 
   for (int32 i = 0;
        i < manifold->pointCount && m_pointCount < k_maxContactPoints; ++i) {
-    ContactPoint* cp = m_points + m_pointCount;
+    ContactPoint *cp = m_points + m_pointCount;
     cp->fixtureA = fixtureA;
     cp->fixtureB = fixtureB;
     cp->position = worldManifold.points[i];
@@ -97,20 +97,20 @@ void Test::PreSolve(b2Contact* contact, const b2Manifold* oldManifold) {
   }
 }
 
-void Test::DrawTitle(const char* string) {
+void Test::DrawTitle(const char *string) {
   g_debugDraw.DrawString(5, 5, string);
   m_textLine = int32(26.0f);
 }
 
 class QueryCallback : public b2QueryCallback {
  public:
-  QueryCallback(const b2Vec2& point) {
+  QueryCallback(const b2Vec2 &point) {
     m_point = point;
     m_fixture = NULL;
   }
 
-  bool ReportFixture(b2Fixture* fixture) override {
-    b2Body* body = fixture->GetBody();
+  bool ReportFixture(b2Fixture *fixture) override {
+    b2Body *body = fixture->GetBody();
     if (body->GetType() == b2_dynamicBody) {
       bool inside = fixture->TestPoint(m_point);
       if (inside) {
@@ -126,10 +126,10 @@ class QueryCallback : public b2QueryCallback {
   }
 
   b2Vec2 m_point;
-  b2Fixture* m_fixture;
+  b2Fixture *m_fixture;
 };
 
-void Test::MouseDown(const b2Vec2& p) {
+void Test::MouseDown(const b2Vec2 &p) {
   m_mouseWorld = p;
 
   if (m_mouseJoint != NULL) {
@@ -151,7 +151,7 @@ void Test::MouseDown(const b2Vec2& p) {
     float frequencyHz = 5.0f;
     float dampingRatio = 0.7f;
 
-    b2Body* body = callback.m_fixture->GetBody();
+    b2Body *body = callback.m_fixture->GetBody();
     b2MouseJointDef jd;
     jd.bodyA = m_groundBody;
     jd.bodyB = body;
@@ -160,17 +160,17 @@ void Test::MouseDown(const b2Vec2& p) {
     b2LinearStiffness(jd.stiffness, jd.damping, frequencyHz, dampingRatio,
                       jd.bodyA, jd.bodyB);
 
-    m_mouseJoint = (b2MouseJoint*)m_world->CreateJoint(&jd);
+    m_mouseJoint = (b2MouseJoint *)m_world->CreateJoint(&jd);
     body->SetAwake(true);
   }
 }
 
-void Test::SpawnBomb(const b2Vec2& worldPt) {
+void Test::SpawnBomb(const b2Vec2 &worldPt) {
   m_bombSpawnPoint = worldPt;
   m_bombSpawning = true;
 }
 
-void Test::CompleteBombSpawn(const b2Vec2& p) {
+void Test::CompleteBombSpawn(const b2Vec2 &p) {
   if (m_bombSpawning == false) {
     return;
   }
@@ -182,7 +182,7 @@ void Test::CompleteBombSpawn(const b2Vec2& p) {
   m_bombSpawning = false;
 }
 
-void Test::ShiftMouseDown(const b2Vec2& p) {
+void Test::ShiftMouseDown(const b2Vec2 &p) {
   m_mouseWorld = p;
 
   if (m_mouseJoint != NULL) {
@@ -192,7 +192,7 @@ void Test::ShiftMouseDown(const b2Vec2& p) {
   SpawnBomb(p);
 }
 
-void Test::MouseUp(const b2Vec2& p) {
+void Test::MouseUp(const b2Vec2 &p) {
   if (m_mouseJoint) {
     m_world->DestroyJoint(m_mouseJoint);
     m_mouseJoint = NULL;
@@ -203,8 +203,8 @@ void Test::MouseUp(const b2Vec2& p) {
   }
 }
 
-void Test::RightMouseDown(const b2Vec2& p) {}
-void Test::MouseMove(const b2Vec2& p) {
+void Test::RightMouseDown(const b2Vec2 &p) {}
+void Test::MouseMove(const b2Vec2 &p) {
   m_mouseWorld = p;
 
   if (m_mouseJoint) {
@@ -218,7 +218,7 @@ void Test::LaunchBomb() {
   LaunchBomb(p, v);
 }
 
-void Test::LaunchBomb(const b2Vec2& position, const b2Vec2& velocity) {
+void Test::LaunchBomb(const b2Vec2 &position, const b2Vec2 &velocity) {
   if (m_bomb) {
     m_world->DestroyBody(m_bomb);
     m_bomb = NULL;
@@ -249,7 +249,7 @@ void Test::LaunchBomb(const b2Vec2& position, const b2Vec2& velocity) {
   m_bomb->CreateFixture(&fd);
 }
 
-void Test::Step(Settings& settings) {
+void Test::Step(Settings &settings) {
   float timeStep =
       settings.m_hertz > 0.0f ? 1.0f / settings.m_hertz : float(0.0f);
 
@@ -308,7 +308,7 @@ void Test::Step(Settings& settings) {
 
   // Track maximum profile times
   {
-    const b2Profile& p = m_world->GetProfile();
+    const b2Profile &p = m_world->GetProfile();
     m_maxProfile.step = b2Max(m_maxProfile.step, p.step);
     m_maxProfile.collide = b2Max(m_maxProfile.collide, p.collide);
     m_maxProfile.solve = b2Max(m_maxProfile.solve, p.solve);
@@ -331,7 +331,7 @@ void Test::Step(Settings& settings) {
   }
 
   if (settings.m_drawProfile) {
-    const b2Profile& p = m_world->GetProfile();
+    const b2Profile &p = m_world->GetProfile();
 
     b2Profile aveProfile;
     memset(&aveProfile, 0, sizeof(b2Profile));
@@ -395,7 +395,7 @@ void Test::Step(Settings& settings) {
     const float k_axisScale = 0.3f;
 
     for (int32 i = 0; i < m_pointCount; ++i) {
-      ContactPoint* point = m_points + i;
+      ContactPoint *point = m_points + i;
 
       if (point->state == b2_addState) {
         // Add
@@ -427,14 +427,14 @@ void Test::Step(Settings& settings) {
   }
 }
 
-void Test::ShiftOrigin(const b2Vec2& newOrigin) {
+void Test::ShiftOrigin(const b2Vec2 &newOrigin) {
   m_world->ShiftOrigin(newOrigin);
 }
 
 std::vector<TestEntry> g_testEntries;
 int g_testCount = 0;
 
-int RegisterTest(const char* category, const char* name, TestCreateFcn fcn) {
+int RegisterTest(const char *category, const char *name, TestCreateFcn fcn) {
   int index = g_testCount;
   if (index < MAX_TESTS) {
     g_testEntries.push_back(

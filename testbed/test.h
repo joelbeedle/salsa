@@ -57,17 +57,17 @@ inline float RandomFloat(float lo, float hi) {
 // nullify the mouse joint.
 class DestructionListener : public b2DestructionListener {
  public:
-  void SayGoodbye(b2Fixture* fixture) override { B2_NOT_USED(fixture); }
-  void SayGoodbye(b2Joint* joint) override;
+  void SayGoodbye(b2Fixture *fixture) override { B2_NOT_USED(fixture); }
+  void SayGoodbye(b2Joint *joint) override;
 
-  Test* test;
+  Test *test;
 };
 
 const int32 k_maxContactPoints = 2048;
 
 struct ContactPoint {
-  b2Fixture* fixtureA;
-  b2Fixture* fixtureB;
+  b2Fixture *fixtureA;
+  b2Fixture *fixtureB;
   b2Vec2 normal;
   b2Vec2 position;
   b2PointState state;
@@ -81,54 +81,54 @@ class Test : public b2ContactListener {
   Test();
   virtual ~Test();
 
-  void DrawTitle(const char* string);
-  virtual void Step(Settings& settings);
+  void DrawTitle(const char *string);
+  virtual void Step(Settings &settings);
   virtual void UpdateUI() {}
   virtual void Keyboard(int key) { B2_NOT_USED(key); }
   virtual void KeyboardUp(int key) { B2_NOT_USED(key); }
-  virtual void ShiftMouseDown(const b2Vec2& p);
-  virtual void MouseDown(const b2Vec2& p);
-  virtual void RightMouseDown(const b2Vec2& p);
-  virtual void MouseUp(const b2Vec2& p);
-  virtual void MouseMove(const b2Vec2& p);
+  virtual void ShiftMouseDown(const b2Vec2 &p);
+  virtual void MouseDown(const b2Vec2 &p);
+  virtual void RightMouseDown(const b2Vec2 &p);
+  virtual void MouseUp(const b2Vec2 &p);
+  virtual void MouseMove(const b2Vec2 &p);
   void LaunchBomb();
-  void LaunchBomb(const b2Vec2& position, const b2Vec2& velocity);
+  void LaunchBomb(const b2Vec2 &position, const b2Vec2 &velocity);
 
-  void SpawnBomb(const b2Vec2& worldPt);
-  void CompleteBombSpawn(const b2Vec2& p);
+  void SpawnBomb(const b2Vec2 &worldPt);
+  void CompleteBombSpawn(const b2Vec2 &p);
 
   // Let derived tests know that a joint was destroyed.
-  virtual void JointDestroyed(b2Joint* joint) { B2_NOT_USED(joint); }
+  virtual void JointDestroyed(b2Joint *joint) { B2_NOT_USED(joint); }
 
   // Callbacks for derived classes.
-  virtual void BeginContact(b2Contact* contact) override {
+  virtual void BeginContact(b2Contact *contact) override {
     B2_NOT_USED(contact);
   }
-  virtual void EndContact(b2Contact* contact) override { B2_NOT_USED(contact); }
-  virtual void PreSolve(b2Contact* contact,
-                        const b2Manifold* oldManifold) override;
-  virtual void PostSolve(b2Contact* contact,
-                         const b2ContactImpulse* impulse) override {
+  virtual void EndContact(b2Contact *contact) override { B2_NOT_USED(contact); }
+  virtual void PreSolve(b2Contact *contact,
+                        const b2Manifold *oldManifold) override;
+  virtual void PostSolve(b2Contact *contact,
+                         const b2ContactImpulse *impulse) override {
     B2_NOT_USED(contact);
     B2_NOT_USED(impulse);
   }
 
-  void ShiftOrigin(const b2Vec2& newOrigin);
+  void ShiftOrigin(const b2Vec2 &newOrigin);
 
  protected:
   friend class DestructionListener;
   friend class BoundaryListener;
   friend class ContactListener;
 
-  b2Body* m_groundBody;
+  b2Body *m_groundBody;
   b2AABB m_worldAABB;
   ContactPoint m_points[k_maxContactPoints];
   int32 m_pointCount;
   DestructionListener m_destructionListener;
   int32 m_textLine;
-  b2World* m_world;
-  b2Body* m_bomb;
-  b2MouseJoint* m_mouseJoint;
+  b2World *m_world;
+  b2Body *m_bomb;
+  b2MouseJoint *m_mouseJoint;
   b2Vec2 m_bombSpawnPoint;
   bool m_bombSpawning;
   b2Vec2 m_mouseWorld;
@@ -141,12 +141,12 @@ class Test : public b2ContactListener {
 // typedef Test* TestCreateFcn();
 typedef std::unique_ptr<Test> TestCreateFcn;
 
-int RegisterTest(const char* category, const char* name, TestCreateFcn fcn);
+int RegisterTest(const char *category, const char *name, TestCreateFcn fcn);
 
 //
 struct TestEntry {
-  const char* category;
-  const char* name;
+  const char *category;
+  const char *name;
   TestCreateFcn instance;
 };
 

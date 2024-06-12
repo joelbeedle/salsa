@@ -50,7 +50,7 @@ class Parameter {
   /// @return Reference to the updated value of the parameter.
   /// @details If newValue is out of bounds, an error message is printed and the
   /// value remains unchanged.
-  float& operator=(const float& newValue) {
+  float &operator=(const float &newValue) {
     if (newValue < min_value_ || newValue > max_value_) {
       std::cerr << "Assignment value out of bounds!" << std::endl;
       return value_;
@@ -67,31 +67,31 @@ class Parameter {
 
   /// @brief Provides read and write access to the parameter's value.
   /// @return Reference to the value of the parameter.
-  float& value() { return value_; }
+  float &value() { return value_; }
 
   /// @brief Provides read access to the parameter's value.
   /// @return Constant reference to the value of the parameter.
-  const float& value() const { return value_; }
+  const float &value() const { return value_; }
 
   /// @brief Provides read and write access to the minimum allowable value of
   /// the parameter.
   /// @return Reference to the minimum value of the parameter.
-  float& min_value() { return min_value_; }
+  float &min_value() { return min_value_; }
 
   /// @brief Provides read access to the minimum allowable value of the
   /// parameter.
   /// @return Constant reference to the minimum value of the parameter.
-  const float& min_value() const { return min_value_; }
+  const float &min_value() const { return min_value_; }
 
   /// @brief Provides read and write access to the maximum allowable value of
   /// the parameter.
   /// @return Reference to the maximum value of the parameter.
-  float& max_value() { return max_value_; }
+  float &max_value() { return max_value_; }
 
   /// @brief Provides read access to the maximum allowable value of the
   /// parameter.
   /// @return Constant reference to the maximum value of the parameter.
-  const float& max_value() const { return max_value_; }
+  const float &max_value() const { return max_value_; }
 };
 
 }  // namespace behaviour

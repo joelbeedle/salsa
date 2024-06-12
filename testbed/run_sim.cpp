@@ -40,7 +40,7 @@
 #include <crtdbg.h>
 #endif
 
-GLFWwindow* g_mainWindow = nullptr;
+GLFWwindow *g_mainWindow = nullptr;
 static int32 s_testSelection = 0;
 static std::unique_ptr<Test> s_test = nullptr;
 static Settings s_settings;
@@ -48,12 +48,12 @@ static bool s_rightMouseDown = false;
 static b2Vec2 s_clickPointWS = b2Vec2_zero;
 static float s_displayScale = 1.0f;
 
-void glfwErrorCallback(int error, const char* description) {
+void glfwErrorCallback(int error, const char *description) {
   fprintf(stderr, "GLFW error occured. Code: %d. Description: %s\n", error,
           description);
 }
 
-static inline bool CompareTests(const TestEntry& a, const TestEntry& b) {
+static inline bool CompareTests(const TestEntry &a, const TestEntry &b) {
   int result = strcmp(a.category, b.category);
   if (result == 0) {
     result = strcmp(a.name, b.name);
@@ -66,7 +66,7 @@ static void RestartTest() {
   s_test = std::move(g_testEntries[s_settings.m_testIndex].instance);
 }
 
-static void CreateUI(GLFWwindow* window, const char* glslVersion = NULL) {
+static void CreateUI(GLFWwindow *window, const char *glslVersion = NULL) {
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
 
@@ -84,11 +84,11 @@ static void CreateUI(GLFWwindow* window, const char* glslVersion = NULL) {
   }
 
   // Search for font file
-  const char* fontPath1 = "data/droid_sans.ttf";
-  const char* fontPath2 = "../data/droid_sans.ttf";
-  const char* fontPath = nullptr;
-  FILE* file1 = fopen(fontPath1, "rb");
-  FILE* file2 = fopen(fontPath2, "rb");
+  const char *fontPath1 = "data/droid_sans.ttf";
+  const char *fontPath2 = "../data/droid_sans.ttf";
+  const char *fontPath = nullptr;
+  FILE *file1 = fopen(fontPath1, "rb");
+  FILE *file2 = fopen(fontPath2, "rb");
   if (file1) {
     fontPath = fontPath1;
     fclose(file1);
@@ -104,14 +104,14 @@ static void CreateUI(GLFWwindow* window, const char* glslVersion = NULL) {
   }
 }
 
-static void ResizeWindowCallback(GLFWwindow*, int width, int height) {
+static void ResizeWindowCallback(GLFWwindow *, int width, int height) {
   g_camera.m_width = width;
   g_camera.m_height = height;
   s_settings.m_windowWidth = width;
   s_settings.m_windowHeight = height;
 }
 
-static void KeyCallback(GLFWwindow* window, int key, int scancode, int action,
+static void KeyCallback(GLFWwindow *window, int key, int scancode, int action,
                         int mods) {
   ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
   if (ImGui::GetIO().WantCaptureKeyboard) {
@@ -228,11 +228,11 @@ static void KeyCallback(GLFWwindow* window, int key, int scancode, int action,
   // else GLFW_REPEAT
 }
 
-static void CharCallback(GLFWwindow* window, unsigned int c) {
+static void CharCallback(GLFWwindow *window, unsigned int c) {
   ImGui_ImplGlfw_CharCallback(window, c);
 }
 
-static void MouseButtonCallback(GLFWwindow* window, int32 button, int32 action,
+static void MouseButtonCallback(GLFWwindow *window, int32 button, int32 action,
                                 int32 mods) {
   ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
 
@@ -279,7 +279,7 @@ static void MouseButtonCallback(GLFWwindow* window, int32 button, int32 action,
   }
 }
 
-static void MouseMotionCallback(GLFWwindow*, double xd, double yd) {
+static void MouseMotionCallback(GLFWwindow *, double xd, double yd) {
   b2Vec2 ps((float)xd, (float)yd);
 
   b2Vec2 pw = g_camera.ConvertScreenToWorld(ps);
@@ -293,7 +293,7 @@ static void MouseMotionCallback(GLFWwindow*, double xd, double yd) {
   }
 }
 
-static void ScrollCallback(GLFWwindow* window, double dx, double dy) {
+static void ScrollCallback(GLFWwindow *window, double dx, double dy) {
   ImGui_ImplGlfw_ScrollCallback(window, dx, dy);
   if (ImGui::GetIO().WantCaptureMouse) {
     return;
@@ -373,7 +373,7 @@ static void UpdateUI() {
 
       if (ImGui::BeginTabItem("Tests")) {
         int categoryIndex = 0;
-        const char* category = g_testEntries[categoryIndex].category;
+        const char *category = g_testEntries[categoryIndex].category;
         int i = 0;
         while (i < g_testCount) {
           bool categorySelected =
@@ -391,7 +391,7 @@ static void UpdateUI() {
               if (s_settings.m_testIndex == i) {
                 selectionFlags = ImGuiTreeNodeFlags_Selected;
               }
-              ImGui::TreeNodeEx((void*)(intptr_t)i,
+              ImGui::TreeNodeEx((void *)(intptr_t)i,
                                 leafNodeFlags | selectionFlags, "%s",
                                 g_testEntries[i].name);
               if (ImGui::IsItemClicked()) {
@@ -445,9 +445,9 @@ int run_sim() {
   }
 
 #if __APPLE__
-  const char* glslVersion = "#version 150";
+  const char *glslVersion = "#version 150";
 #else
-  const char* glslVersion = NULL;
+  const char *glslVersion = NULL;
 #endif
 
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -534,7 +534,7 @@ int run_sim() {
                        ImGuiWindowFlags_NoScrollbar);
       ImGui::End();
 
-      const TestEntry& entry = g_testEntries[s_settings.m_testIndex];
+      const TestEntry &entry = g_testEntries[s_settings.m_testIndex];
       sprintf(buffer, "%s : %s", entry.category, entry.name);
       s_test->DrawTitle(buffer);
     }

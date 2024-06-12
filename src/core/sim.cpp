@@ -2,8 +2,8 @@
 
 namespace swarm {
 
-Sim::Sim(b2World* world, int drone_count, int target_count,
-         DroneConfiguration* configuration, float border_width,
+Sim::Sim(b2World *world, int drone_count, int target_count,
+         DroneConfiguration *configuration, float border_width,
          float border_height, float time_limit)
     : world_(world),
       num_drones_(drone_count),
@@ -19,7 +19,7 @@ Sim::Sim(b2World* world, int drone_count, int target_count,
   createDrones(*behaviour_, *drone_configuration_);
 }
 
-Sim::Sim(b2World* world, TestConfig& config)
+Sim::Sim(b2World *world, TestConfig &config)
     : world_(world),
       num_drones_(config.num_drones),
       num_targets_(config.num_targets),
@@ -34,19 +34,19 @@ Sim::Sim(b2World* world, TestConfig& config)
   current_behaviour_name_ = config.behaviour_name;
   auto behaviour_pointer =
       behaviour::Registry::getInstance().getBehaviour(current_behaviour_name_);
-  auto visitor = [&](auto&& arg) { behaviour_pointer->setParameters(arg); };
+  auto visitor = [&](auto &&arg) { behaviour_pointer->setParameters(arg); };
   std::visit(visitor, config.parameters);
   createDrones(*behaviour_, *drone_configuration_);
 }
 
 Sim::~Sim() {
-  for (auto& obstacle : obstacles_) {
+  for (auto &obstacle : obstacles_) {
     world_->DestroyBody(obstacle);
   }
 }
 
 void Sim::update() {
-  for (auto& drone : drones_) {
+  for (auto &drone : drones_) {
     drone->update(drones_);
   }
 }
@@ -56,8 +56,8 @@ void Sim::reset() {
   createDrones(*behaviour_, *drone_configuration_);
 }
 
-void Sim::createDrones(Behaviour& behaviour,
-                       DroneConfiguration& configuration) {
+void Sim::createDrones(Behaviour &behaviour,
+                       DroneConfiguration &configuration) {
   const float margin = 2.0f;  // Define a margin to prevent spawning exactly
                               // at the border or outside
   for (int i = 0; i < num_drones_; i++) {
@@ -70,7 +70,7 @@ void Sim::createDrones(Behaviour& behaviour,
 
 void Sim::setDroneCount(int count) { num_drones_ = count; }
 void Sim::updateDroneSettings() {
-  for (auto& drone : drones_) {
+  for (auto &drone : drones_) {
     drone->setMaxForce(drone_configuration_->maxForce);
     drone->setMaxSpeed(drone_configuration_->maxSpeed);
     drone->setViewRange(drone_configuration_->cameraViewRange);
@@ -79,24 +79,24 @@ void Sim::updateDroneSettings() {
   }
 }
 
-void Sim::setDroneConfiguration(DroneConfiguration* configuration) {
+void Sim::setDroneConfiguration(DroneConfiguration *configuration) {
   drone_configuration_ = configuration;
 }
 
 void Sim::setTargetCount(int count) { num_targets_ = count; }
 
-void Sim::addBehaviour(const std::string& name,
+void Sim::addBehaviour(const std::string &name,
                        std::unique_ptr<swarm::Behaviour> behaviour) {
   swarm::behaviour::Registry::getInstance().add(name, std::move(behaviour));
 }
 
 void Sim::applyCurrentBehaviour() {
-  for (auto& drone : drones_) {
+  for (auto &drone : drones_) {
     drone->setBehaviour(*behaviour_);
   }
 }
 
-void Sim::setContactListener(BaseContactListener& listener) {
+void Sim::setContactListener(BaseContactListener &listener) {
   contact_listener_ = &listener;
   world_->SetContactListener(contact_listener_);
 }
@@ -106,7 +106,7 @@ void Sim::createBounds() {
   b2BodyDef groundBodyDef;
   groundBodyDef.position.Set(0.0f, 0.0f);
 
-  b2Body* groundBody = world_->CreateBody(&groundBodyDef);
+  b2Body *groundBody = world_->CreateBody(&groundBodyDef);
 
   b2EdgeShape groundBox;
 

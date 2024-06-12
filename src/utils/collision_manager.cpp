@@ -9,9 +9,9 @@ std::map<std::type_index, std::vector<std::type_index>>
 uint16_t CollisionManager::next_category_bit_ = 0x0001;
 
 void CollisionManager::updateMaskBits() {
-  for (auto& config : configurations_) {
+  for (auto &config : configurations_) {
     uint16_t mask_bits = 0;
-    for (auto& partner_type : collision_partners_[config.first]) {
+    for (auto &partner_type : collision_partners_[config.first]) {
       if (configurations_.find(partner_type) != configurations_.end()) {
         mask_bits |= configurations_[partner_type].categoryBits;
       }
@@ -25,8 +25,8 @@ CollisionConfig CollisionManager::getCollisionConfig(std::type_index type) {
 }
 
 void CollisionManager::registerType(
-    std::type_index type, const std::vector<std::type_index>& partners) {
-  for (const auto& config : configurations_) {
+    std::type_index type, const std::vector<std::type_index> &partners) {
+  for (const auto &config : configurations_) {
     std::cout << "Already registered type: " << config.first.name()
               << std::endl;
   }
@@ -43,7 +43,7 @@ void CollisionManager::registerType(
     configurations_[type] = {category_bit, 0};
   }
   collision_partners_[type] = partners;
-  for (const auto& config : configurations_) {
+  for (const auto &config : configurations_) {
     std::cout << "Now registered types: " << config.first.name() << std::endl;
   }
 

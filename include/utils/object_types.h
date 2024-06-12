@@ -14,14 +14,14 @@ enum class ObjectType {
 
 struct UserData {
   ObjectType type;
-  Entity* object;  // Point to any object derived from EnvironmentObject
+  Entity *object;  // Point to any object derived from EnvironmentObject
 
   UserData() : object(nullptr) {}
-  explicit UserData(Entity* obj) : object(obj) {}
+  explicit UserData(Entity *obj) : object(obj) {}
 
   template <typename T>
-  T* as() {
-    return static_cast<T*>(object);  // Safely cast to the requested type
+  T *as() {
+    return static_cast<T *>(object);  // Safely cast to the requested type
   }
 };
 

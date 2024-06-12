@@ -12,23 +12,23 @@ using ::testing::_;
 class MockBehaviour : public swarm::Behaviour {
  public:
   MOCK_METHOD(void, execute,
-              (const std::vector<std::unique_ptr<swarm::Drone>>& drones,
-               swarm::Drone& currentDrone),
+              (const std::vector<std::unique_ptr<swarm::Drone>> &drones,
+               swarm::Drone &currentDrone),
               (override));
 
-  MOCK_METHOD((std::unordered_map<std::string, swarm::behaviour::Parameter*>),
+  MOCK_METHOD((std::unordered_map<std::string, swarm::behaviour::Parameter *>),
               getParameters, (), (override));
   MOCK_METHOD(void, clean,
-              (const std::vector<std::unique_ptr<swarm::Drone>>& drones),
+              (const std::vector<std::unique_ptr<swarm::Drone>> &drones),
               (override));
 };
 
 // Test fixture for Drone tests
 class DroneTest : public ::testing::Test {
  protected:
-  b2World* world;
+  b2World *world;
   MockBehaviour behaviour;
-  swarm::DroneConfiguration* config;
+  swarm::DroneConfiguration *config;
 
   void SetUp() override {
     world = new b2World(b2Vec2(0.0f, 0.0f));
@@ -54,7 +54,7 @@ TEST_F(DroneTest, DroneBehaviourExecution) {
 
   EXPECT_CALL(behaviour, execute(_, _)).Times(1);
 
-  for (auto& drone : drones) {
+  for (auto &drone : drones) {
     GTEST_LOG_(INFO) << "Testing drone";
     drone->update(drones);
   }
@@ -70,7 +70,7 @@ TEST_F(DroneTest, UpdateSensorRange) {
   auto fixture = drone.getBody()->GetFixtureList();
   while (fixture) {
     if (fixture->IsSensor()) {
-      auto shape = static_cast<b2CircleShape*>(fixture->GetShape());
+      auto shape = static_cast<b2CircleShape *>(fixture->GetShape());
       EXPECT_FLOAT_EQ(shape->m_radius, newRange);
       break;
     }

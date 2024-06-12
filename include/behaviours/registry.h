@@ -25,7 +25,7 @@ class Registry {
  public:
   /// @brief Returns the singleton instance of the Registry.
   /// @return Reference to the singleton instance of Registry.
-  static Registry& getInstance() {
+  static Registry &getInstance() {
     static Registry instance;
     return instance;
   }
@@ -34,7 +34,7 @@ class Registry {
   ///
   /// @param name The name key under which the Behaviour will be stored.
   /// @param Behaviour Pointer to the Behaviour instance to be stored.
-  void add(const std::string& name, std::unique_ptr<Behaviour> Behaviour) {
+  void add(const std::string &name, std::unique_ptr<Behaviour> Behaviour) {
     Behaviours[name] = std::move(Behaviour);
   }
 
@@ -42,7 +42,7 @@ class Registry {
   ///
   /// @param name The name key of the Behaviour to retrieve.
   /// @return Pointer to the Behaviour, or nullptr if not found.
-  Behaviour* getBehaviour(const std::string& name) {
+  Behaviour *getBehaviour(const std::string &name) {
     if (Behaviours.find(name) != Behaviours.end()) {
       return Behaviours[name].get();
     }
@@ -55,7 +55,7 @@ class Registry {
   /// Behaviours.
   std::vector<std::string> getBehaviourNames() const {
     std::vector<std::string> names;
-    for (const auto& pair : Behaviours) {
+    for (const auto &pair : Behaviours) {
       names.push_back(pair.first);
     }
     return names;
@@ -63,12 +63,12 @@ class Registry {
 
   /// @brief Prevent copy construction
   /// @param rhs The Registry instance intended to copy from
-  Registry(const Registry&) = delete;
+  Registry(const Registry &) = delete;
 
   /// @brief Prevent assignment
   /// @param rhs The Registry instance intended to assign from
   /// @return deletes the assigned value
-  Registry& operator=(const Registry&) = delete;
+  Registry &operator=(const Registry &) = delete;
 
  private:
   /// @brief Private constructor to enforce singleton pattern.

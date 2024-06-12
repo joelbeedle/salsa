@@ -12,7 +12,7 @@ class Target : public Entity {
   float radius_;
 
  public:
-  Target(b2World* world, const b2Vec2& position, float radius);
+  Target(b2World *world, const b2Vec2 &position, float radius);
 
   virtual void create_fixture() override {
     b2CircleShape shape;
