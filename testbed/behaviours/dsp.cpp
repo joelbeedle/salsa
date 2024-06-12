@@ -1,4 +1,4 @@
-#include "behaviours/dsp.h"
+#include "dsp.h"
 
 #include "box2d/box2d.h"
 #include "drones/drone.h"

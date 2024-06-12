@@ -1,4 +1,4 @@
-#include "behaviours/uniform_random_walk.h"
+#include "uniform_random_walk.h"
 
 #include <iostream>
 #include <memory>
