@@ -203,6 +203,7 @@ void Test::MouseUp(const b2Vec2& p) {
   }
 }
 
+void Test::RightMouseDown(const b2Vec2& p) {}
 void Test::MouseMove(const b2Vec2& p) {
   m_mouseWorld = p;
 

@@ -86,8 +86,9 @@ class Test : public b2ContactListener {
   virtual void UpdateUI() {}
   virtual void Keyboard(int key) { B2_NOT_USED(key); }
   virtual void KeyboardUp(int key) { B2_NOT_USED(key); }
-  void ShiftMouseDown(const b2Vec2& p);
+  virtual void ShiftMouseDown(const b2Vec2& p);
   virtual void MouseDown(const b2Vec2& p);
+  virtual void RightMouseDown(const b2Vec2& p);
   virtual void MouseUp(const b2Vec2& p);
   virtual void MouseMove(const b2Vec2& p);
   void LaunchBomb();

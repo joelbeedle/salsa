@@ -29,13 +29,14 @@ set(MY_PROJECT_SOURCE_FILES
 
 )
 set(MY_PROJECT_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../include")
+find_package(Freetype REQUIRED)
 
 add_executable(my_testbed ${MY_PROJECT_SOURCE_FILES} ${MY_TESTBED_SOURCE_FILES} )
 target_sources(my_testbed PRIVATE ${PROJECT_SOURCES})
 target_include_directories(my_testbed PRIVATE
-${CMAKE_CURRENT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/include)
+${CMAKE_CURRENT_SOURCE_DIR} ${FREETYPE_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/include)
 
-target_link_libraries(my_testbed PRIVATE glfw imgui sajson glad box2d libswarm-sim)
+target_link_libraries(my_testbed PRIVATE glfw imgui sajson glad box2d ${FREETYPE_LIBRARIES} libswarm-sim)
 
 set_target_properties(my_testbed PROPERTIES
 	CXX_STANDARD 20
@@ -47,7 +48,6 @@ set_target_properties(my_testbed PROPERTIES
 # message(STATUS "binary = ${CMAKE_CURRENT_BINARY_DIR}")
 
 # Copy font files, etc
-
 
 #source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${MY_TESTBED_SOURCE_FILES})
 
