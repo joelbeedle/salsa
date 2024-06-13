@@ -30,7 +30,8 @@ class Drone : public Entity {
  public:
   Drone(b2World *world, const b2Vec2 &position, Behaviour &behaviour,
         const DroneConfiguration &config);
-  ~Drone();
+  virtual ~Drone();
+  Drone() = default;
 
   void create_fixture() override;
 
@@ -44,6 +45,7 @@ class Drone : public Entity {
 
   // Accessors and Mutators
   void setBehaviour(Behaviour &newBehaviour) { behaviour = &newBehaviour; }
+  Behaviour *getBehaviour() { return behaviour; }
 
   b2Body *getBody() { return body_; }
   b2Vec2 getVelocity() { return body_->GetLinearVelocity(); }

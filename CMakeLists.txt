@@ -10,6 +10,7 @@ project(SwarmSim
     set(CMAKE_CXX_EXTENSIONS OFF)
     set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+    include(CTest)
 
     find_package(Doxygen)
     if(Doxygen_FOUND)

@@ -6,23 +6,10 @@
 
 #include "behaviours/behaviour.h"
 #include "drones/drone_factory.h"
+#include "mock_behaviour.h"
 #include "utils/drone_configuration.h"
+
 using ::testing::_;
-
-class MockBehaviour : public swarm::Behaviour {
- public:
-  MOCK_METHOD(void, execute,
-              (const std::vector<std::unique_ptr<swarm::Drone>> &drones,
-               swarm::Drone &currentDrone),
-              (override));
-
-  MOCK_METHOD((std::unordered_map<std::string, swarm::behaviour::Parameter *>),
-              getParameters, (), (override));
-  MOCK_METHOD(void, clean,
-              (const std::vector<std::unique_ptr<swarm::Drone>> &drones),
-              (override));
-};
-
 // Test fixture for Drone tests
 class DroneTest : public ::testing::Test {
  protected:
@@ -44,18 +31,44 @@ TEST_F(DroneTest, DroneInitialization) {
   swarm::Drone drone(world, b2Vec2(0, 0), behaviour, *config);
   EXPECT_FLOAT_EQ(drone.getViewRange(), 5.0f);
   EXPECT_FLOAT_EQ(drone.getMaxSpeed(), 2.0f);
+  EXPECT_NE(world, nullptr);
+  EXPECT_EQ(world->GetBodyCount(), 1);
   EXPECT_NE(drone.getBody(), nullptr);
+}
+
+TEST_F(DroneTest, DroneFactoryInitialisation) {
+  auto drone =
+      swarm::DroneFactory::createDrone(world, b2Vec2(0, 0), behaviour, *config);
+  EXPECT_FLOAT_EQ(drone->getViewRange(), 5.0f);
+  EXPECT_FLOAT_EQ(drone->getMaxSpeed(), 2.0f);
+  EXPECT_NE(world, nullptr);
+  EXPECT_EQ(world->GetBodyCount(), 1);
+  EXPECT_NE(drone->getBody(), nullptr);
 }
 
 TEST_F(DroneTest, DroneBehaviourExecution) {
   swarm::Drone drone(world, b2Vec2(0, 0), behaviour, *config);
-  std::vector<std::unique_ptr<swarm::Drone>> drones;
-  drones.push_back(std::make_unique<swarm::Drone>(drone));
-
   EXPECT_CALL(behaviour, execute(_, _)).Times(1);
+  drone.update({});
+}
 
+TEST_F(DroneTest, UpdateDroneBehaviour) {
+  swarm::Drone drone(world, b2Vec2(0, 0), behaviour, *config);
+  MockBehaviour newBehaviour;
+  EXPECT_CALL(newBehaviour, execute(_, _)).Times(1);
+  drone.setBehaviour(newBehaviour);
+  drone.update({});
+}
+
+TEST_F(DroneTest, MultipleDroneBehaviourExecution) {
+  std::vector<std::unique_ptr<swarm::Drone>> drones;
+  int n = 10;
+  for (int i = 0; i < n; i++) {
+    drones.push_back(swarm::DroneFactory::createDrone(world, b2Vec2(i, i),
+                                                      behaviour, *config));
+  }
+  EXPECT_CALL(behaviour, execute(_, _)).Times(n);
   for (auto &drone : drones) {
-    GTEST_LOG_(INFO) << "Testing drone";
     drone->update(drones);
   }
 }
