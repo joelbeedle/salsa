@@ -60,6 +60,16 @@ static void setupInteractions(swarm::BaseContactListener &listener) {
           tree->addNumMapped();
         }
       });
+  listener.addCollisionHandler(
+      typeid(swarm::Drone), typeid(swarm::Drone),
+      [](b2Fixture *droneFixture1, b2Fixture *droneFixture2) -> void {
+        swarm::Drone *drone1 = reinterpret_cast<swarm::UserData *>(
+                                   droneFixture1->GetUserData().pointer)
+                                   ->as<swarm::Drone>();
+        swarm::Drone *drone2 = reinterpret_cast<swarm::UserData *>(
+                                   droneFixture2->GetUserData().pointer)
+                                   ->as<swarm::Drone>();
+      });
 }
 
 int main() {
