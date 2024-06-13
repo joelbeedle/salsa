@@ -7,6 +7,7 @@
 #include <box2d/box2d.h>
 
 #include <stack>
+#include <stdexcept>
 #include <variant>
 
 #include "behaviours/behaviour.h"
@@ -38,6 +39,8 @@ class TestStack {
  public:
   static void push(TestConfig test);
   static TestConfig pop();
+  static int size() { return tests_.size(); }
+  static bool isEmpty() { return tests_.empty(); }
 };
 
 }  // namespace swarm

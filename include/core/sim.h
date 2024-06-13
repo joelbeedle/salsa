@@ -121,6 +121,10 @@ class Sim {
     current_behaviour_name_ = name;
   }
   int getDroneCount() { return num_drones_; }
+  std::vector<std::unique_ptr<swarm::Drone>> &getDrones() { return drones_; }
+  void setDrones(std::vector<std::unique_ptr<swarm::Drone>> drones) {
+    drones_ = std::move(drones);
+  }
 
   DroneConfiguration *getDroneConfiguration() { return drone_configuration_; }
   void setCurrentDroneConfiguration(DroneConfiguration &configuration) {

@@ -61,6 +61,11 @@ class Registry {
     return names;
   }
 
+  /// @brief Removes a Behaviour from the Registry.
+  /// @param name The name of the Behaviour to remove.
+  /// @return True if the Behaviour was removed, false if it was not found.
+  bool remove(const std::string &name) { return Behaviours.erase(name) > 0; }
+
   /// @brief Prevent copy construction
   /// @param rhs The Registry instance intended to copy from
   Registry(const Registry &) = delete;

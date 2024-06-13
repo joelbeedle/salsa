@@ -21,6 +21,8 @@ class Entity {
     this->body_ = world_->CreateBody(&bodyDef);
   }
 
+  Entity() = default;
+
   virtual ~Entity() {
     if (body_) {
       world_->DestroyBody(body_);
