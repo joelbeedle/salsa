@@ -27,11 +27,9 @@ set (MY_TESTBED_SOURCE_FILES
 	# tests/swarm_test.cpp
 )
 
-find_package(Freetype REQUIRED)
-
 add_executable(my_testbed ${MY_TESTBED_SOURCE_FILES} )
 target_compile_features(my_testbed PRIVATE cxx_std_20)
-target_link_libraries(my_testbed PRIVATE glfw imgui sajson glad box2d ${FREETYPE_LIBRARIES} swarm-sim)
+target_link_libraries(my_testbed PRIVATE glfw imgui sajson glad box2d swarm-sim)
 
 # message(STATUS "runtime = ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 # message(STATUS "binary = ${CMAKE_CURRENT_BINARY_DIR}")
