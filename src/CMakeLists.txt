@@ -1,14 +1,11 @@
 file(GLOB_RECURSE HEADER_LIST CONFIGURE_DEPENDS "${SwarmSim_SOURCE_DIR}/include/*.h")
 file(GLOB_RECURSE SOURCE_LIST CONFIGURE_DEPENDS "${SwarmSim_SOURCE_DIR}/src/*.cpp")
 
-#if(NOT TARGET spdlog)
-#    find_package(spdlog REQUIRED)
-#endif()
 
 FetchContent_Declare(
   spdlog
   GIT_REPOSITORY https://github.com/gabime/spdlog.git
-  GIT_TAG        v1.14.1  # Optionally pin to a specific tag or branch
+  GIT_TAG        v1.14.1
 )
 
 # Make spdlog available
