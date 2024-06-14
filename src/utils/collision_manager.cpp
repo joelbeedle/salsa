@@ -1,6 +1,9 @@
 #include "utils/collision_manager.h"
 
 #include <iostream>
+
+#include "spdlog/spdlog.h"
+
 namespace swarm {
 
 std::map<std::type_index, CollisionConfig> CollisionManager::configurations_;
@@ -26,25 +29,20 @@ CollisionConfig CollisionManager::getCollisionConfig(std::type_index type) {
 
 void CollisionManager::registerType(
     std::type_index type, const std::vector<std::type_index> &partners) {
-  for (const auto &config : configurations_) {
-    std::cout << "Already registered type: " << config.first.name()
-              << std::endl;
-  }
-  std::cout << "Registering type " << type.name() << std::endl;
+  spdlog::info("Registering type {}", type.name());
 
   if (configurations_.find(type) == configurations_.end()) {
     uint16_t category_bit = next_category_bit_;
     std::bitset<16> catBits(category_bit);
-    std::cout << "Registering type " << type.name() << " with category bit "
-              << category_bit << std::endl;
-    std::cout << catBits << std::endl;
+    spdlog::info("Registering type {} with category bit {}", type.name(),
+                 category_bit);
 
     next_category_bit_ <<= 1;
     configurations_[type] = {category_bit, 0};
   }
   collision_partners_[type] = partners;
   for (const auto &config : configurations_) {
-    std::cout << "Now registered types: " << config.first.name() << std::endl;
+    spdlog::info("Now registered types: {}", config.first.name());
   }
 
   updateMaskBits();
