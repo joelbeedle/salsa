@@ -69,6 +69,7 @@ void Sim::createDrones(Behaviour &behaviour,
 }
 
 void Sim::setDroneCount(int count) { num_drones_ = count; }
+
 void Sim::updateDroneSettings() {
   for (auto &drone : drones_) {
     drone->setMaxForce(drone_configuration_->maxForce);

@@ -18,12 +18,7 @@
 #include <variant>
 #include <vector>
 
-#include "behaviours/dsp.h"
-#include "behaviours/flocking.h"
-#include "behaviours/levy_flocking.h"
-#include "behaviours/pheromone_avoidance.h"
 #include "behaviours/registry.h"
-#include "behaviours/uniform_random_walk.h"
 #include "core/test_stack.h"
 #include "draw.h"
 #include "drones/drone.h"
@@ -76,20 +71,16 @@ static void setupInteractions(swarm::BaseContactListener &listener) {
 }
 
 int main() {
-  auto flock =
-      std::make_unique<swarm::FlockingBehaviour>(250.0, 1.6, 1.0, 3.0, 3.0);
-  auto flock_params = flock.get()->getParameters();
+  auto flock_params = swarm::behaviour::Registry::getInstance()
+                          .getBehaviour("Flocking")
+                          ->getParameters();
 
-  auto pheromone = std::make_unique<swarm::PheromoneBehaviour>(0.5, 1.0);
   swarm::DroneConfiguration *smallDrone = new swarm::DroneConfiguration(
       25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f);
   swarm::CollisionManager::registerType(typeid(swarm::Drone),
                                         {typeid(swarm::Tree)});
   swarm::CollisionManager::registerType(typeid(swarm::Tree),
                                         {typeid(swarm::Drone)});
-  swarm::behaviour::Registry::getInstance().add("Flocking", std::move(flock));
-  swarm::behaviour::Registry::getInstance().add("Pheromone Avoidance",
-                                                std::move(pheromone));
 
   auto new_flock_params = std::unordered_map<std::string, float>({
       {"Separation Distance", 300.0},

@@ -1,91 +1,97 @@
-#include "pheromone_avoidance.h"
+#include <box2d/b2_math.h>
+#include <box2d/box2d.h>
 
 #include <map>
 #include <memory>
 #include <unordered_map>
 
+#include "behaviours/behaviour.h"
+#include "behaviours/registry.h"
 #include "drones/drone.h"
-
+#include "utils/raycastcallback.h"
 namespace swarm {
-void PheromoneBehaviour::execute(
-    const std::vector<std::unique_ptr<Drone>> &drones, Drone &currentDrone) {
-  // Perform ray casting to detect nearby drones and obstacles
-  RayCastCallback callback;
-  performRayCasting(currentDrone, callback);
+class PheromoneBehaviour : public Behaviour {
+ private:
+  struct Pheromone {
+    b2Vec2 position;
+    float intensity;
+  };
 
-  std::vector<b2Vec2> obstaclePoints = callback.obstaclePoints;
-  std::vector<b2Body *> neighbours = callback.detectedDrones;
+  std::map<int, Pheromone> pheromones;
+  int pheromoneCount = 0;
+  std::unordered_map<std::string, behaviour::Parameter *> parameters_;
+  behaviour::Parameter decay_rate_;
+  behaviour::Parameter obstacle_avoidance_weight_;
 
-  layPheromone(currentDrone.getPosition());
+ public:
+  PheromoneBehaviour(float decayRate, float obstacleAvoidanceWeight)
+      : decay_rate_(decayRate, 0.0f, 50.0f),
+        obstacle_avoidance_weight_(obstacleAvoidanceWeight, 0.0f, 3.0f) {
+    // Register parameters in the map
+    parameters_["Decay Rate"] = &decay_rate_;
+    parameters_["Obstacle Avoidance Weight"] = &obstacle_avoidance_weight_;
+  }
 
-  updatePheromones();
-  b2Vec2 steering =
-      obstacle_avoidance_weight_ * avoidObstacles(obstaclePoints, currentDrone);
+  void execute(const std::vector<std::unique_ptr<Drone>> &drones,
+               Drone &currentDrone) override {
+    // Perform ray casting to detect nearby drones and obstacles
+    RayCastCallback callback;
+    performRayCasting(currentDrone, callback);
 
-  b2Vec2 avoidanceSteering(0, 0);
-  int32 count = 0;
+    std::vector<b2Vec2> obstaclePoints = callback.obstaclePoints;
+    std::vector<b2Body *> neighbours = callback.detectedDrones;
 
-  for (auto &pair : pheromones) {
-    Pheromone &Pheromone = pair.second;
-    float distance = b2Distance(currentDrone.getPosition(), Pheromone.position);
+    layPheromone(currentDrone.getPosition());
 
-    if (distance < currentDrone.getObstacleViewRange() && distance > 0) {
-      b2Vec2 awayFromPheromone =
-          currentDrone.getPosition() - Pheromone.position;
-      awayFromPheromone.Normalize();
+    updatePheromones();
+    b2Vec2 steering = obstacle_avoidance_weight_ *
+                      avoidObstacles(obstaclePoints, currentDrone);
 
-      awayFromPheromone *= (1.0f / (distance)) * Pheromone.intensity;
+    b2Vec2 avoidanceSteering(0, 0);
+    int32 count = 0;
 
-      avoidanceSteering += awayFromPheromone;
-      count++;
+    for (auto &pair : pheromones) {
+      Pheromone &Pheromone = pair.second;
+      float distance =
+          b2Distance(currentDrone.getPosition(), Pheromone.position);
+
+      if (distance < currentDrone.getObstacleViewRange() && distance > 0) {
+        b2Vec2 awayFromPheromone =
+            currentDrone.getPosition() - Pheromone.position;
+        awayFromPheromone.Normalize();
+
+        awayFromPheromone *= (1.0f / (distance)) * Pheromone.intensity;
+
+        avoidanceSteering += awayFromPheromone;
+        count++;
+      }
     }
   }
 
-  if (count > 0) {
-    avoidanceSteering.x /= count;
-    avoidanceSteering.y /= count;
-    avoidanceSteering.Normalize();
-    avoidanceSteering *= currentDrone.getMaxSpeed();
-
-    steering += avoidanceSteering - currentDrone.getVelocity();
-    clampMagnitude(steering, currentDrone.getMaxForce());
+  std::unordered_map<std::string, behaviour::Parameter *> getParameters()
+      override {
+    return parameters_;
   }
 
-  b2Vec2 acceleration =
-      steering + (obstacle_avoidance_weight_ *
-                  avoidObstacles(obstaclePoints, currentDrone));
-  b2Vec2 velocity = currentDrone.getVelocity();
-  b2Vec2 position = currentDrone.getPosition();
-
-  velocity += acceleration;
-  float speed = 0.001f + velocity.Length();
-  b2Vec2 dir(velocity.x / speed, velocity.y / speed);
-
-  // Clamp speed
-  if (speed > currentDrone.getMaxSpeed()) {
-    speed = currentDrone.getMaxSpeed();
-  } else if (speed < 0) {
-    speed = 0.001f;
-  }
-  velocity = b2Vec2(dir.x * speed, dir.y * speed);
-
-  currentDrone.getBody()->SetLinearVelocity(velocity);
-  acceleration.SetZero();
-}
-
-void PheromoneBehaviour::layPheromone(const b2Vec2 &position) {
-  Pheromone pheromone = {position, 500.0f};
-  pheromones[pheromoneCount++] = pheromone;
-}
-
-void PheromoneBehaviour::updatePheromones() {
-  for (auto it = pheromones.begin(); it != pheromones.end();) {
-    it->second.intensity -= decay_rate_;
-    if (it->second.intensity <= 0) {
-      it = pheromones.erase(it);
-    } else {
-      ++it;
+ private:
+  void updatePheromones() {
+    for (auto it = pheromones.begin(); it != pheromones.end();) {
+      it->second.intensity -= decay_rate_;
+      if (it->second.intensity <= 0) {
+        it = pheromones.erase(it);
+      } else {
+        ++it;
+      }
     }
   }
-}
+  void layPheromone(const b2Vec2 &position) {
+    Pheromone pheromone = {position, 500.0f};
+    pheromones[pheromoneCount++] = pheromone;
+  }
+};
+
+auto p = std::make_unique<swarm::PheromoneBehaviour>(0.5f, 1.0f);
+
+auto pheromone =
+    behaviour::Registry::getInstance().add("Pheromone Avoidance", std::move(p));
 }  // namespace swarm

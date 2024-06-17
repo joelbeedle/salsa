@@ -16,10 +16,7 @@ set (MY_TESTBED_SOURCE_FILES
 	swarm.cpp
 	swarm.h
 	main.cpp
-	behaviours/pheromone_avoidance.h
 	behaviours/pheromone_avoidance.cpp
-	behaviours/flocking.cpp
-	behaviours/levy_flocking.cpp
 	behaviours/flocking.cpp
 	behaviours/uniform_random_walk.cpp
 	behaviours/dsp.cpp

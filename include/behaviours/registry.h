@@ -34,8 +34,9 @@ class Registry {
   ///
   /// @param name The name key under which the Behaviour will be stored.
   /// @param Behaviour Pointer to the Behaviour instance to be stored.
-  void add(const std::string &name, std::unique_ptr<Behaviour> Behaviour) {
+  bool add(const std::string &name, std::unique_ptr<Behaviour> Behaviour) {
     Behaviours[name] = std::move(Behaviour);
+    return true;
   }
 
   /// @brief Retrieves a Behaviour by name.
