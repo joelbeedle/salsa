@@ -69,20 +69,23 @@ class FlockingBehaviour : public Behaviour {
     int32 neighbours = 0;
     b2Vec2 centreOfMass(0, 0);
 
+    float currentMaxSpeed = currentDrone.getMaxSpeed();
+    float currentMaxForce = currentDrone.getMaxForce();
+
     for (auto &drone : drones) {
-      if (drone->getBody() == currentDrone.getBody()) {
+      b2Body *body = drone->getBody();
+      b2Vec2 bodyPos = body->GetPosition();
+      if (body == currentDrone.getBody()) {
         continue;
       }
-      float distance = b2Distance(currentDrone.getPosition(),
-                                  drone->getBody()->GetPosition());
+      float distance = b2Distance(currentDrone.getPosition(), bodyPos);
       if (distance > currentDrone.getDroneDetectionRange()) {
         continue;
       }
-      alignAvgVec += drone->getBody()->GetLinearVelocity();
-      centreOfMass += drone->getBody()->GetPosition();
+      alignAvgVec += body->GetLinearVelocity();
+      centreOfMass += bodyPos;
       if (distance < separation_distance_ && distance > 0) {
-        b2Vec2 diff =
-            currentDrone.getPosition() - drone->getBody()->GetPosition();
+        b2Vec2 diff = currentDrone.getPosition() - bodyPos;
         diff.Normalize();
         diff.x /= distance;
         diff.y /= distance;
@@ -96,29 +99,29 @@ class FlockingBehaviour : public Behaviour {
       alignAvgVec.x /= neighbours;
       alignAvgVec.y /= neighbours;
       alignAvgVec.Normalize();
-      alignAvgVec *= currentDrone.getMaxSpeed();
+      alignAvgVec *= currentMaxSpeed;
 
       alignSteering = alignAvgVec - currentDrone.getVelocity();
-      clampMagnitude(alignSteering, currentDrone.getMaxForce());
+      clampMagnitude(alignSteering, currentMaxForce);
 
       centreOfMass.x /= neighbours;
       centreOfMass.y /= neighbours;
       b2Vec2 vecToCom = centreOfMass - currentDrone.getPosition();
 
       vecToCom.Normalize();
-      vecToCom *= currentDrone.getMaxSpeed();
+      vecToCom *= currentMaxSpeed;
 
       cohereSteering = vecToCom - currentDrone.getVelocity();
-      clampMagnitude(cohereSteering, currentDrone.getMaxForce());
+      clampMagnitude(cohereSteering, currentMaxForce);
       separateAvgVec.x /= neighbours;
       separateAvgVec.y /= neighbours;
     }
     if (separateAvgVec.Length() > 0) {
       separateAvgVec.Normalize();
-      separateAvgVec *= currentDrone.getMaxSpeed();
+      separateAvgVec *= currentMaxSpeed;
 
       separateSteering = separateAvgVec - currentDrone.getVelocity();
-      clampMagnitude(separateSteering, currentDrone.getMaxForce());
+      clampMagnitude(separateSteering, currentMaxForce);
     }
 
     b2Vec2 alignment = alignSteering;
@@ -138,8 +141,8 @@ class FlockingBehaviour : public Behaviour {
     b2Vec2 dir(velocity.x / speed, velocity.y / speed);
 
     // Clamp speed
-    if (speed > currentDrone.getMaxSpeed()) {
-      speed = currentDrone.getMaxSpeed();
+    if (speed > currentMaxSpeed) {
+      speed = currentMaxSpeed;
     } else if (speed < 0) {
       speed = 0.001f;
     }
