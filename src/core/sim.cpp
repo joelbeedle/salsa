@@ -52,6 +52,7 @@ void Sim::update() {
 }
 
 void Sim::reset() {
+  current_time_ = 0.0;
   drones_.clear();
   createDrones(*behaviour_, *drone_configuration_);
 }

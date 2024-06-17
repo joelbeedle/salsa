@@ -156,6 +156,8 @@ class SwarmTest : public Test {
         SetStackSim();
       }
     }
+    g_debugDraw.DrawString(5, m_textLine, "%fs", sim->current_time());
+    m_textLine += m_textIncrement;
   }
   void UpdateUI() override {
     ImGui::SetNextWindowPos(ImVec2(10.0f, 100.0f));
