@@ -8,16 +8,96 @@
 #include "utils/raycastcallback.h"
 
 namespace swarm {
+
+class DroneQueryCallback : public b2QueryCallback {
+ public:
+  std::vector<b2Body *> foundWalls;
+  std::vector<b2Body *> foundDrones;
+
+  bool ReportFixture(b2Fixture *fixture) override {
+    b2Body *body = fixture->GetBody();
+    if (body->GetType() == b2_staticBody) {
+      foundWalls.push_back(body);
+    }
+    if (body->GetType() == b2_dynamicBody) {
+      foundDrones.push_back(body);
+    }
+    return true;
+  }
+};
+
 void FlockingBehaviour::execute(
     const std::vector<std::unique_ptr<Drone>> &drones, Drone &currentDrone) {
   // Using ray casting to find neighbours and obstacles
+  DroneQueryCallback queryCallback;
+  b2AABB aabb;
+  aabb.lowerBound = currentDrone.getPosition() - b2Vec2(100, 100);
+  aabb.upperBound = currentDrone.getPosition() + b2Vec2(100, 100);
+  currentDrone.getBody()->GetWorld()->QueryAABB(&queryCallback, aabb);
   RayCastCallback callback;
-  performRayCasting(currentDrone, callback);
+  if (queryCallback.foundWalls.size() > 0) {
+    performRayCasting(currentDrone, callback);
+  }
   std::vector<b2Vec2> obstaclePoints = callback.obstaclePoints;
+  b2Vec2 alignSteering(0, 0);
+  b2Vec2 cohereSteering(0, 0);
+  b2Vec2 separateSteering(0, 0);
 
-  b2Vec2 alignment = align(drones, currentDrone);
-  b2Vec2 separation = separate(drones, currentDrone);
-  b2Vec2 cohesion = cohere(drones, currentDrone);
+  b2Vec2 alignAvgVec(0, 0);
+  b2Vec2 separateAvgVec(0, 0);
+
+  int32 neighbours = 0;
+  b2Vec2 centreOfMass(0, 0);
+
+  for (auto &drone : drones) {
+    float distance =
+        b2Distance(currentDrone.getPosition(), drone->getBody()->GetPosition());
+    if (distance < separation_distance_ && distance > 0) {
+      alignAvgVec += drone->getBody()->GetLinearVelocity();
+      centreOfMass += drone->getBody()->GetPosition();
+      b2Vec2 diff =
+          currentDrone.getPosition() - drone->getBody()->GetPosition();
+      diff.Normalize();
+      diff.x /= distance;
+      diff.y /= distance;
+      separateAvgVec += diff;
+
+      neighbours++;
+    }
+  }
+
+  if (neighbours > 0) {
+    alignAvgVec.x /= neighbours;
+    alignAvgVec.y /= neighbours;
+    alignAvgVec.Normalize();
+    alignAvgVec *= currentDrone.getMaxSpeed();
+
+    alignSteering = alignAvgVec - currentDrone.getVelocity();
+    clampMagnitude(alignSteering, currentDrone.getMaxForce());
+
+    centreOfMass.x /= neighbours;
+    centreOfMass.y /= neighbours;
+    b2Vec2 vecToCom = centreOfMass - currentDrone.getPosition();
+
+    vecToCom.Normalize();
+    vecToCom *= currentDrone.getMaxSpeed();
+
+    cohereSteering = vecToCom - currentDrone.getVelocity();
+    clampMagnitude(cohereSteering, currentDrone.getMaxForce());
+    separateAvgVec.x /= neighbours;
+    separateAvgVec.y /= neighbours;
+  }
+  if (separateAvgVec.Length() > 0) {
+    separateAvgVec.Normalize();
+    separateAvgVec *= currentDrone.getMaxSpeed();
+
+    separateSteering = separateAvgVec - currentDrone.getVelocity();
+    clampMagnitude(separateSteering, currentDrone.getMaxForce());
+  }
+
+  b2Vec2 alignment = alignSteering;
+  b2Vec2 separation = separateSteering;
+  b2Vec2 cohesion = cohereSteering;
   b2Vec2 obstacleAvoidance = avoidObstacles(obstaclePoints, currentDrone);
 
   b2Vec2 acceleration = (alignment_weight_ * alignment) +
@@ -124,5 +204,15 @@ b2Vec2 FlockingBehaviour::separate(
   }
 
   return steering;
+}
+
+b2Vec2 FlockingBehaviour::avoidWall(b2Vec2 point, Drone &currentDrone) {
+  b2Vec2 avoidDirection = currentDrone.getPosition() - point;
+  avoidDirection.Normalize();
+  float desiredSpeed = 5.0f;  // Change as necessary
+  b2Vec2 desiredVelocity = desiredSpeed * avoidDirection;
+  b2Vec2 steeringForce =
+      desiredVelocity - currentDrone.getBody()->GetLinearVelocity();
+  return steeringForce;
 }
 }  // namespace swarm

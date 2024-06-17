@@ -69,6 +69,9 @@ static void setupInteractions(swarm::BaseContactListener &listener) {
         swarm::Drone *drone2 = reinterpret_cast<swarm::UserData *>(
                                    droneFixture2->GetUserData().pointer)
                                    ->as<swarm::Drone>();
+        if (droneFixture1->IsSensor() && droneFixture2->IsSensor()) {
+          return;
+        }
       });
 }
 
