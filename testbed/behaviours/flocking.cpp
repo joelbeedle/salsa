@@ -12,15 +12,11 @@ namespace swarm {
 class DroneQueryCallback : public b2QueryCallback {
  public:
   std::vector<b2Body *> foundWalls;
-  std::vector<b2Body *> foundDrones;
 
   bool ReportFixture(b2Fixture *fixture) override {
     b2Body *body = fixture->GetBody();
     if (body->GetType() == b2_staticBody) {
       foundWalls.push_back(body);
-    }
-    if (body->GetType() == b2_dynamicBody) {
-      foundDrones.push_back(body);
     }
     return true;
   }
@@ -30,9 +26,7 @@ void FlockingBehaviour::execute(
     const std::vector<std::unique_ptr<Drone>> &drones, Drone &currentDrone) {
   // Using ray casting to find neighbours and obstacles
   DroneQueryCallback queryCallback;
-  b2AABB aabb;
-  aabb.lowerBound = currentDrone.getPosition() - b2Vec2(100, 100);
-  aabb.upperBound = currentDrone.getPosition() + b2Vec2(100, 100);
+  b2AABB aabb = currentDrone.getViewSensor()->GetAABB(0);
   currentDrone.getBody()->GetWorld()->QueryAABB(&queryCallback, aabb);
   RayCastCallback callback;
   if (queryCallback.foundWalls.size() > 0) {
@@ -42,28 +36,32 @@ void FlockingBehaviour::execute(
   b2Vec2 alignSteering(0, 0);
   b2Vec2 cohereSteering(0, 0);
   b2Vec2 separateSteering(0, 0);
-
   b2Vec2 alignAvgVec(0, 0);
   b2Vec2 separateAvgVec(0, 0);
-
   int32 neighbours = 0;
   b2Vec2 centreOfMass(0, 0);
 
   for (auto &drone : drones) {
+    if (drone->getBody() == currentDrone.getBody()) {
+      continue;
+    }
     float distance =
         b2Distance(currentDrone.getPosition(), drone->getBody()->GetPosition());
+    if (distance > currentDrone.getDroneDetectionRange()) {
+      continue;
+    }
+    alignAvgVec += drone->getBody()->GetLinearVelocity();
+    centreOfMass += drone->getBody()->GetPosition();
     if (distance < separation_distance_ && distance > 0) {
-      alignAvgVec += drone->getBody()->GetLinearVelocity();
-      centreOfMass += drone->getBody()->GetPosition();
       b2Vec2 diff =
           currentDrone.getPosition() - drone->getBody()->GetPosition();
       diff.Normalize();
       diff.x /= distance;
       diff.y /= distance;
-      separateAvgVec += diff;
 
-      neighbours++;
+      separateAvgVec += diff;
     }
+    neighbours++;
   }
 
   if (neighbours > 0) {
