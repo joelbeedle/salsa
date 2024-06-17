@@ -25,8 +25,9 @@ class RayCastCallback : public b2RayCastCallback {
 
     // Check the body type to differentiate between drones and obstacles
     if (body->GetType() == b2_dynamicBody) {
-      detectedDrones.push_back(body);
-    } else if (body->GetType() == b2_staticBody) {
+      return -1;
+    }
+    if (body->GetType() == b2_staticBody) {
       obstaclePoints.push_back(point);
     }
 

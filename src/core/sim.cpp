@@ -75,6 +75,7 @@ void Sim::updateDroneSettings() {
     drone->setMaxSpeed(drone_configuration_->maxSpeed);
     drone->setViewRange(drone_configuration_->cameraViewRange);
     drone->setObstacleViewRange(drone_configuration_->obstacleViewRange);
+    drone->setDroneDetectionRange(drone_configuration_->droneDetectionRange);
     drone->updateSensorRange();
   }
 }

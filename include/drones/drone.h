@@ -68,6 +68,8 @@ class Drone : public Entity {
   float getMaxForce() { return maxForce; }
   void setMaxForce(float newForce) { maxForce = newForce; }
 
+  b2Fixture *getViewSensor() { return viewSensor; }
+
   float getRadius() { return radius_; }
 
   std::vector<b2Vec2 *> getFoundDiseasedTreePositions() {
