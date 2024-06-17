@@ -69,6 +69,9 @@ static void setupInteractions(swarm::BaseContactListener &listener) {
         swarm::Drone *drone2 = reinterpret_cast<swarm::UserData *>(
                                    droneFixture2->GetUserData().pointer)
                                    ->as<swarm::Drone>();
+        if (droneFixture1->IsSensor() && droneFixture2->IsSensor()) {
+          return;
+        }
       });
 }
 
@@ -120,7 +123,7 @@ int main() {
   swarm::TestStack stack;
   stack.push(config);
   stack.push(config2);
-  config.num_drones = 2048;
+  config.num_drones = 1024;
   stack.push(config);
 
   std::unique_ptr<SwarmTest> test = std::make_unique<SwarmTest>();

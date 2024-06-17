@@ -60,6 +60,8 @@ class FlockingBehaviour : public Behaviour {
                   Drone &currentDrone);
   b2Vec2 cohere(const std::vector<std::unique_ptr<Drone>> &drones,
                 Drone &currentDrone);
+
+  b2Vec2 avoidWall(b2Vec2 point, Drone &currentDrone);
 };
 
 // }  // namespace behaviours

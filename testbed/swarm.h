@@ -41,6 +41,7 @@ class SwarmTest : public Test {
   swarm::Sim *sim;
   static swarm::SimBuilder *sim_builder;
   bool draw_visual_range_ = true;
+  bool draw_drone_sensor_range_ = true;
   bool draw_trees_ = false;
   bool first_run_ = true;
   bool using_stack_ = true;
