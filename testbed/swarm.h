@@ -92,6 +92,9 @@ class SwarmTest : public Test {
     auto old_sim = sim;
     sim = temp_sim;
     delete old_sim;
+    sim->setCurrentBehaviour(sim->current_behaviour_name());
+    sim->applyCurrentBehaviour();
+
     return true;
   }
   void SetHeight(float height) { sim_builder->setWorldHeight(height); }
