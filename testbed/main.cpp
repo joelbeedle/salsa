@@ -19,7 +19,7 @@
 #include <vector>
 
 #include "behaviours/registry.h"
-#include "core/test_stack.h"
+#include "core/test_queue.h"
 #include "draw.h"
 #include "drones/drone.h"
 #include "drones/drone_factory.h"
@@ -169,18 +169,17 @@ int main() {
       1200.0f,
   };
 
-  swarm::TestStack stack;
-  stack.push(config);
-  stack.push(config2);
+  swarm::TestQueue queue;
+  queue.push(config);
+  queue.push(config2);
   config.num_drones = 50;
-  stack.push(config);
+  queue.push(config);
   std::unique_ptr<SwarmTest> test = std::make_unique<SwarmTest>();
-  test->UseStack(stack);
-  test->SetStackSim();
+  test->UseQueue(queue);
+  test->SetNextTestFromQueue();
   auto contactListener = std::make_shared<swarm::BaseContactListener>();
   setupInteractions(*contactListener);
   test->SetContactListener(*contactListener);
-  // test->SetWorld(world);
   test->Build();
   RegisterTest("SwarmTest", "Swarm_Test", std::move(test));
   RegisterTest("MapCreator", "Map_Creator", std::make_unique<MapCreator>());

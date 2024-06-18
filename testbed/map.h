@@ -1,3 +1,5 @@
+#ifndef SWARM_TESTBED_MAP_H
+#define SWARM_TESTBED_MAP_H
 #include <box2d/box2d.h>
 
 #include <filesystem>
@@ -673,3 +675,5 @@ class MapCreator : public Test {
     ImGui::End();
   }
 };
+
+#endif  // SWARM_TESTBED_MAP_H
