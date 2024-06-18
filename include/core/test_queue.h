@@ -6,7 +6,7 @@
 
 #include <box2d/box2d.h>
 
-#include <stack>
+#include <queue>
 #include <stdexcept>
 #include <variant>
 
@@ -20,25 +20,27 @@ struct TestConfig {
   typedef std::unordered_map<std::string, behaviour::Parameter *> Parameters;
   typedef std::unordered_map<std::string, float> FloatParameters;
 
-  const std::string &behaviour_name;
+  std::string behaviour_name;
   std::variant<Parameters, FloatParameters> parameters;
   DroneConfiguration *drone_config;
   b2World *world;
   int num_drones;
   int num_targets;
   float time_limit;
+  bool keep = true;
   // FUTURE: std::function<void()> drone_setup;
   // FUTURE: std::function<void()> target_setup;
 };
 
-class TestStack {
+class TestQueue {
  private:
-  static std::stack<TestConfig> tests_;
+  static std::vector<TestConfig> tests_;
 
  public:
   static void push(TestConfig test);
   static TestConfig pop();
   static int size() { return tests_.size(); }
+  static std::vector<TestConfig> &getTests() { return tests_; }
   static bool isEmpty() { return tests_.empty(); }
 };
 
