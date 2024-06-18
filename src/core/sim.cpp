@@ -19,12 +19,13 @@ Sim::Sim(b2World *world, int drone_count, int target_count,
   createDrones(*behaviour_, *drone_configuration_);
 }
 
-Sim::Sim(b2World *world, TestConfig &config)
+Sim::Sim(TestConfig &config)
     : world_(config.world),
       num_drones_(config.num_drones),
       num_targets_(config.num_targets),
       drone_configuration_(config.drone_config),
-      time_limit_(config.time_limit) {
+      time_limit_(config.time_limit),
+      test_config_(config) {
   is_stack_test_ = true;
   b2Vec2 gravity(0.0f, 0.0f);
   world_->SetGravity(gravity);
