@@ -7,14 +7,21 @@ FetchContent_Declare(
   GIT_REPOSITORY https://github.com/gabime/spdlog.git
   GIT_TAG        v1.14.1
 )
+FetchContent_Declare(
+	nlohmann_json
+	GIT_REPOSITORY https://github.com/nlohmann/json.git
+	GIT_TAG        v3.11.3)
 
+FetchContent_MakeAvailable(nlohmann_json)
 # Make spdlog available
 FetchContent_MakeAvailable(spdlog)
 
 add_library(swarm-sim ${SOURCE_LIST} ${HEADER_LIST})
 
-target_link_libraries(swarm-sim PRIVATE spdlog::spdlog box2d)
-target_include_directories(swarm-sim PUBLIC ${FREETYPE_INCLUDE_DIRS} ../include)
+target_link_libraries(swarm-sim PRIVATE nlohmann_json::nlohmann_json spdlog::spdlog box2d)
+target_include_directories(swarm-sim PUBLIC     ${spdlog_SOURCE_DIR}/include
+    ${nlohmann_json_SOURCE_DIR}/include
+ ${FREETYPE_INCLUDE_DIRS} ../include)
 
 target_compile_features(swarm-sim PUBLIC cxx_std_17)
 
