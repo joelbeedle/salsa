@@ -330,9 +330,8 @@ class SwarmTest : public Test {
       }
 
       if (new_world != nullptr) {
+        ImGui::SameLine();
         ImGui::Text("Map Loaded");
-      } else {
-        ImGui::Text("Map Not Loaded");
       }
 
       // Get drone configuration for test
@@ -348,13 +347,17 @@ class SwarmTest : public Test {
       ImGui::InputFloat("Time Limit", &new_time_limit);
 
       // create new_config and add it to the queue
-      if (ImGui::Button("Add Test")) {
+      if (ImGui::Button("Add Test", ImVec2(120, 0))) {
         swarm::TestConfig new_config = {
             current_name,    new_params,       smallDrone,     new_world,
             new_drone_count, new_target_count, new_time_limit,
         };
         queue_.push(new_config);
         added_new_test_ = true;
+        ImGui::CloseCurrentPopup();
+      }
+      ImGui::SameLine();
+      if (ImGui::Button("Cancel", ImVec2(120, 0))) {
         ImGui::CloseCurrentPopup();
       }
       ImGui::EndPopup();
@@ -409,12 +412,14 @@ class SwarmTest : public Test {
       ImGui::Separator();
       ImGui::Text("Select Range or List for each parameter");
       ImGui::Text("For Range: Input min, max, and step values");
-      ImGui::Text("For List: Input a list of values separated by commas");
+      ImGui::Text("For List: Input a list of values separated by spaces");
       int index = 0;
       static char buf[16][128];
       const char *combo_items[] = {"Range", "List"};
       static std::vector<int> selections(new_params.size(), 0);
+
       for (auto [name, parameter] : new_params) {
+        ImGui::PushItemWidth(80.0f);
         std::string comboLabel = "##combo" + std::to_string(index);
         if (ImGui::BeginCombo(comboLabel.c_str(),
                               combo_items[selections[index]])) {
@@ -429,6 +434,7 @@ class SwarmTest : public Test {
           }
           ImGui::EndCombo();
         }
+        ImGui::PopItemWidth();
         ImGui::SetItemAllowOverlap();
         ImGui::SameLine();
         static float vec4f[4] = {0.0, 0.0, 0.0, 0.0};
@@ -437,7 +443,6 @@ class SwarmTest : public Test {
         } else {
           ImGui::InputText(name.c_str(), buf[index], IM_ARRAYSIZE(buf[index]));
         }
-
         index++;
       }
 
@@ -449,9 +454,8 @@ class SwarmTest : public Test {
       }
 
       if (new_world != nullptr) {
+        ImGui::SameLine();
         ImGui::Text("Map Loaded");
-      } else {
-        ImGui::Text("Map Not Loaded");
       }
 
       // Get drone configuration for test
@@ -467,7 +471,7 @@ class SwarmTest : public Test {
       ImGui::InputFloat("Time Limit", &new_time_limit);
 
       // create new_config and add it to the queue
-      if (ImGui::Button("Add Test")) {
+      if (ImGui::Button("Add Test", ImVec2(120, 0))) {
         swarm::TestConfig new_config = {
             current_name,    new_params,       smallDrone,     new_world,
             new_drone_count, new_target_count, new_time_limit,
@@ -476,6 +480,11 @@ class SwarmTest : public Test {
         added_test_permutation_ = true;
         ImGui::CloseCurrentPopup();
       }
+      ImGui::SameLine();
+      if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+        ImGui::CloseCurrentPopup();
+      }
+
       ImGui::EndPopup();
     }
 
