@@ -1,0 +1,276 @@
+{
+    "bodies": [
+        {
+            "angle": 0.0,
+            "angular_damping": 0.0,
+            "bullet": false,
+            "fixed_rotation": false,
+            "fixtures": [
+                {
+                    "category_bits": 1,
+                    "circle": {
+                        "center": [
+                            0.0,
+                            0.0
+                        ],
+                        "radius": 170.18881225585938
+                    },
+                    "density": 0.0,
+                    "friction": 0.20000000298023224,
+                    "group_index": 0,
+                    "is_sensor": false,
+                    "mask_bits": 65535,
+                    "restitution": 0.0
+                }
+            ],
+            "gravity_scale": 1.0,
+            "linear_damping": 0.0,
+            "position": [
+                2454.41357421875,
+                1915.6397705078125
+            ],
+            "type": 0
+        },
+        {
+            "angle": 0.0,
+            "angular_damping": 0.0,
+            "bullet": false,
+            "fixed_rotation": false,
+            "fixtures": [
+                {
+                    "category_bits": 1,
+                    "density": 0.0,
+                    "edge": {
+                        "end": [
+                            488.24365234375,
+                            3205.80126953125
+                        ],
+                        "start": [
+                            1073.9493408203125,
+                            3451.441650390625
+                        ]
+                    },
+                    "friction": 0.20000000298023224,
+                    "group_index": 0,
+                    "is_sensor": false,
+                    "mask_bits": 65535,
+                    "restitution": 0.0
+                }
+            ],
+            "gravity_scale": 1.0,
+            "linear_damping": 0.0,
+            "position": [
+                0.0,
+                0.0
+            ],
+            "type": 0
+        },
+        {
+            "angle": 0.0,
+            "angular_damping": 0.0,
+            "bullet": false,
+            "fixed_rotation": false,
+            "fixtures": [
+                {
+                    "category_bits": 1,
+                    "density": 0.0,
+                    "edge": {
+                        "end": [
+                            1073.9493408203125,
+                            3451.441650390625
+                        ],
+                        "start": [
+                            1073.9493408203125,
+                            2882.962890625
+                        ]
+                    },
+                    "friction": 0.20000000298023224,
+                    "group_index": 0,
+                    "is_sensor": false,
+                    "mask_bits": 65535,
+                    "restitution": 0.0
+                }
+            ],
+            "gravity_scale": 1.0,
+            "linear_damping": 0.0,
+            "position": [
+                0.0,
+                0.0
+            ],
+            "type": 0
+        },
+        {
+            "angle": 0.0,
+            "angular_damping": 0.0,
+            "bullet": false,
+            "fixed_rotation": false,
+            "fixtures": [
+                {
+                    "category_bits": 1,
+                    "density": 0.0,
+                    "edge": {
+                        "end": [
+                            1073.9493408203125,
+                            2882.962890625
+                        ],
+                        "start": [
+                            488.24365234375,
+                            2882.962890625
+                        ]
+                    },
+                    "friction": 0.20000000298023224,
+                    "group_index": 0,
+                    "is_sensor": false,
+                    "mask_bits": 65535,
+                    "restitution": 0.0
+                }
+            ],
+            "gravity_scale": 1.0,
+            "linear_damping": 0.0,
+            "position": [
+                0.0,
+                0.0
+            ],
+            "type": 0
+        },
+        {
+            "angle": 0.0,
+            "angular_damping": 0.0,
+            "bullet": false,
+            "fixed_rotation": false,
+            "fixtures": [
+                {
+                    "category_bits": 1,
+                    "density": 0.0,
+                    "edge": {
+                        "end": [
+                            488.24365234375,
+                            2882.962890625
+                        ],
+                        "start": [
+                            488.24365234375,
+                            3205.80126953125
+                        ]
+                    },
+                    "friction": 0.20000000298023224,
+                    "group_index": 0,
+                    "is_sensor": false,
+                    "mask_bits": 65535,
+                    "restitution": 0.0
+                }
+            ],
+            "gravity_scale": 1.0,
+            "linear_damping": 0.0,
+            "position": [
+                0.0,
+                0.0
+            ],
+            "type": 0
+        },
+        {
+            "angle": 0.0,
+            "angular_damping": 0.0,
+            "bullet": false,
+            "fixed_rotation": false,
+            "fixtures": [
+                {
+                    "category_bits": 1,
+                    "density": 0.0,
+                    "edge": {
+                        "end": [
+                            4000.0,
+                            4000.0
+                        ],
+                        "start": [
+                            4000.0,
+                            0.0
+                        ]
+                    },
+                    "friction": 0.20000000298023224,
+                    "group_index": 0,
+                    "is_sensor": false,
+                    "mask_bits": 65535,
+                    "restitution": 0.0
+                },
+                {
+                    "category_bits": 1,
+                    "density": 0.0,
+                    "edge": {
+                        "end": [
+                            0.0,
+                            4000.0
+                        ],
+                        "start": [
+                            0.0,
+                            0.0
+                        ]
+                    },
+                    "friction": 0.20000000298023224,
+                    "group_index": 0,
+                    "is_sensor": false,
+                    "mask_bits": 65535,
+                    "restitution": 0.0
+                },
+                {
+                    "category_bits": 1,
+                    "density": 0.0,
+                    "edge": {
+                        "end": [
+                            4000.0,
+                            4000.0
+                        ],
+                        "start": [
+                            0.0,
+                            4000.0
+                        ]
+                    },
+                    "friction": 0.20000000298023224,
+                    "group_index": 0,
+                    "is_sensor": false,
+                    "mask_bits": 65535,
+                    "restitution": 0.0
+                },
+                {
+                    "category_bits": 1,
+                    "density": 0.0,
+                    "edge": {
+                        "end": [
+                            4000.0,
+                            0.0
+                        ],
+                        "start": [
+                            0.0,
+                            0.0
+                        ]
+                    },
+                    "friction": 0.20000000298023224,
+                    "group_index": 0,
+                    "is_sensor": false,
+                    "mask_bits": 65535,
+                    "restitution": 0.0
+                }
+            ],
+            "gravity_scale": 1.0,
+            "linear_damping": 0.0,
+            "position": [
+                0.0,
+                0.0
+            ],
+            "type": 0
+        },
+        {
+            "angle": 0.0,
+            "angular_damping": 0.0,
+            "bullet": false,
+            "fixed_rotation": false,
+            "gravity_scale": 1.0,
+            "linear_damping": 0.0,
+            "position": [
+                0.0,
+                0.0
+            ],
+            "type": 0
+        }
+    ],
+    "name": "test"
+}

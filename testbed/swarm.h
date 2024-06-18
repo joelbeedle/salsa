@@ -45,6 +45,8 @@ class SwarmTest : public Test {
   bool draw_trees_ = false;
   bool first_run_ = true;
   bool using_stack_ = true;
+  bool pause = false;
+  bool next_frame = false;
   swarm::TestStack stack_;
   std::vector<swarm::Tree *> trees;
   std::vector<b2Vec2> treePositions;
@@ -58,7 +60,7 @@ class SwarmTest : public Test {
  public:
   SwarmTest() {
     g_debugDraw.SetFlags(b2Draw::e_shapeBit | b2Draw::e_jointBit);
-    sim_builder->setWorld(m_world);
+    sim_builder->setWorld(new b2World(b2Vec2(0.0f, 0.0f)));
     sim = sim_builder->build();
 
     auto &registry = swarm::behaviour::Registry::getInstance();
@@ -95,9 +97,11 @@ class SwarmTest : public Test {
     delete old_sim;
     sim->setCurrentBehaviour(sim->current_behaviour_name());
     sim->applyCurrentBehaviour();
-
+    m_world = sim->getWorld();
+    pause = false;
     return true;
   }
+  void SetWorld(b2World *world) { sim_builder->setWorld(world); }
   void SetHeight(float height) { sim_builder->setWorldHeight(height); }
   void SetWidth(float width) { sim_builder->setWorldWidth(width); }
   float GetHeight() { return sim->world_height(); }
@@ -146,16 +150,25 @@ class SwarmTest : public Test {
   void Step(Settings &settings) override {
     // Run simulation steps here
     Test::Step(settings);
+    settings.m_pause = pause;
     std::vector<int> foundTreeIDs;
     sim->update();
     sim->current_time() += 1.0f / settings.m_hertz;
+    m_world->DebugDraw();
     Draw(sim->getWorld(), &g_debugDraw, foundTreeIDs);
+    if (next_frame) {
+      pause = true;
+      SetStackSim();
+      next_frame = false;
+    }
     if (using_stack_) {
       if (sim->current_time() >= sim->time_limit()) {
         // This sim is finished, get the next one from the stack
-        SetStackSim();
+        pause = true;
+        next_frame = true;
       }
     }
+
     g_debugDraw.DrawString(5, m_textLine, "%fs", sim->current_time());
     m_textLine += m_textIncrement;
   }
@@ -208,7 +221,8 @@ class SwarmTest : public Test {
     }
 
     if (ImGui::Button("Next Test in Stack")) {
-      SetStackSim();
+      pause = true;
+      next_frame = true;
     }
 
     ImGui::End();

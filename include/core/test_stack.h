@@ -23,8 +23,7 @@ struct TestConfig {
   const std::string &behaviour_name;
   std::variant<Parameters, FloatParameters> parameters;
   DroneConfiguration *drone_config;
-  float world_height;
-  float world_width;
+  b2World *world;
   int num_drones;
   int num_targets;
   float time_limit;

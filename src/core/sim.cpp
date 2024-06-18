@@ -20,23 +20,21 @@ Sim::Sim(b2World *world, int drone_count, int target_count,
 }
 
 Sim::Sim(b2World *world, TestConfig &config)
-    : world_(world),
+    : world_(config.world),
       num_drones_(config.num_drones),
       num_targets_(config.num_targets),
       drone_configuration_(config.drone_config),
-      border_width_(config.world_width),
-      border_height_(config.world_height),
       time_limit_(config.time_limit) {
   is_stack_test_ = true;
   b2Vec2 gravity(0.0f, 0.0f);
   world_->SetGravity(gravity);
-  createBounds();
+  // createBounds();
   current_behaviour_name_ = config.behaviour_name;
   auto behaviour_pointer =
       behaviour::Registry::getInstance().getBehaviour(current_behaviour_name_);
   auto visitor = [&](auto &&arg) { behaviour_pointer->setParameters(arg); };
   std::visit(visitor, config.parameters);
-  createDrones(*behaviour_, *drone_configuration_);
+  createDronesCircular(*behaviour_, *drone_configuration_);
 }
 
 Sim::~Sim() {
@@ -62,10 +60,41 @@ void Sim::createDrones(Behaviour &behaviour,
   const float margin = 2.0f;  // Define a margin to prevent spawning exactly
                               // at the border or outside
   for (int i = 0; i < num_drones_; i++) {
-    float x = (rand() % static_cast<int>(border_width_ - 2 * margin)) + margin;
-    float y = (rand() % static_cast<int>(border_height_ - 2 * margin)) + margin;
+    float x = (rand() % static_cast<int>(4000 - 2 * margin)) + margin;
+    float y = (rand() % static_cast<int>(4000 - 2 * margin)) + margin;
     drones_.push_back(DroneFactory::createDrone(world_, b2Vec2(x, y), behaviour,
                                                 configuration));
+  }
+}
+
+void Sim::createDronesCircular(Behaviour &behaviour,
+                               DroneConfiguration &config) {
+  // Calculate the total area needed for all drones
+  float droneArea = M_PI * std::pow(config.radius, 2);
+  float totalDroneArea = num_drones_ * droneArea;
+
+  // Calculate the radius of the circle needed to fit all drones
+  float requiredCircleRadius = sqrt(totalDroneArea / M_PI);
+
+  // Adjust center of the circle to be the center of the map
+  // TODO: Make this the point of the drone spawn point.
+  float centerX = 1000 / 2.0f;
+  float centerY = 1000 / 2.0f;
+
+  for (int i = 0; i < num_drones_; i++) {
+    // generate random angle and radius within the required circle
+    float theta = static_cast<float>(rand()) / RAND_MAX * 2.0f * M_PI;
+    // Ensure drones fit within the required circle, leaving a margin equal to
+    // the drone's radius
+    float r = sqrt(static_cast<float>(rand()) / RAND_MAX) *
+              (requiredCircleRadius - config.radius);
+
+    // Convert polar coordinates (r, theta) to Cartesian coordinates (x, y)
+    float x = centerX + r * cos(theta);
+    float y = centerY + r * sin(theta);
+
+    drones_.push_back(
+        DroneFactory::createDrone(world_, b2Vec2(x, y), behaviour, config));
   }
 }
 

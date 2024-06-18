@@ -84,6 +84,8 @@ class Sim {
 
   // Drone functions
   void createDrones(Behaviour &behaviour, DroneConfiguration &configuration);
+  void createDronesCircular(Behaviour &behaviour,
+                            DroneConfiguration &configuration);
   void setDroneCount(int count);
   void setDroneConfiguration(DroneConfiguration *configuration);
   void updateDroneSettings();
@@ -105,6 +107,11 @@ class Sim {
 
   float &time_limit() { return time_limit_; }
   b2World *getWorld() { return world_; }
+  void setWorld(b2World *world) {
+    // test
+    delete world_;
+    world_ = world;
+  }
 
   std::string getBehaviourName() { return current_behaviour_name_; }
 

@@ -329,7 +329,7 @@ class MapCreator : public Test {
       map["bodies"].push_back(body_json);
     }
 
-    std::string directory = "./maps";
+    std::string directory = "../../testbed/maps";
     std::string filename = std::string(map_name) + ".json";
     std::string fullPath = directory + "/" + filename;
 
@@ -359,7 +359,8 @@ class MapCreator : public Test {
 
   void LoadMap(const char *new_map_name) {
     b2World *world = new b2World(b2Vec2(0.0f, 0.0f));
-    std::ifstream file("maps/" + std::string(new_map_name) + ".json");
+    std::ifstream file("../../testbed/maps/" + std::string(new_map_name) +
+                       ".json");
     nlohmann::json map;
     file >> map;
     std::copy(new_map_name, new_map_name + 128, map_name);

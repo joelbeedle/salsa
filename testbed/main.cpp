@@ -25,6 +25,7 @@
 #include "drones/drone_factory.h"
 #include "imgui/imgui.h"
 #include "map.h"
+#include "nlohmann/json.hpp"
 #include "settings.h"
 #include "swarm.h"
 #include "test.h"
@@ -69,7 +70,65 @@ static void setupInteractions(swarm::BaseContactListener &listener) {
         }
       });
 }
+b2World *LoadMap(const char *new_map_name) {
+  b2World *world = new b2World(b2Vec2(0.0f, 0.0f));
+  std::ifstream file("../../testbed/maps/" + std::string(new_map_name) +
+                     ".json");
+  nlohmann::json map;
+  file >> map;
 
+  for (auto &body_json : map["bodies"]) {
+    b2BodyDef body_def;
+    body_def.type = (b2BodyType)body_json["type"];
+    body_def.position.Set(body_json["position"][0], body_json["position"][1]);
+    body_def.angle = body_json["angle"];
+    body_def.linearDamping = body_json["linear_damping"];
+    body_def.angularDamping = body_json["angular_damping"];
+    body_def.gravityScale = body_json["gravity_scale"];
+    body_def.fixedRotation = body_json["fixed_rotation"];
+    body_def.bullet = body_json["bullet"];
+
+    b2Body *body = world->CreateBody(&body_def);
+    std::cout << "Created Body: " << body << std::endl;
+    std::cout << "Body Type: " << body->GetType() << std::endl;
+    std::cout << "Body Position: " << body->GetPosition().x << ", "
+              << body->GetPosition().y << std::endl;
+
+    for (auto &fixture_json : body_json["fixtures"]) {
+      b2FixtureDef fixture_def;
+      fixture_def.density = fixture_json["density"];
+      fixture_def.friction = fixture_json["friction"];
+      fixture_def.restitution = fixture_json["restitution"];
+      fixture_def.isSensor = fixture_json["is_sensor"];
+      fixture_def.filter.categoryBits = fixture_json["category_bits"];
+      fixture_def.filter.maskBits = fixture_json["mask_bits"];
+      fixture_def.filter.groupIndex = fixture_json["group_index"];
+
+      if (fixture_json.find("polygon") != fixture_json.end()) {
+        b2PolygonShape shape;
+        for (auto &vertex : fixture_json["polygon"]) {
+          shape.m_vertices[shape.m_count++] = {vertex[0], vertex[1]};
+        }
+        fixture_def.shape = &shape;
+      } else if (fixture_json.find("circle") != fixture_json.end()) {
+        b2CircleShape shape;
+        shape.m_p.Set(fixture_json["circle"]["center"][0],
+                      fixture_json["circle"]["center"][1]);
+        shape.m_radius = fixture_json["circle"]["radius"];
+        fixture_def.shape = &shape;
+      } else if (fixture_json.find("edge") != fixture_json.end()) {
+        b2EdgeShape shape;
+        shape.m_vertex1.Set(fixture_json["edge"]["start"][0],
+                            fixture_json["edge"]["start"][1]);
+        shape.m_vertex2.Set(fixture_json["edge"]["end"][0],
+                            fixture_json["edge"]["end"][1]);
+        fixture_def.shape = &shape;
+      }
+      body->CreateFixture(&fixture_def);
+    }
+  }
+  return world;
+}
 int main() {
   auto flock_params = swarm::behaviour::Registry::getInstance()
                           .getBehaviour("Flocking")
@@ -94,18 +153,17 @@ int main() {
       {"Decay Rate", 0.5},
       {"Obstacle Avoidance Weight", 1.0},
   });
-
+  b2World *world = LoadMap("test");
+  b2World *world2 = LoadMap("test2");
   swarm::TestConfig config = {
-      "Flocking", new_flock_params, smallDrone, BORDER_HEIGHT, BORDER_WIDTH, 1,
-      0,          1200.0f,
+      "Flocking", new_flock_params, smallDrone, world, 1, 0, 1200.0f,
   };
 
   swarm::TestConfig config2 = {
       "Pheromone Avoidance",
       pheromone_params,
       smallDrone,
-      500.0f,
-      500.0f,
+      world2,
       100,
       0,
       1200.0f,
@@ -114,16 +172,15 @@ int main() {
   swarm::TestStack stack;
   stack.push(config);
   stack.push(config2);
-  config.num_drones = 1024;
+  config.num_drones = 50;
   stack.push(config);
-
   std::unique_ptr<SwarmTest> test = std::make_unique<SwarmTest>();
   test->UseStack(stack);
   test->SetStackSim();
-
   auto contactListener = std::make_shared<swarm::BaseContactListener>();
   setupInteractions(*contactListener);
   test->SetContactListener(*contactListener);
+  // test->SetWorld(world);
   test->Build();
   RegisterTest("SwarmTest", "Swarm_Test", std::move(test));
   RegisterTest("MapCreator", "Map_Creator", std::make_unique<MapCreator>());
