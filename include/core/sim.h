@@ -7,7 +7,7 @@
 
 #include "behaviours/behaviour.h"
 #include "behaviours/registry.h"
-#include "core/test_stack.h"
+#include "core/test_queue.h"
 #include "drones/drone.h"
 #include "drones/drone_factory.h"
 #include "target.h"
@@ -35,6 +35,8 @@ class Sim {
 
   swarm::Behaviour *behaviour_;
   std::string current_behaviour_name_;
+
+  swarm::TestConfig test_config_;
 
   // Setup drone parameters and configurations
   std::unordered_map<std::string, DroneParameters> all_drone_parameters_;
@@ -69,7 +71,7 @@ class Sim {
   Sim(b2World *world, int drone_count, int target_count,
       DroneConfiguration *config, float border_width, float border_height,
       float time_limit);
-  Sim(b2World *world, swarm::TestConfig &config);
+  Sim(swarm::TestConfig &config);
   ~Sim();
   void run();
   void init();
@@ -112,6 +114,8 @@ class Sim {
     delete world_;
     world_ = world;
   }
+
+  swarm::TestConfig &test_config() { return test_config_; }
 
   std::string getBehaviourName() { return current_behaviour_name_; }
 
