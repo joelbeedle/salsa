@@ -373,7 +373,6 @@ class SwarmTest : public Test {
         }
         ImGui::EndCombo();
       }
-
       // Get parameters for test
       auto chosen_behaviour =
           swarm::behaviour::Registry::getInstance().getBehaviour(current_name);
@@ -383,9 +382,7 @@ class SwarmTest : public Test {
       if (new_params.empty() || to_change) {
         new_params.clear();
         for (const auto &pair : chosen_params) {
-          new_params[pair.first] =
-              pair.second->clone();  // Clone each Parameter and insert into the
-          // new map
+          new_params[pair.first] = pair.second->clone();
           to_change = false;
         }
       }
@@ -396,7 +393,11 @@ class SwarmTest : public Test {
       int index = 0;
       static char buf[16][128];
       const char *combo_items[] = {"Range", "List"};
-      static std::vector<int> selections(new_params.size(), 0);
+      static std::vector<int> selections;
+
+      if (selections.size() != new_params.size()) {
+        selections.resize(new_params.size(), 0);
+      }
 
       for (auto [name, parameter] : new_params) {
         ImGui::PushItemWidth(80.0f);
@@ -470,6 +471,7 @@ class SwarmTest : public Test {
 
     ImGui::SetNextTreeNodeOpen(true, ImGuiCond_Once);
     if (ImGui::CollapsingHeader("Behaviour Settings")) {
+      ImGui::Text("Current Behaviour");
       if (ImGui::BeginCombo("Behaviours",
                             sim->current_behaviour_name().c_str())) {
         auto behaviourNames =
@@ -513,7 +515,6 @@ class SwarmTest : public Test {
       }
       ImGui::Separator();
       ImGui::Text("Simulation Queue");
-      ImGui::Text("Current Test");
       ImGui::BeginChild("Current Test", ImVec2(200, 100), true,
                         ImGuiWindowFlags_None | ImGuiWindowFlags_MenuBar);
       if (ImGui::BeginMenuBar()) {
