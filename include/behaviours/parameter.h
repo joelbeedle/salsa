@@ -92,6 +92,13 @@ class Parameter {
   /// parameter.
   /// @return Constant reference to the maximum value of the parameter.
   const float &max_value() const { return max_value_; }
+
+  /// @brief Clones the parameter, creating a new instance with the same
+  /// settings.
+  /// @return Pointer to the cloned parameter.
+  Parameter *clone() const {
+    return new Parameter(value_, min_value_, max_value_);
+  }
 };
 
 }  // namespace behaviour
