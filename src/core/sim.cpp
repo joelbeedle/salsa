@@ -29,6 +29,7 @@ Sim::Sim(TestConfig &config)
   is_stack_test_ = true;
   b2Vec2 gravity(0.0f, 0.0f);
   world_->SetGravity(gravity);
+  logger_ = std::make_shared<Logger>("test.log");
   // createBounds();
   current_behaviour_name_ = config.behaviour_name;
   auto behaviour_pointer =
@@ -96,6 +97,9 @@ void Sim::createDronesCircular(Behaviour &behaviour,
 
     drones_.push_back(
         DroneFactory::createDrone(world_, b2Vec2(x, y), behaviour, config));
+  }
+  for (auto &drone : drones_) {
+    drone->addObserver(logger_);
   }
 }
 

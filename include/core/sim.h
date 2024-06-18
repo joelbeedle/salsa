@@ -37,6 +37,7 @@ class Sim {
   std::string current_behaviour_name_;
 
   swarm::TestConfig test_config_;
+  std::shared_ptr<Logger> logger_;
 
   // Setup drone parameters and configurations
   std::unordered_map<std::string, DroneParameters> all_drone_parameters_;

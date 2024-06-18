@@ -170,6 +170,7 @@ int main() {
   };
 
   swarm::TestQueue queue;
+  config.num_drones = 50;
   queue.push(config);
   queue.push(config2);
   config.num_drones = 50;
