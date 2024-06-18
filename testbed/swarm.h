@@ -25,7 +25,6 @@
 #include "utils/object_types.h"
 #include "utils/tree.h"
 
-#define TREE_COUNT 0
 #define MAX_TIME 1200.0f
 
 struct DroneParameters {
@@ -128,25 +127,6 @@ class SwarmTest : public Test {
   }
 
   void SetDroneCount(int count) { sim_builder->setDroneCount(count); }
-
-  void createTrees() {
-    // Seed for reproducability
-    auto seed =
-        std::chrono::high_resolution_clock::now().time_since_epoch().count();
-
-    srand(seed);
-    const float margin = 2.0f;
-    for (int i = 0; i < TREE_COUNT; i++) {
-      float x =
-          (rand() % static_cast<int>(sim->world_width() - 2 * margin)) + margin;
-      float y = (rand() % static_cast<int>(sim->world_height() - 2 * margin)) +
-                margin;
-      trees.push_back(
-          new swarm::Tree(m_world, i, b2Vec2(x, y), false, false, 2.5f));
-      treePositions.push_back(trees[i]->getBody()->GetPosition());
-      treeColors.push_back(falseColour);
-    }
-  }
 
   static Test *Create() {
     // Generate a new version of this test with the user defined settings
