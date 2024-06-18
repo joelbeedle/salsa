@@ -3,7 +3,7 @@
 #include <memory>
 
 #include "behaviours/registry.h"
-#include "core/test_stack.h"
+#include "core/test_queue.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "mock_behaviour.h"
