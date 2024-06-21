@@ -1,7 +1,8 @@
+#include "core/test_queue.h"
+
 #include <memory>
 
 #include "behaviours/parameter.h"
-#include "core/test_queue.h"
 #include "gtest/gtest.h"
 
 using swarm::TestConfig;
@@ -24,14 +25,19 @@ TEST_F(TestQueueTest, PushAndPopTest) {
   parameters.insert({"speed", &param});
 
   TestConfig testConfig1 = {
-      "TestBehaviour1", parameters, nullptr, nullptr, 100, 5, 3};
-
+      "Behaviour1",
+      std::variant<TestConfig::Parameters, TestConfig::FloatParameters>(),
+      nullptr,
+      nullptr,
+      100,
+      2,
+      30.0f};
   TestQueue::push(testConfig1);
   EXPECT_EQ(1, TestQueue::size());
 
   auto poppedConfig = TestQueue::pop();
-  EXPECT_EQ("TestBehaviour1", poppedConfig.behaviour_name);
-  EXPECT_EQ(5, poppedConfig.num_drones);
+  EXPECT_EQ(100, poppedConfig.num_drones);
+  EXPECT_EQ("Behaviour1", poppedConfig.behaviour_name);
 }
 
 TEST_F(TestQueueTest, PopEmptyStack) {
@@ -59,6 +65,6 @@ TEST_F(TestQueueTest, MaintainOrder) {
   TestQueue::push(testConfig1);
   TestQueue::push(testConfig2);
 
-  EXPECT_EQ("Behaviour2", TestQueue::pop().behaviour_name);
   EXPECT_EQ("Behaviour1", TestQueue::pop().behaviour_name);
+  EXPECT_EQ("Behaviour2", TestQueue::pop().behaviour_name);
 }

@@ -4,7 +4,7 @@ add_executable(
   drone_test.cpp
   behaviour_registry_test.cpp
   parameter_test.cpp
-  test_stack_test.cpp
+  test_queue_test.cpp
   sim_test.cpp
   mock_behaviour.h
   mock_drone.h
