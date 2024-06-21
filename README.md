@@ -74,22 +74,26 @@ SwarmTest::Run();
 
 ### Dependencies
 
-- CMake
-- A C/C++ compiler (gcc, clang, cl)
-- Box2D (packaged with directory)
+- CMake 3.14+
+- A C++17 compatible compiler (gcc, clang, cl)
+- Git
+- Doxygen (optional)
 - OpenGL and GLFW
-
+- Box2D (packaged with directory as submodule)
+- spdlog (should be downloaded automatically)
+- nhlohmann_json (should be downloaded automatically)
+  
 ### Steps
 
 1. Clone the github directory using `git clone --recursive https://github.com/joelbeedle/swarm-sim.git`
    - Note: the `--recursive` tag is important, as this also clones the Box2D submodule
 2. Set up the Box2D submodule using `git submodule update --init --recursive`
-3. Run the following commands:
-   - `mkdir build`
-   - `cd build`
-   - `cmake .`
-4. The `testbed` binary will be found in `build/testbed`, the library `.a` file in `build/src`, and the docs in `build/docs`.
-5. To run the testbed, use `./testbed`.
+3. To configure, inside the root `swarm-sim` folder, run `cmake -S . -B build`
+   - If you have Ninja installed, you can run: `cmake -S . -B build -GNinja`
+4. To build, run `cmake --build build`
+   - To run tests, `cmake --build build --target test`
+5. To build docs (this requires Doxygen, docs can be found in `build/docs/html`), run `cmake --build --target docs`
+6. To run the testbed, then navigate to `build/testbed` and run `./testbed`.
 
 ## Design
 
