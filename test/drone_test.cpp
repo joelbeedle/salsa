@@ -5,9 +5,9 @@
 #include <gtest/gtest.h>
 
 #include "behaviours/behaviour.h"
+#include "drones/drone_configuration.h"
 #include "drones/drone_factory.h"
 #include "mock_behaviour.h"
-#include "utils/drone_configuration.h"
 
 using ::testing::_;
 // Test fixture for Drone tests
