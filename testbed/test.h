@@ -139,7 +139,7 @@ class Test : public b2ContactListener {
 };
 
 // typedef Test* TestCreateFcn();
-typedef std::unique_ptr<Test> TestCreateFcn;
+typedef std::unique_ptr<Test> TestCreateFcn();
 
 int RegisterTest(const char *category, const char *name, TestCreateFcn fcn);
 
@@ -147,7 +147,7 @@ int RegisterTest(const char *category, const char *name, TestCreateFcn fcn);
 struct TestEntry {
   const char *category;
   const char *name;
-  TestCreateFcn instance;
+  TestCreateFcn *instance;
 };
 
 #define MAX_TESTS 256

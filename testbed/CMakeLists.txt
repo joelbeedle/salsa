@@ -9,8 +9,8 @@ set (MY_TESTBED_SOURCE_FILES
 	settings.cpp
 	test.cpp
 	test.h
+	map.cpp
 	swarm.cpp
-	swarm.h
 	main.cpp
 	behaviours/pheromone_avoidance.cpp
 	behaviours/flocking.cpp
