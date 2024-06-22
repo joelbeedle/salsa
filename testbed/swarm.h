@@ -14,7 +14,7 @@
 #include "core/test_queue.h"
 #include "draw.h"
 #include "drones/drone.h"
-#include "imgui/imgui.h"
+#include "imgui.h"
 #include "map.h"
 #include "run_sim.h"
 #include "settings.h"
@@ -469,7 +469,7 @@ class SwarmTest : public Test {
       ImGui::EndPopup();
     }
 
-    ImGui::SetNextTreeNodeOpen(true, ImGuiCond_Once);
+    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if (ImGui::CollapsingHeader("Behaviour Settings")) {
       ImGui::Text("Current Behaviour");
       if (ImGui::BeginCombo("Behaviours",
@@ -591,7 +591,7 @@ class SwarmTest : public Test {
             25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f));
       }
     }
-    ImGui::SetNextTreeNodeOpen(true, ImGuiCond_Once);
+    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if (ImGui::CollapsingHeader("Drone Settings")) {
       // Drone settings window
       ImGui::Text("Drone Preset Settings");

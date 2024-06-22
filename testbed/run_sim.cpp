@@ -29,12 +29,16 @@
 #include <chrono>
 #include <thread>
 
+#include "backends/imgui_impl_glfw.h"
+#include "backends/imgui_impl_opengl3.h"
 #include "draw.h"
-#include "imgui/imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
+#include "imgui.h"
 #include "settings.h"
 #include "test.h"
+
+#ifdef __APPLE__
+#define GL_SILENCE_DEPRECATION
+#endif
 
 #if defined(_WIN32)
 #include <crtdbg.h>
@@ -67,7 +71,7 @@ static void RestartTest() {
 }
 
 static void CreateUI(GLFWwindow *window, const char *glslVersion = NULL) {
-  IMGUI_CHECKVERSION();
+  // IMGUI_CHECKVERSION();
   ImGui::CreateContext();
 
   bool success;

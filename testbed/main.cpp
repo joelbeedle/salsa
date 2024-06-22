@@ -23,7 +23,7 @@
 #include "draw.h"
 #include "drones/drone.h"
 #include "drones/drone_factory.h"
-#include "imgui/imgui.h"
+#include "imgui.h"
 #include "map.h"
 #include "nlohmann/json.hpp"
 #include "settings.h"
@@ -72,8 +72,13 @@ static void setupInteractions(swarm::BaseContactListener &listener) {
 }
 b2World *LoadMap(const char *new_map_name) {
   b2World *world = new b2World(b2Vec2(0.0f, 0.0f));
-  std::ifstream file("../../testbed/maps/" + std::string(new_map_name) +
-                     ".json");
+  std::filesystem::path file_path = "../../testbed/maps";
+  file_path /= std::string(new_map_name) + ".json";
+  std::ifstream file(file_path);
+  if (!file.is_open()) {
+    throw std::runtime_error("Could not open file at: " + file_path.string());
+  }
+
   nlohmann::json map;
   file >> map;
 
@@ -156,7 +161,7 @@ int main() {
   b2World *world = LoadMap("test");
   b2World *world2 = LoadMap("test2");
   swarm::TestConfig config = {
-      "Flocking", new_flock_params, smallDrone, world, 1, 0, 1200.0f,
+      "Flocking", pheromone_params, smallDrone, world, 100, 0, 1200.0f,
   };
 
   swarm::TestConfig config2 = {

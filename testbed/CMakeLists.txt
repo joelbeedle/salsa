@@ -3,10 +3,6 @@
 set (MY_TESTBED_SOURCE_FILES
 	draw.cpp
 	draw.h
-	imgui_impl_glfw.cpp
-	imgui_impl_glfw.h
-	imgui_impl_opengl3.cpp
-	imgui_impl_opengl3.h
 	run_sim.cpp
 	run_sim.h
 	settings.h
@@ -30,9 +26,9 @@ FetchContent_Declare(
 	GIT_TAG        v3.11.3)
 FetchContent_MakeAvailable(nlohmann_json)
 
-add_executable(my_testbed ${MY_TESTBED_SOURCE_FILES} )
+add_executable(my_testbed ${MY_TESTBED_SOURCE_FILES})
 target_compile_features(my_testbed PRIVATE cxx_std_20)
-target_link_libraries(my_testbed PRIVATE glfw imgui sajson glad box2d nlohmann_json::nlohmann_json swarm-sim)
+target_link_libraries(my_testbed PRIVATE glad glfw imgui box2d nlohmann_json::nlohmann_json swarm-sim)
 
 # message(STATUS "runtime = ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 # message(STATUS "binary = ${CMAKE_CURRENT_BINARY_DIR}")

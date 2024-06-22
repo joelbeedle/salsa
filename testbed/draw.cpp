@@ -29,7 +29,7 @@
 #include <iostream>
 #include <vector>
 
-#include "imgui/imgui.h"
+#include "imgui.h"
 
 #define BUFFER_OFFSET(x) ((const void *)(x))
 #define MAX_VERTICES_BASE 2048

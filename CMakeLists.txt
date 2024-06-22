@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.14...3.51)
 project(SwarmSim
  VERSION 1.0
  DESCRIPTION "Drone Swarm Simulation System"
- LANGUAGES CXX)
+ LANGUAGES CXX C)
 
  if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 
@@ -33,6 +33,15 @@ FetchContent_MakeAvailable(googletest)
 
 add_compile_definitions(_USE_MATH_DEFINES)
 
+# We don't want to build the Box2D testbed, so we turn it off
+set(BOX2D_BUILD_TESTBED OFF CACHE BOOL "Turn off Box2D testbed" FORCE)
+
+# Add GLFW submodule
+add_subdirectory(extern/glfw)
+
+add_subdirectory(extern/glad)
+
+add_subdirectory(extern/imgui)
 
 # Add Box2D submodule, and include it
 add_subdirectory(extern/Box2D)

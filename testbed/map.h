@@ -8,7 +8,7 @@
 
 #include "box2d/b2_body.h"
 #include "box2d/b2_math.h"
-#include "imgui/imgui.h"
+#include "imgui.h"
 #include "nlohmann/json.hpp"
 #include "settings.h"
 #include "test.h"
@@ -544,7 +544,7 @@ class MapCreator : public Test {
 
     // Drawing Controls
     static int selected = -1;
-    ImGui::SetNextTreeNodeOpen(true, ImGuiCond_Once);
+    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if (ImGui::TreeNode("Drawing Controls")) {
       if (ImGui::Selectable("Line", selected == 0)) selected = 0;
       if (ImGui::Selectable("Polygon", selected == 1)) selected = 1;
@@ -554,7 +554,7 @@ class MapCreator : public Test {
       ImGui::TreePop();
     }
     ImGui::Separator();
-    ImGui::SetNextTreeNodeOpen(true, ImGuiCond_Once);
+    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if (ImGui::TreeNode("Drone Spawn Controls")) {
       if (ImGui::Button("Drone Spawn")) {
         points.clear();
@@ -592,7 +592,7 @@ class MapCreator : public Test {
     if (ImGui::BeginPopupModal("Save As", NULL,
                                ImGuiWindowFlags_AlwaysAutoResize)) {
       static char str1[128] = "";
-      if (ImGui::IsRootWindowOrAnyChildFocused() && !ImGui::IsAnyItemActive() &&
+      if (ImGui::IsWindowFocused() && !ImGui::IsAnyItemActive() &&
           !ImGui::IsMouseClicked(0))
         ImGui::SetKeyboardFocusHere(0);
       ImGui::InputText("Map Name", str1, IM_ARRAYSIZE(str1));
@@ -621,7 +621,7 @@ class MapCreator : public Test {
     if (ImGui::BeginPopupModal("Open Map", NULL,
                                ImGuiWindowFlags_AlwaysAutoResize)) {
       static char str1[128] = "";
-      if (ImGui::IsRootWindowOrAnyChildFocused() && !ImGui::IsAnyItemActive() &&
+      if (ImGui::IsAnyItemFocused() && !ImGui::IsAnyItemActive() &&
           !ImGui::IsMouseClicked(0))
         ImGui::SetKeyboardFocusHere(0);
       ImGui::InputText("Map Name", str1, IM_ARRAYSIZE(str1));
@@ -648,7 +648,8 @@ class MapCreator : public Test {
     bool changed = false;
     if (draw_boundary) {
       ImGui::Text("Boundary Length");
-      changed = ImGui::SliderFloat("", &boundary_side_length, 0.0f, 4000.0f);
+      changed =
+          ImGui::SliderFloat("Length", &boundary_side_length, 0.0f, 4000.0f);
       if (changed) {
         DeleteBoundary();
         CreateBoundary();
