@@ -1,9 +1,8 @@
-#ifndef SWARM_H
-#define SWARM_H
 #include <box2d/box2d.h>
 #include <stdio.h>
 
 #include <chrono>
+#include <fstream>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -14,14 +13,13 @@
 #include "core/test_queue.h"
 #include "draw.h"
 #include "drones/drone.h"
+#include "drones/drone_configuration.h"
 #include "imgui.h"
-#include "map.h"
 #include "run_sim.h"
 #include "settings.h"
 #include "test.h"
 #include "utils/base_contact_listener.h"
 #include "utils/collision_manager.h"
-#include "utils/drone_configuration.h"
 #include "utils/object_types.h"
 #include "utils/tree.h"
 
@@ -36,7 +34,7 @@ struct DroneParameters {
   float mass;
   float radius;
 };
-class SwarmTest : public Test {
+class QueueSimulator : public Test {
  private:
   swarm::Sim *sim;
   static swarm::SimBuilder *sim_builder;
@@ -62,22 +60,22 @@ class SwarmTest : public Test {
       b2Color(0.5f * 0.77f, 0.5f * 0.92f, 0.5f * 0.66f, 0.5f * 0.25f);
 
  public:
-  SwarmTest() {
+  QueueSimulator() {
+    swarm::DroneConfiguration *smallDrone = new swarm::DroneConfiguration(
+        25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f);
+
     g_debugDraw.SetFlags(b2Draw::e_shapeBit | b2Draw::e_jointBit);
-    sim_builder->setWorld(new b2World(b2Vec2(0.0f, 0.0f)));
-    sim = sim_builder->build();
+    m_world = new b2World(b2Vec2(0.0f, 0.0f));
+    sim = new swarm::Sim(m_world, 0, 0, smallDrone, 0, 0, 0);
 
     auto &registry = swarm::behaviour::Registry::getInstance();
     auto behaviour_names = registry.getBehaviourNames();
-    if (!behaviour_names.empty()) {
-      sim->current_behaviour_name() = behaviour_names[0];
-      sim->setBehaviour(registry.getBehaviour(sim->current_behaviour_name()));
-    }
-    g_camera.m_center.x = sim->world_height() / 2;
-    g_camera.m_center.y = sim->world_width() / 2;
-    g_camera.m_zoom = 10.0f;
+    sim->setCurrentBehaviour(behaviour_names[0]);
 
     // m_world->SetContactListener(contactListener_);
+  }
+  static std::unique_ptr<Test> Create() {
+    return std::make_unique<QueueSimulator>();
   }
   void Build() { sim_builder->build(); }
   void SetBuilder(swarm::SimBuilder *builder) {
@@ -100,7 +98,6 @@ class SwarmTest : public Test {
     sim = temp_sim;
     delete old_sim;
     sim->setCurrentBehaviour(sim->current_behaviour_name());
-    sim->applyCurrentBehaviour();
     m_world = sim->getWorld();
     pause = false;
     return true;
@@ -128,17 +125,13 @@ class SwarmTest : public Test {
 
   void SetDroneCount(int count) { sim_builder->setDroneCount(count); }
 
-  static Test *Create() {
-    // Generate a new version of this test with the user defined settings
-    return new SwarmTest();
-  }
   void Step(Settings &settings) override {
     // Run simulation steps here
     Test::Step(settings);
     settings.m_pause = pause;
     std::vector<int> foundTreeIDs;
     sim->update();
-    if (!settings.m_pause) sim->current_time() += 1.0f / settings.m_hertz;
+    // if (!settings.m_pause) sim->current_time() += 1.0f / settings.m_hertz;
     m_world->DebugDraw();
     Draw(sim->getWorld(), &g_debugDraw, foundTreeIDs);
     if (next_frame) {
@@ -152,14 +145,14 @@ class SwarmTest : public Test {
       next_frame = false;
     }
     if (using_queue_) {
-      if (sim->current_time() >= sim->time_limit()) {
-        // This sim is finished, get the next one from the stack
-        pause = true;
-        next_frame = true;
-      }
+      // if (sim->current_time() >= sim->time_limit()) {
+      // This sim is finished, get the next one from the stack
+      // pause = true;
+      // next_frame = true;
+      // }
     }
 
-    g_debugDraw.DrawString(5, m_textLine, "%fs", sim->current_time());
+    // g_debugDraw.DrawString(5, m_textLine, "%fs", sim->current_time());
     m_textLine += m_textIncrement;
   }
 
@@ -503,7 +496,6 @@ class SwarmTest : public Test {
           if (ImGui::Selectable(name.c_str(), isSelected)) {
             sim->current_behaviour_name() = name;
             sim->setCurrentBehaviour(name);
-            sim->applyCurrentBehaviour();
           }
           if (isSelected) {
             ImGui::SetItemDefaultFocus();
@@ -515,7 +507,7 @@ class SwarmTest : public Test {
       ImGui::SeparatorText("Behaviour Settings");
       bool changed = false;
       auto behaviour = swarm::behaviour::Registry::getInstance().getBehaviour(
-          sim->getBehaviourName());
+          sim->current_behaviour_name());
       for (auto [name, parameter] : behaviour->getParameters()) {
         changed |=
             ImGui::SliderFloat(name.c_str(), &(parameter->value()),
@@ -523,7 +515,7 @@ class SwarmTest : public Test {
       }
 
       if (changed) {
-        sim->applyCurrentBehaviour();
+        sim->setCurrentBehaviour(sim->current_behaviour_name());
       }
       ImGui::SeparatorText("Visual Settings");
       ImGui::Checkbox("Draw Drone visual range", &draw_visual_range_);
@@ -750,5 +742,5 @@ class SwarmTest : public Test {
     }
   }
 };
-
-#endif  // SWARM_H
+static int testIndex2 =
+    RegisterTest("Simulator", "Queue Mode", QueueSimulator::Create);

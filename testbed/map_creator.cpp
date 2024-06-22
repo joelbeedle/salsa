@@ -1,5 +1,3 @@
-#ifndef SWARM_TESTBED_MAP_H
-#define SWARM_TESTBED_MAP_H
 #include <box2d/box2d.h>
 
 #include <filesystem>
@@ -439,7 +437,9 @@ class MapCreator : public Test {
     }
   }
 
-  static Test *Create() { return new MapCreator(); }
+  static std::unique_ptr<Test> Create() {
+    return std::make_unique<MapCreator>();
+  }
   void Step(Settings &settings) override {
     Test::Step(settings);
     settings.m_pause = pause;
@@ -676,5 +676,5 @@ class MapCreator : public Test {
     ImGui::End();
   }
 };
-
-#endif  // SWARM_TESTBED_MAP_H
+static int testIndex =
+    RegisterTest("Map Creator", "Map Creator", MapCreator::Create);

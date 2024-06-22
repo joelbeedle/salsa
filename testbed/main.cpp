@@ -22,15 +22,15 @@
 #include "core/test_queue.h"
 #include "draw.h"
 #include "drones/drone.h"
+#include "drones/drone_configuration.h"
 #include "drones/drone_factory.h"
 #include "imgui.h"
-#include "map.h"
 #include "nlohmann/json.hpp"
+#include "run_sim.h"
 #include "settings.h"
-#include "swarm.h"
 #include "test.h"
+#include "utils/base_contact_listener.h"
 #include "utils/collision_manager.h"
-#include "utils/drone_configuration.h"
 #include "utils/object_types.h"
 #include "utils/tree.h"
 
@@ -70,10 +70,51 @@ static void setupInteractions(swarm::BaseContactListener &listener) {
         }
       });
 }
+#if defined(_WIN32)
+#include <windows.h>
+#elif defined(__linux__)
+#include <limits.h>
+#include <unistd.h>
+#elif defined(__APPLE__)
+#include <mach-o/dyld.h>
+#endif
+
+std::filesystem::path getExecutablePath() {
+#if defined(_WIN32)
+  char path[MAX_PATH] = {0};
+  HMODULE hModule = GetModuleHandle(nullptr);
+  if (GetModuleFileNameA(hModule, path, MAX_PATH) == 0) {
+    throw std::runtime_error("Failed to get module filename.");
+  }
+  return std::filesystem::path(path).parent_path();
+#elif defined(__linux__)
+  char result[PATH_MAX];
+  ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
+  if (count == -1) {
+    throw std::runtime_error(
+        "Failed to read symbolic link for executable path.");
+  }
+  return std::filesystem::path(std::string(result, (count > 0) ? count : 0))
+      .parent_path();
+#elif defined(__APPLE__)
+  char path[1024];
+  uint32_t size = sizeof(path);
+  if (_NSGetExecutablePath(path, &size) != 0) {
+    throw std::runtime_error("Buffer too small; increase buffer size.");
+  }
+  return std::filesystem::path(path).parent_path();
+#else
+  throw std::runtime_error("Unsupported platform.");
+#endif
+}
+
 b2World *LoadMap(const char *new_map_name) {
+  std::filesystem::path exec_path = getExecutablePath();
+  std::filesystem::path file_path = exec_path / ".." / ".." / "testbed" /
+                                    "maps" /
+                                    (std::string(new_map_name) + ".json");
+
   b2World *world = new b2World(b2Vec2(0.0f, 0.0f));
-  std::filesystem::path file_path = "../../testbed/maps";
-  file_path /= std::string(new_map_name) + ".json";
   std::ifstream file(file_path);
   if (!file.is_open()) {
     throw std::runtime_error("Could not open file at: " + file_path.string());
@@ -135,6 +176,9 @@ b2World *LoadMap(const char *new_map_name) {
   return world;
 }
 int main() {
+  b2World *world = LoadMap("test");
+  b2World *world2 = LoadMap("test2");
+
   auto flock_params = swarm::behaviour::Registry::getInstance()
                           .getBehaviour("Flocking")
                           ->getParameters();
@@ -158,8 +202,6 @@ int main() {
       {"Decay Rate", 0.5},
       {"Obstacle Avoidance Weight", 1.0},
   });
-  b2World *world = LoadMap("test");
-  b2World *world2 = LoadMap("test2");
   swarm::TestConfig config = {
       "Flocking", pheromone_params, smallDrone, world, 100, 0, 1200.0f,
   };
@@ -168,7 +210,7 @@ int main() {
       "Pheromone Avoidance",
       pheromone_params,
       smallDrone,
-      world2,
+      world,
       100,
       0,
       1200.0f,
@@ -180,15 +222,6 @@ int main() {
   queue.push(config2);
   config.num_drones = 50;
   queue.push(config);
-  std::unique_ptr<SwarmTest> test = std::make_unique<SwarmTest>();
-  test->UseQueue(queue);
-  test->SetNextTestFromQueue();
-  auto contactListener = std::make_shared<swarm::BaseContactListener>();
-  setupInteractions(*contactListener);
-  test->SetContactListener(*contactListener);
-  test->Build();
-  RegisterTest("SwarmTest", "Swarm_Test", std::move(test));
-  RegisterTest("MapCreator", "Map_Creator", std::make_unique<MapCreator>());
   run_sim();
   return 0;
 }

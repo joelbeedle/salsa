@@ -9,8 +9,9 @@ set (MY_TESTBED_SOURCE_FILES
 	settings.cpp
 	test.cpp
 	test.h
-	swarm.cpp
-	swarm.h
+	map_creator.cpp
+	queue_mode.cpp
+	sandbox_mode.cpp
 	main.cpp
 	behaviours/pheromone_avoidance.cpp
 	behaviours/flocking.cpp

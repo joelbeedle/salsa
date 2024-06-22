@@ -12,7 +12,7 @@
 
 #include "behaviours/behaviour.h"
 #include "behaviours/parameter.h"
-#include "utils/drone_configuration.h"
+#include "drones/drone_configuration.h"
 
 namespace swarm {
 

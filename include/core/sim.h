@@ -9,10 +9,10 @@
 #include "behaviours/registry.h"
 #include "core/test_queue.h"
 #include "drones/drone.h"
+#include "drones/drone_configuration.h"
 #include "drones/drone_factory.h"
 #include "target.h"
 #include "utils/base_contact_listener.h"
-#include "utils/drone_configuration.h"
 
 namespace swarm {
 
@@ -28,185 +28,167 @@ struct DroneParameters {
 
 class Sim {
  private:
-  b2World *world_;
+  // Box2D world pointer
+  b2World* world_;
+  // Contact listener for Box2D collisions
+  swarm::BaseContactListener* contact_listener_;
 
+  // Simulation configurations and parameters
+  swarm::TestConfig test_config_;
   float border_height_;
   float border_width_;
+  float time_limit_ = -1.0f;
+  float current_time_ = 0.0f;
+  bool is_stack_test_ = false;
 
-  swarm::Behaviour *behaviour_;
-  std::string current_behaviour_name_;
-
-  swarm::TestConfig test_config_;
-  std::shared_ptr<Logger> logger_;
-
-  // Setup drone parameters and configurations
+  // Drone management
   std::unordered_map<std::string, DroneParameters> all_drone_parameters_;
   std::unordered_map<std::string, swarm::DroneConfiguration>
       all_drone_configurations_;
-
-  swarm::DroneConfiguration *drone_configuration_;
-  DroneParameters *drone_parameters_;
-
+  swarm::DroneConfiguration* drone_configuration_;
   std::vector<std::unique_ptr<swarm::Drone>> drones_;
-  std::vector<swarm::Target *> targets_;
-  std::vector<b2Body *> obstacles_;
-
-  swarm::BaseContactListener *contact_listener_;
-
-  float obstacle_view_range_;
-  float camera_view_range_;
+  float num_drones_;
   float max_speed_;
   float max_force_;
 
-  float num_drones_;
+  // Target management
+  std::vector<swarm::Target*> targets_;
   float num_targets_;
-  float is_stack_test_ = false;
-  float time_limit_ = -1.0f;
-  float current_time_ = 0.0f;
 
+  // Obstacles in the environment
+  std::vector<b2Body*> obstacles_;
+  float obstacle_view_range_;
+
+  // Behaviour management
+  swarm::Behaviour* behaviour_;
+  std::string current_behaviour_name_;
+  float camera_view_range_;
+
+  // Visualization flags
   bool draw_visual_range_ = false;
   bool draw_targets_ = false;
-  bool draw_drones = false;
+  bool draw_drones_ = false;
+
+  // Logging
+  std::shared_ptr<Logger> logger_;
+
+  // Private methods for internal use
+  void createBounds();
+  void applyCurrentBehaviour();
+  void createDronesCircular(Behaviour& behaviour,
+                            DroneConfiguration& configuration);
+  void createDronesRandom(Behaviour& behaviour,
+                          DroneConfiguration& configuration);
 
  public:
-  Sim(b2World *world, int drone_count, int target_count,
-      DroneConfiguration *config, float border_width, float border_height,
+  // Constructors and Destructor
+  Sim(b2World* world, int drone_count, int target_count,
+      DroneConfiguration* config, float border_width, float border_height,
       float time_limit);
-  Sim(swarm::TestConfig &config);
+  Sim(swarm::TestConfig& config);
   ~Sim();
-  void run();
-  void init();
+
+  enum class SpawnType { CIRCULAR, RANDOM };
+
+  // Simulation control
   void update();
   void reset();
-  void cleanup();
-  void updateImGui();
+
   // Behaviour functions
-  void addBehaviour(const std::string &name,
+  void addBehaviour(const std::string& name,
                     std::unique_ptr<swarm::Behaviour> behaviour);
-  void applyCurrentBehaviour();
+  void setCurrentBehaviour(Behaviour* behaviour);
+  void setCurrentBehaviour(const std::string& name);
 
   // Drone functions
-  void createDrones(Behaviour &behaviour, DroneConfiguration &configuration);
-  void createDronesCircular(Behaviour &behaviour,
-                            DroneConfiguration &configuration);
+  void createDrones(Behaviour& behaviour, DroneConfiguration& configuration,
+                    SpawnType mode);
   void setDroneCount(int count);
-  void setDroneConfiguration(DroneConfiguration *configuration);
+  int getDroneCount();
+  void setDroneConfiguration(DroneConfiguration* configuration);
   void updateDroneSettings();
+  std::vector<std::unique_ptr<swarm::Drone>>& getDrones();
+  void setDrones(std::vector<std::unique_ptr<swarm::Drone>> drones);
 
   // Target functions
   void setTargetCount(int count);
 
   // Box2D functions
-  void setContactListener(BaseContactListener &listener);
+  void setContactListener(BaseContactListener& listener);
 
-  float &world_height() { return border_height_; }
-  const float &world_height() const { return border_height_; }
-
-  float &world_width() { return border_width_; }
-  const float &world_width() const { return border_width_; }
-
-  float &current_time() { return current_time_; }
-  const float &current_time() const { return current_time_; }
-
-  float &time_limit() { return time_limit_; }
-  b2World *getWorld() { return world_; }
-  void setWorld(b2World *world) {
-    // test
-    delete world_;
-    world_ = world;
-  }
-
-  swarm::TestConfig &test_config() { return test_config_; }
-
-  std::string getBehaviourName() { return current_behaviour_name_; }
-
-  std::string &current_behaviour_name() { return current_behaviour_name_; }
-  const std::string &current_behaviour_name() const {
-    return current_behaviour_name_;
-  }
-  void setBehaviour(Behaviour *behaviour) { behaviour_ = behaviour; }
-  Behaviour *getBehaviour() { return behaviour_; }
-  Behaviour *behaviour() { return behaviour_; }
-  const Behaviour *behaviour() const { return behaviour_; }
-  void setCurrentBehaviour(const std::string &name) {
-    behaviour_ = behaviour::Registry::getInstance().getBehaviour(name);
-    current_behaviour_name_ = name;
-  }
-  int getDroneCount() { return num_drones_; }
-  std::vector<std::unique_ptr<swarm::Drone>> &getDrones() { return drones_; }
-  void setDrones(std::vector<std::unique_ptr<swarm::Drone>> drones) {
-    drones_ = std::move(drones);
-  }
-
-  DroneConfiguration *getDroneConfiguration() { return drone_configuration_; }
-  void setCurrentDroneConfiguration(DroneConfiguration &configuration) {
-    drone_configuration_ = &configuration;
-  }
-
-  DroneConfiguration *drone_configuration() { return drone_configuration_; }
-  const DroneConfiguration *drone_configuration() const {
-    return drone_configuration_;
-  }
-
- private:
-  void createBounds();
+  // Getters and Setters for properties
+  float& world_height();
+  const float& world_height() const;
+  float& world_width();
+  const float& world_width() const;
+  float& current_time();
+  const float& current_time() const;
+  float& time_limit();
+  b2World* getWorld();
+  void setWorld(b2World* world);
+  swarm::TestConfig& test_config();
+  std::string& current_behaviour_name();
+  const std::string& current_behaviour_name() const;
+  DroneConfiguration* getDroneConfiguration();
+  const DroneConfiguration* drone_configuration() const;
+  void setCurrentDroneConfiguration(DroneConfiguration& configuration);
 };
 
 class SimBuilder {
  private:
-  b2World *world_;
-  Behaviour *behaviour_;
+  b2World* world_;
+  Behaviour* behaviour_;
   int drone_count_ = 0;
   int target_count_ = 0;
   float world_height_ = 0;
   float world_width_ = 0;
   float time_limit_ = -1.0f;
-  DroneConfiguration *config_;
-  BaseContactListener *contact_listener_;
+  DroneConfiguration* config_;
+  BaseContactListener* contact_listener_;
 
  public:
-  SimBuilder &setWorld(b2World *world) {
+  SimBuilder& setWorld(b2World* world) {
     world_ = world;
     return *this;
   }
 
-  SimBuilder &setDroneCount(int count) {
+  SimBuilder& setDroneCount(int count) {
     drone_count_ = count;
     return *this;
   }
 
-  SimBuilder &setTargetCount(int count) {
+  SimBuilder& setTargetCount(int count) {
     target_count_ = count;
     return *this;
   }
 
-  SimBuilder &setContactListener(BaseContactListener &listener) {
+  SimBuilder& setContactListener(BaseContactListener& listener) {
     contact_listener_ = &listener;
     world_->SetContactListener(&listener);
     return *this;
   }
 
-  SimBuilder &setDroneConfiguration(DroneConfiguration *config) {
+  SimBuilder& setDroneConfiguration(DroneConfiguration* config) {
     config_ = config;
     return *this;
   }
 
-  SimBuilder &setWorldHeight(float height) {
+  SimBuilder& setWorldHeight(float height) {
     world_height_ = height;
     return *this;
   }
 
-  SimBuilder &setWorldWidth(float width) {
+  SimBuilder& setWorldWidth(float width) {
     world_width_ = width;
     return *this;
   }
 
-  SimBuilder &setTimeLimit(float time_limit) {
+  SimBuilder& setTimeLimit(float time_limit) {
     time_limit_ = time_limit;
     return *this;
   }
 
-  Sim *build() {
+  Sim* build() {
     std::cout << "Building sim with:\nDrone count: " << drone_count_
               << "\nTarget Count: " << target_count_
               << "\nWorld Height: " << world_height_
