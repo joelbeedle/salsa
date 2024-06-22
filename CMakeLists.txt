@@ -35,7 +35,7 @@ add_compile_definitions(_USE_MATH_DEFINES)
 
 # We don't want to build the Box2D testbed, so we turn it off
 set(BOX2D_BUILD_TESTBED OFF CACHE BOOL "Turn off Box2D testbed" FORCE)
-
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "Turn off GLFW docs" FORCE)
 # Add GLFW submodule
 add_subdirectory(extern/glfw)
 
