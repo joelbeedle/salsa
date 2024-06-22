@@ -54,6 +54,8 @@ class SandboxSimulator : public Test {
   bool added_new_test_ = false;
   bool add_test_permutation_ = false;
   bool added_test_permutation_ = false;
+  bool update_drone_count_ = false;
+  int new_count;
   b2Color falseColour =
       b2Color(0.5f * 0.95294f, 0.5f * 0.50588f, 0.5f * 0.50588f, 0.5f * 0.25f);
   b2Color trueColour =
@@ -66,8 +68,8 @@ class SandboxSimulator : public Test {
 
     g_debugDraw.SetFlags(b2Draw::e_shapeBit | b2Draw::e_jointBit);
     m_world = new b2World(b2Vec2(0.0f, 0.0f));
-    sim = new swarm::Sim(m_world, 0, 0, smallDrone, 0, 0, 0);
-
+    sim = new swarm::Sim(m_world, 1, 0, smallDrone, 2000, 2000, 0);
+    new_count = 1;
     auto &registry = swarm::behaviour::Registry::getInstance();
     auto behaviour_names = registry.getBehaviourNames();
     sim->setCurrentBehaviour(behaviour_names[0]);
@@ -134,26 +136,14 @@ class SandboxSimulator : public Test {
     // if (!settings.m_pause) sim->current_time() += 1.0f / settings.m_hertz;
     m_world->DebugDraw();
     Draw(sim->getWorld(), &g_debugDraw, foundTreeIDs);
-    if (next_frame) {
-      pause = true;
-      try {
-        SetNextTestFromQueue();
-      } catch (const std::exception &e) {
-        std::cerr << "No more tests in queue" << std::endl;
-        pause = true;
-      }
-      next_frame = false;
+    if (update_drone_count_) {
+      sim->setDroneCount(new_count);
+      sim->reset();
+      update_drone_count_ = false;
+      pause = false;
     }
-    if (using_queue_) {
-      // if (sim->current_time() >= sim->time_limit()) {
-      // This sim is finished, get the next one from the stack
-      // pause = true;
-      // next_frame = true;
-      // }
-    }
-
     // g_debugDraw.DrawString(5, m_textLine, "%fs", sim->current_time());
-    m_textLine += m_textIncrement;
+    // m_textLine += m_textIncrement;
   }
 
   b2World *LoadMap(const char *new_map_name) {
@@ -219,270 +209,6 @@ class SandboxSimulator : public Test {
     ImGui::SetNextWindowPos(ImVec2(10.0f, 100.0f));
     ImGui::Begin("Swarm Controls", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
-    // Modal windows
-    if (add_new_test_) {
-      pause = true;
-      ImGui::OpenPopup("Add Test");
-      add_new_test_ = false;
-    }
-
-    if (added_new_test_) {
-      pause = false;
-      added_new_test_ = false;
-    }
-
-    if (add_test_permutation_) {
-      pause = true;
-      ImGui::OpenPopup("Add Test Permutation");
-      add_test_permutation_ = false;
-    }
-
-    if (added_test_permutation_) {
-      pause = false;
-      added_test_permutation_ = false;
-    }
-
-    ImGuiIO &io = ImGui::GetIO();
-    ImGui::SetNextWindowPos(
-        ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f),
-        ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-    if (ImGui::BeginPopupModal("Add Test", NULL,
-                               ImGuiWindowFlags_AlwaysAutoResize)) {
-      auto behaviourNames =
-          swarm::behaviour::Registry::getInstance().getBehaviourNames();
-      static std::string current_name = behaviourNames[0];
-      static std::string new_map_name = "";
-      static int new_drone_count = 0;
-      static int new_target_count = 0;
-      static float new_time_limit = 0.0f;
-      static bool to_change = false;
-      static b2World *new_world = nullptr;
-      // Get behaviour name for test
-      if (ImGui::BeginCombo("Behaviour", current_name.c_str())) {
-        auto behaviourNames =
-            swarm::behaviour::Registry::getInstance().getBehaviourNames();
-
-        for (auto &name : behaviourNames) {
-          bool isSelected = (current_name == name);
-          if (ImGui::Selectable(name.c_str(), isSelected)) {
-            current_name = name;
-            to_change = true;
-          }
-          if (isSelected) {
-            ImGui::SetItemDefaultFocus();
-          }
-        }
-        ImGui::EndCombo();
-      }
-
-      // Get parameters for test
-      auto chosen_behaviour =
-          swarm::behaviour::Registry::getInstance().getBehaviour(current_name);
-      auto chosen_params = chosen_behaviour->getParameters();
-      static std::unordered_map<std::string, swarm::behaviour::Parameter *>
-          new_params;
-      if (new_params.empty() || to_change) {
-        new_params.clear();
-        for (const auto &pair : chosen_params) {
-          new_params[pair.first] =
-              pair.second->clone();  // Clone each Parameter and insert into the
-          // new map
-          to_change = false;
-        }
-      }
-      for (auto [name, parameter] : new_params) {
-        ImGui::SliderFloat(name.c_str(), &(parameter->value()),
-                           parameter->min_value(), parameter->max_value());
-      }
-
-      // Get world map for test
-      static char str1[128] = "";
-      ImGui::InputText("Map Name", str1, IM_ARRAYSIZE(str1));
-      if (ImGui::Button("Open", ImVec2(120, 0))) {
-        new_world = LoadMap(str1);
-      }
-
-      if (new_world != nullptr) {
-        ImGui::SameLine();
-        ImGui::Text("Map Loaded");
-      }
-
-      // Get drone configuration for test
-      ImGui::SeparatorText("Drone Configuration");
-      swarm::DroneConfiguration *smallDrone = new swarm::DroneConfiguration(
-          25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f);
-
-      // Set number of drones
-      ImGui::InputInt("Drone Count", &new_drone_count);
-      // Set number of targets
-      ImGui::InputInt("Target Count", &new_target_count);
-      // Set time limit
-      ImGui::InputFloat("Time Limit", &new_time_limit);
-      if (new_world == nullptr) {
-        ImGui::BeginDisabled();
-      }
-      // create new_config and add it to the queue
-      if (ImGui::Button("Add Test", ImVec2(120, 0))) {
-        swarm::TestConfig new_config = {
-            current_name,    new_params,       smallDrone,     new_world,
-            new_drone_count, new_target_count, new_time_limit,
-        };
-        queue_.push(new_config);
-        added_new_test_ = true;
-        ImGui::CloseCurrentPopup();
-      }
-      if (new_world == nullptr) {
-        ImGui::EndDisabled();
-        if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip))
-          ImGui::SetTooltip("Please select a map first");
-      }
-
-      ImGui::SameLine();
-      if (ImGui::Button("Cancel", ImVec2(120, 0))) {
-        added_new_test_ = true;
-        ImGui::CloseCurrentPopup();
-      }
-      ImGui::EndPopup();
-    }
-    ImGui::SetNextWindowPos(
-        ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f),
-        ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-    if (ImGui::BeginPopupModal("Add Test Permutation", NULL,
-                               ImGuiWindowFlags_AlwaysAutoResize)) {
-      auto behaviourNames =
-          swarm::behaviour::Registry::getInstance().getBehaviourNames();
-      static std::string current_name = behaviourNames[0];
-      static std::string new_map_name = "";
-      static int new_drone_count = 0;
-      static int new_target_count = 0;
-      static float new_time_limit = 0.0f;
-      static bool to_change = false;
-      static b2World *new_world = nullptr;
-      // Get behaviour name for test
-      if (ImGui::BeginCombo("Behaviour", current_name.c_str())) {
-        auto behaviourNames =
-            swarm::behaviour::Registry::getInstance().getBehaviourNames();
-
-        for (auto &name : behaviourNames) {
-          bool isSelected = (current_name == name);
-          if (ImGui::Selectable(name.c_str(), isSelected)) {
-            current_name = name;
-            to_change = true;
-          }
-          if (isSelected) {
-            ImGui::SetItemDefaultFocus();
-          }
-        }
-        ImGui::EndCombo();
-      }
-      // Get parameters for test
-      auto chosen_behaviour =
-          swarm::behaviour::Registry::getInstance().getBehaviour(current_name);
-      auto chosen_params = chosen_behaviour->getParameters();
-      static std::unordered_map<std::string, swarm::behaviour::Parameter *>
-          new_params;
-      if (new_params.empty() || to_change) {
-        new_params.clear();
-        for (const auto &pair : chosen_params) {
-          new_params[pair.first] = pair.second->clone();
-          to_change = false;
-        }
-      }
-      ImGui::Separator();
-      ImGui::Text("Select Range or List for each parameter");
-      ImGui::Text("For Range: Input min, max, and step values");
-      ImGui::Text("For List: Input a list of values separated by spaces");
-      int index = 0;
-      static char buf[16][128];
-      const char *combo_items[] = {"Range", "List"};
-      static std::vector<int> selections;
-
-      if (selections.size() != new_params.size()) {
-        selections.resize(new_params.size(), 0);
-      }
-
-      for (auto [name, parameter] : new_params) {
-        ImGui::PushItemWidth(80.0f);
-        std::string comboLabel = "##combo" + std::to_string(index);
-        if (ImGui::BeginCombo(comboLabel.c_str(),
-                              combo_items[selections[index]])) {
-          for (int n = 0; n < IM_ARRAYSIZE(combo_items); n++) {
-            bool is_selected = (selections[index] == n);
-            if (ImGui::Selectable(combo_items[n], is_selected)) {
-              selections[index] = n;
-            }
-            if (is_selected) {
-              ImGui::SetItemDefaultFocus();
-            }
-          }
-          ImGui::EndCombo();
-        }
-        ImGui::PopItemWidth();
-        ImGui::SetItemAllowOverlap();
-        ImGui::SameLine();
-        static float vec4f[4] = {0.0, 0.0, 0.0, 0.0};
-        if (selections[index] == 0) {
-          ImGui::InputFloat3(name.c_str(), vec4f);
-        } else {
-          ImGui::InputText(name.c_str(), buf[index], IM_ARRAYSIZE(buf[index]));
-        }
-        index++;
-      }
-
-      // Get world map for test
-      static char str1[128] = "";
-      ImGui::InputText("Map Name", str1, IM_ARRAYSIZE(str1));
-      if (ImGui::Button("Open", ImVec2(120, 0))) {
-        new_world = LoadMap(str1);
-      }
-
-      if (new_world != nullptr) {
-        ImGui::SameLine();
-        ImGui::Text("Map Loaded");
-      }
-
-      // Get drone configuration for test
-      ImGui::Text("Drone Configuration");
-      swarm::DroneConfiguration *smallDrone = new swarm::DroneConfiguration(
-          25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f);
-
-      // Set number of drones
-      ImGui::InputInt("Drone Count", &new_drone_count);
-      // Set number of targets
-      ImGui::InputInt("Target Count", &new_target_count);
-      // Set time limit
-      ImGui::InputFloat("Time Limit", &new_time_limit);
-
-      if (new_world == nullptr) {
-        ImGui::BeginDisabled();
-      }
-
-      // create new_config and add it to the queue
-      if (ImGui::Button("Add Test", ImVec2(120, 0))) {
-        swarm::TestConfig new_config = {
-            current_name,    new_params,       smallDrone,     new_world,
-            new_drone_count, new_target_count, new_time_limit,
-        };
-        queue_.push(new_config);
-        added_test_permutation_ = true;
-        ImGui::CloseCurrentPopup();
-      }
-
-      if (new_world == nullptr) {
-        ImGui::EndDisabled();
-        if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip))
-          ImGui::SetTooltip("Please select a map first");
-      }
-
-      ImGui::SameLine();
-      if (ImGui::Button("Cancel", ImVec2(120, 0))) {
-        added_test_permutation_ = true;
-        ImGui::CloseCurrentPopup();
-      }
-
-      ImGui::EndPopup();
-    }
-
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if (ImGui::CollapsingHeader("Behaviour Settings")) {
       ImGui::SeparatorText("Current Behaviour");
@@ -524,83 +250,8 @@ class SandboxSimulator : public Test {
       if (ImGui::Button("Reset Simulation")) {
         sim->reset();
       }
-      ImGui::SeparatorText("Simulation Queue");
-      ImGui::BeginChild("Current Test", ImVec2(200, 100), true,
-                        ImGuiWindowFlags_None | ImGuiWindowFlags_MenuBar);
-      if (ImGui::BeginMenuBar()) {
-        ImGui::MenuItem("Current Test", NULL, false, false);
-      }
-      ImGui::EndMenuBar();
-      swarm::TestConfig current_config = sim->test_config();
-      ImGui::Text("Behaviour: %s", current_config.behaviour_name.c_str());
-      ImGui::Text("Drone Count: %d", current_config.num_drones);
-      ImGui::Text("Target Count: %d", current_config.num_targets);
-      ImGui::Text("Time Limit: %f", current_config.time_limit);
-      ImGui::EndChild();
-      static int selectedTestIndex = -1;
-      static swarm::TestConfig *selectedTest = nullptr;
-
-      ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
-      ImGui::BeginChild("Test Queue", ImVec2(0, 100), true,
-                        ImGuiWindowFlags_None | ImGuiWindowFlags_MenuBar);
-      if (ImGui::BeginMenuBar()) {
-        ImGui::MenuItem("Test Queue", NULL, false, false);
-        if (ImGui::BeginMenu("Options")) {
-          if (ImGui::MenuItem("Clear Queue")) {
-            queue_.getTests().clear();
-          }
-          ImGui::EndMenu();
-        }
-        if (ImGui::BeginMenu("+")) {
-          if (ImGui::MenuItem("New Test")) {
-            add_new_test_ = true;
-            pause = true;
-          }
-          if (ImGui::MenuItem("New Test Permutation")) {
-            add_test_permutation_ = true;
-            pause = true;
-          }
-          ImGui::EndMenu();
-        }
-        ImGui::EndMenuBar();
-      }
-      int testIndex = 0;
-      auto &tests = queue_.getTests();
-      for (int i = 0; i < tests.size(); ++i) {
-        auto &test = tests[i];
-
-        if (ImGui::CollapsingHeader(test.behaviour_name.c_str(), &test.keep)) {
-          ImGui::Text("Behaviour: %s", test.behaviour_name.c_str());
-          ImGui::Text("Drone Count: %d", test.num_drones);
-          ImGui::Text("Target Count: %d", test.num_targets);
-          ImGui::Text("Time Limit: %f", test.time_limit);
-        }
-        if (ImGui::IsItemActive() && !ImGui::IsItemHovered()) {
-          int n_next = i + (ImGui::GetMouseDragDelta(0).y < 0.f ? -1 : 1);
-          if (n_next >= 0 && n_next < tests.size()) {
-            std::swap(tests[i], tests[n_next]);
-            ImGui::ResetMouseDragDelta();
-          }
-        }
-        // Remove tests from queue if requested
-        if (!test.keep) {
-          tests.erase(tests.begin() + i);
-          i--;  // Adjust loop index to account for the removed element
-        }
-      }
-
-      ImGui::EndChild();
-      ImGui::PopStyleVar();
-
-      if (ImGui::Button("Next Test in Queue")) {
-        pause = true;
-        next_frame = true;
-      }
-      if (sim->getDroneConfiguration() == nullptr) {
-        sim->setDroneConfiguration(new swarm::DroneConfiguration(
-            25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f));
-      }
     }
+
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if (ImGui::CollapsingHeader("Drone Settings")) {
       // Drone settings window
@@ -622,6 +273,19 @@ class SandboxSimulator : public Test {
 
       if (droneChanged) {
         sim->updateDroneSettings();
+      }
+    }
+    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+    if (ImGui::CollapsingHeader("Simulation Settings")) {
+      ImGui::SeparatorText("Simulation Settings");
+
+      // Change drone count
+      static int changed_count = new_count;
+      bool changed = ImGui::SliderInt("Drone Count", &new_count, 0, 100);
+      if (changed) {
+        changed_count = new_count;
+        pause = true;
+        update_drone_count_ = true;
       }
     }
     ImGui::End();
