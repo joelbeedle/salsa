@@ -51,6 +51,7 @@ static Settings s_settings;
 static bool s_rightMouseDown = false;
 static b2Vec2 s_clickPointWS = b2Vec2_zero;
 static float s_displayScale = 1.0f;
+static bool start_menu = true;
 
 void glfwErrorCallback(int error, const char *description) {
   fprintf(stderr, "GLFW error occured. Code: %d. Description: %s\n", error,
@@ -126,7 +127,8 @@ static void KeyCallback(GLFWwindow *window, int key, int scancode, int action,
     switch (key) {
       case GLFW_KEY_ESCAPE:
         // Quit
-        glfwSetWindowShouldClose(g_mainWindow, GL_TRUE);
+        start_menu = true;
+        // glfwSetWindowShouldClose(g_mainWindow, GL_TRUE);
         break;
 
       case GLFW_KEY_LEFT:
@@ -312,7 +314,41 @@ static void ScrollCallback(GLFWwindow *window, double dx, double dy) {
 
 static void UpdateUI() {
   float menuWidth = 180.0f * s_displayScale;
-  if (g_debugDraw.m_showUI) {
+  if (start_menu) {
+    s_settings.m_pause = true;
+    ImGui::SetNextWindowPos({g_camera.m_width / 2 - menuWidth / 2,
+                             g_camera.m_height / 2 - menuWidth / 2});
+    ImGui::SetNextWindowSize({menuWidth, 200});
+
+    ImGui::Begin("Start Menu", &start_menu,
+                 ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
+                     ImGuiWindowFlags_NoCollapse);
+
+    if (ImGui::Button("Start in Queue mode", ImVec2(-1, 0))) {
+      start_menu = false;
+      s_settings.m_pause = false;
+      s_testSelection = 1;
+    }
+
+    if (ImGui::Button("Start in Sandbox mode", ImVec2(-1, 0))) {
+      start_menu = false;
+      s_settings.m_pause = false;
+      s_testSelection = 2;
+    }
+
+    if (ImGui::Button("Map Creator", ImVec2(-1, 0))) {
+      start_menu = false;
+      s_settings.m_pause = false;
+      s_testSelection = 0;
+    }
+
+    if (ImGui::Button("Exit", ImVec2(-1, 0))) {
+      glfwSetWindowShouldClose(g_mainWindow, GL_TRUE);
+    }
+
+    ImGui::End();
+  }
+  if (!start_menu && g_debugDraw.m_showUI) {
     ImGui::SetNextWindowPos({g_camera.m_width - menuWidth - 10.0f, 10.0f});
     ImGui::SetNextWindowSize({menuWidth, g_camera.m_height - 20.0f});
 
