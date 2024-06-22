@@ -34,7 +34,7 @@ struct DroneParameters {
   float mass;
   float radius;
 };
-class SwarmTest : public Test {
+class QueueSimulator : public Test {
  private:
   swarm::Sim *sim;
   static swarm::SimBuilder *sim_builder;
@@ -60,7 +60,7 @@ class SwarmTest : public Test {
       b2Color(0.5f * 0.77f, 0.5f * 0.92f, 0.5f * 0.66f, 0.5f * 0.25f);
 
  public:
-  SwarmTest() {
+  QueueSimulator() {
     swarm::DroneConfiguration *smallDrone = new swarm::DroneConfiguration(
         25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f);
 
@@ -75,7 +75,7 @@ class SwarmTest : public Test {
     // m_world->SetContactListener(contactListener_);
   }
   static std::unique_ptr<Test> Create() {
-    return std::make_unique<SwarmTest>();
+    return std::make_unique<QueueSimulator>();
   }
   void Build() { sim_builder->build(); }
   void SetBuilder(swarm::SimBuilder *builder) {
@@ -743,4 +743,4 @@ class SwarmTest : public Test {
   }
 };
 static int testIndex2 =
-    RegisterTest("Simulator", "Queue Mode", SwarmTest::Create);
+    RegisterTest("Simulator", "Queue Mode", QueueSimulator::Create);
