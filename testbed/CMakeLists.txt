@@ -9,7 +9,7 @@ set (MY_TESTBED_SOURCE_FILES
 	settings.cpp
 	test.cpp
 	test.h
-	map.cpp
+	map_creator.cpp
 	queue_mode.cpp
 	sandbox_mode.cpp
 	main.cpp
