@@ -315,7 +315,7 @@ class SwarmTest : public Test {
       }
 
       // Get drone configuration for test
-      ImGui::Text("Drone Configuration");
+      ImGui::SeparatorText("Drone Configuration");
       swarm::DroneConfiguration *smallDrone = new swarm::DroneConfiguration(
           25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f);
 
@@ -325,7 +325,9 @@ class SwarmTest : public Test {
       ImGui::InputInt("Target Count", &new_target_count);
       // Set time limit
       ImGui::InputFloat("Time Limit", &new_time_limit);
-
+      if (new_world == nullptr) {
+        ImGui::BeginDisabled();
+      }
       // create new_config and add it to the queue
       if (ImGui::Button("Add Test", ImVec2(120, 0))) {
         swarm::TestConfig new_config = {
@@ -336,8 +338,15 @@ class SwarmTest : public Test {
         added_new_test_ = true;
         ImGui::CloseCurrentPopup();
       }
+      if (new_world == nullptr) {
+        ImGui::EndDisabled();
+        if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip))
+          ImGui::SetTooltip("Please select a map first");
+      }
+
       ImGui::SameLine();
       if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+        added_new_test_ = true;
         ImGui::CloseCurrentPopup();
       }
       ImGui::EndPopup();
@@ -451,6 +460,10 @@ class SwarmTest : public Test {
       // Set time limit
       ImGui::InputFloat("Time Limit", &new_time_limit);
 
+      if (new_world == nullptr) {
+        ImGui::BeginDisabled();
+      }
+
       // create new_config and add it to the queue
       if (ImGui::Button("Add Test", ImVec2(120, 0))) {
         swarm::TestConfig new_config = {
@@ -461,8 +474,16 @@ class SwarmTest : public Test {
         added_test_permutation_ = true;
         ImGui::CloseCurrentPopup();
       }
+
+      if (new_world == nullptr) {
+        ImGui::EndDisabled();
+        if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip))
+          ImGui::SetTooltip("Please select a map first");
+      }
+
       ImGui::SameLine();
       if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+        added_test_permutation_ = true;
         ImGui::CloseCurrentPopup();
       }
 
@@ -471,7 +492,7 @@ class SwarmTest : public Test {
 
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if (ImGui::CollapsingHeader("Behaviour Settings")) {
-      ImGui::Text("Current Behaviour");
+      ImGui::SeparatorText("Current Behaviour");
       if (ImGui::BeginCombo("Behaviours",
                             sim->current_behaviour_name().c_str())) {
         auto behaviourNames =
@@ -490,9 +511,8 @@ class SwarmTest : public Test {
         }
         ImGui::EndCombo();
       }
-      ImGui::Separator();
 
-      ImGui::Text("Behaviour Settings");
+      ImGui::SeparatorText("Behaviour Settings");
       bool changed = false;
       auto behaviour = swarm::behaviour::Registry::getInstance().getBehaviour(
           sim->getBehaviourName());
@@ -505,16 +525,14 @@ class SwarmTest : public Test {
       if (changed) {
         sim->applyCurrentBehaviour();
       }
-      ImGui::Separator();
-      ImGui::Text("Visual Settings");
+      ImGui::SeparatorText("Visual Settings");
       ImGui::Checkbox("Draw Drone visual range", &draw_visual_range_);
       ImGui::Checkbox("Draw Trees", &draw_trees_);
 
       if (ImGui::Button("Reset Simulation")) {
         sim->reset();
       }
-      ImGui::Separator();
-      ImGui::Text("Simulation Queue");
+      ImGui::SeparatorText("Simulation Queue");
       ImGui::BeginChild("Current Test", ImVec2(200, 100), true,
                         ImGuiWindowFlags_None | ImGuiWindowFlags_MenuBar);
       if (ImGui::BeginMenuBar()) {
@@ -594,7 +612,7 @@ class SwarmTest : public Test {
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if (ImGui::CollapsingHeader("Drone Settings")) {
       // Drone settings window
-      ImGui::Text("Drone Preset Settings");
+      ImGui::SeparatorText("Drone Preset Settings");
       bool droneChanged = false;
       droneChanged |= ImGui::SliderFloat(
           "maxSpeed", &sim->getDroneConfiguration()->maxSpeed, 0.0f, 50.0f);
