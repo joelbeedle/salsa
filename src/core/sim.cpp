@@ -16,6 +16,7 @@ Sim::Sim(b2World *world, int drone_count, int target_count,
       time_limit_(time_limit) {
   b2Vec2 gravity(0.0f, 0.0f);
   world_->SetGravity(gravity);
+  logger_ = Logger::getInstance("test.log");
   createBounds();
 
   createDrones(*behaviour_, *drone_configuration_, SpawnType::CIRCULAR);
@@ -31,7 +32,7 @@ Sim::Sim(TestConfig &config)
   is_stack_test_ = true;
   b2Vec2 gravity(0.0f, 0.0f);
   world_->SetGravity(gravity);
-  logger_ = std::make_shared<Logger>("test.log");
+  logger_ = Logger::getInstance("test.log");
   current_behaviour_name_ = config.behaviour_name;
   auto behaviour_pointer =
       behaviour::Registry::getInstance().getBehaviour(current_behaviour_name_);
@@ -144,6 +145,9 @@ void Sim::createDronesCircular(Behaviour &behaviour,
 void Sim::setDroneCount(int count) { num_drones_ = count; }
 
 int Sim::getDroneCount() { return num_drones_; }
+
+int &Sim::num_drones() { return num_drones_; }
+const int &Sim::num_drones() const { return num_drones_; }
 
 void Sim::setDroneConfiguration(DroneConfiguration *configuration) {
   drone_configuration_ = configuration;

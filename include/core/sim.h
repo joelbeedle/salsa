@@ -47,7 +47,7 @@ class Sim {
       all_drone_configurations_;
   swarm::DroneConfiguration* drone_configuration_;
   std::vector<std::unique_ptr<swarm::Drone>> drones_;
-  float num_drones_;
+  int num_drones_;
   float max_speed_;
   float max_force_;
 
@@ -105,6 +105,8 @@ class Sim {
                     SpawnType mode);
   void setDroneCount(int count);
   int getDroneCount();
+  int& num_drones();
+  const int& num_drones() const;
   void setDroneConfiguration(DroneConfiguration* configuration);
   void updateDroneSettings();
   std::vector<std::unique_ptr<swarm::Drone>>& getDrones();
