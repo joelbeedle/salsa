@@ -127,7 +127,7 @@ static void KeyCallback(GLFWwindow *window, int key, int scancode, int action,
     switch (key) {
       case GLFW_KEY_ESCAPE:
         // Quit
-        start_menu = true;
+        start_menu = !start_menu;
         // glfwSetWindowShouldClose(g_mainWindow, GL_TRUE);
         break;
 
