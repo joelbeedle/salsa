@@ -19,12 +19,12 @@ Once an algorithm is written, the user needs to set up the simulation. This is d
 The user creates an instance of their algorithm, for example such as:
 
 ```cpp
-#include <swarm_simulator.h>
+#include <testbed.h>
 // Create Flocking behaviour and assign initial parameters
-auto flocking = std::make_unique<Flocking>(250.0, 1.6, 1.0, 3.0, 3.0);
+auto behaviour_parameters = std::make_unique<CustomBehaviour>(250.0, 1.6, 1.0, 3.0, 3.0);
 
 // Create a drone configuration with initial parameters
-auto *small_drone = new swarm::DroneConfiguration(
+auto *drone_config = new swarm::DroneConfiguration(
     25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f);
 
 // Set up the listener to listen for collisions
@@ -34,40 +34,27 @@ auto listener = std::make_shared<swarm::BaseContactListener>();
 listener.addColisionHandler(typeid(swarm::Drone), typeid(swarm::Target), userHandlingFunction)
 
 // Set up test environment
-SwarmTest::SetHeight(BORDER_HEIGHT);
-SwarmTest::SetWidth(BORDER_WIDTH);
+auto map = map::load("map.json");
+auto num_drones = 100;
+auto num_targets = 1000;
+auto time_limit = 1200.0;
 
-// Set the simulation contact listener to be our user defined listener
-SwarmTest::SetContactListener(*listener);
+swarm::TestConfig test = {
+   "Custom Behaviour",
+   behaviour_parameters,
+   drone_config,
+   map,
+   num_drones,
+   num_targets,
+   time_limit,
+};
 
-// Register behaviors in the simulation
-SwarmTest::AddBehaviour("Flocking", std::move(flock));
-SwarmTest::SetDroneConfiguration(small_drone);
-
-// Register a type of target for the drones to detect, here `Tree` is a user defined class.
-SwarmTest::AddTargetType(typeid(Tree));
-SwarmTest::SetNumDrones(DRONE_COUNT);
-SwarmTest::SetNumTargets(typeid(Tree), TREE_COUNT);
-
-// TODO: IMPLEMENT and redesign?
-// Use a test stack, and point to a file that defines it, in the format:
-// {Behaviour Name},{Behaviour Parameters},{Drone Count},{DroneConfig},{Target Type},{Target Count},{Max time}
-SwarmTest::SetTestStack("path/to/test/stack.txt");
-
-// Alternatively, use a test stack, and initialise it here:
-auto *test_stack = std::make_unique<swarm::TestStack>();
-test_stack.addTest()
-        .setNumDrones(50)
-        .setDroneConfig(myDroneConfig)
-        .setBehaviour("Flocking");
-        .setParameters(250.0, 1.6, 1.0, 3.0, 3.0)
-        .setNumTargets(typeid(Tree), 10000);
-        .setMaxTime(20000);
-
-// Or, use a smart test stack in order to permute through some parameters
+// Create queue and add test to it
+swarm::TestQueue queue;
+queue.push(test);
 
 // Begin the simulation
-SwarmTest::Run();
+testbed::run();
 ```
 
 ## Installation
@@ -82,7 +69,7 @@ SwarmTest::Run();
 - Box2D (packaged with directory as submodule)
 - spdlog (should be downloaded automatically)
 - nhlohmann_json (should be downloaded automatically)
-  
+
 ### Steps
 
 1. Clone the github directory using `git clone --recursive https://github.com/joelbeedle/swarm-sim.git`
