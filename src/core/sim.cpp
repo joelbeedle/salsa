@@ -53,7 +53,7 @@ Sim::Sim(TestConfig &config)
   auto visitor = [&](auto &&arg) { behaviour_pointer->setParameters(arg); };
   std::visit(visitor, config.parameters);
   createDrones(*behaviour_, *drone_configuration_, SpawnType::CIRCULAR);
-  createTargets();
+  createTargets(config.target_parameters);
 }
 
 Sim::~Sim() {
@@ -199,12 +199,8 @@ void Sim::createTargets(Params... params) {
     float x = (rand() % static_cast<int>(border_width_));
     float y = (rand() % static_cast<int>(border_height_));
     const b2Vec2 position(x, y);
-    bool diseased = false;
-    bool mapped = false;
-    float radius = 5.0f;
-    auto params = std::make_tuple();
     auto target = TargetFactory::createTarget(
-        target_type_, world_, std::ref(position), id, diseased, mapped, radius);
+        target_type_, world_, std::ref(position), id++, params...);
     targets_.push_back(target);
   }
 }

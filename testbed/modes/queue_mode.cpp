@@ -653,7 +653,6 @@ class QueueSimulator : public Test {
             case swarm::ObjectType::Target: {
               swarm::Target *target = userData->as<swarm::Target>();
               b2Vec2 position = body->GetPosition();
-              std::cout << target->getRadius() << std::endl;
               debugDraw->DrawSolidCircle(position, target->getRadius(),
                                          transform.q.GetXAxis(),
                                          b2Color(0.5f, 0.5f, 0.5f));
