@@ -18,22 +18,7 @@
 #include <variant>
 #include <vector>
 
-#include "behaviours/registry.h"
-#include "core/map.h"
-#include "core/test_queue.h"
-#include "draw.h"
-#include "drones/drone.h"
-#include "drones/drone_configuration.h"
-#include "drones/drone_factory.h"
-#include "imgui.h"
-#include "nlohmann/json.hpp"
-#include "run_sim.h"
-#include "settings.h"
-#include "test.h"
-#include "utils/base_contact_listener.h"
-#include "utils/collision_manager.h"
-#include "utils/object_types.h"
-#include "utils/tree.h"
+#include "testbed.h"
 
 #define DRONE_COUNT 512
 #define TREE_COUNT 50000
@@ -122,6 +107,7 @@ int main() {
   queue.push(config2);
   config.num_drones = 50;
   queue.push(config);
-  run_sim();
+
+  testbed::run();
   return 0;
 }

@@ -3,8 +3,8 @@
 set (MY_TESTBED_SOURCE_FILES
 	draw.cpp
 	draw.h
-	run_sim.cpp
-	run_sim.h
+	testbed.cpp
+	testbed.h
 	settings.h
 	settings.cpp
 	test.cpp

@@ -44,6 +44,8 @@
 #include <crtdbg.h>
 #endif
 
+namespace testbed {
+
 GLFWwindow *g_mainWindow = nullptr;
 static int32 s_testSelection = 0;
 static std::unique_ptr<Test> s_test = nullptr;
@@ -464,7 +466,7 @@ static void UpdateUI() {
 }
 
 //
-int run_sim() {
+int run() {
 #if defined(_WIN32)
   // Enable memory-leak reports
   _CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF | _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG));
@@ -632,3 +634,4 @@ int run_sim() {
 
   return 0;
 }
+}  // namespace testbed
