@@ -1,21 +1,18 @@
-#include "utils/tree.h"
+#include "tree.h"
 
 #include <cstdlib>
 
-#include "core/entity.h"
-#include "utils/collision_manager.h"
-#include "utils/object_types.h"
-namespace swarm {
+#include "core/simulation.h"
 Tree::Tree(b2World *world, int treeID, const b2Vec2 &position, bool diseased,
            bool mapped, float radius)
     : Entity(world, position, true),
-      treeID(treeID),
       diseased(diseased),
       mapped(mapped),
       radius(radius) {
   // Create Box2D fixture
   create_fixture();
-
+  id = treeID;
+  id_prefix = 'T';
   // Set diseased status of dree
   float infectionChance = 0.05f;
   float randomValue =
@@ -34,16 +31,15 @@ void Tree::create_fixture() {
   b2FixtureDef fixtureDef;
   fixtureDef.shape = &shape;
   fixtureDef.isSensor = true;
-  CollisionConfig config = CollisionManager::getCollisionConfig(typeid(Tree));
+  auto config = swarm::CollisionManager::getCollisionConfig(typeid(Tree));
 
   fixtureDef.filter.categoryBits = config.categoryBits;
   fixtureDef.filter.maskBits = config.maskBits;
 
-  UserData *userData = new UserData();
-  userData->type = ObjectType::Tree;
+  swarm::UserData *userData = new swarm::UserData();
+  userData->type = swarm::ObjectType::Target;
   userData->object = this;
 
   fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(userData);
   body_->CreateFixture(&fixtureDef);
 }
-}  // namespace swarm

@@ -1,7 +1,7 @@
 #include "behaviours/behaviour.h"
 
 #include "box2d/box2d.h"
-#include "drones/drone.h"
+#include "entity/drone.h"
 
 namespace swarm {
 // namespace behaviours {

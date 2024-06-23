@@ -1,11 +1,7 @@
 #include <iostream>
 #include <valarray>
 
-#include "behaviours/behaviour.h"
-#include "behaviours/registry.h"
-#include "box2d/box2d.h"
-#include "drones/drone.h"
-#include "utils/raycastcallback.h"
+#include "core/simulation.h"
 namespace swarm {
 
 class DroneQueryCallback : public b2QueryCallback {

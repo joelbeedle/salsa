@@ -1,6 +1,6 @@
-#include "target.h"
+#include "entity/target.h"
 
-#include "drones/drone.h"
+#include "entity/drone.h"
 
 namespace swarm {
 Target::Target(b2World *world, const b2Vec2 &position, float radius)

@@ -8,21 +8,11 @@
 #include <string>
 #include <vector>
 
-#include "behaviours/registry.h"
-#include "core/sim.h"
-#include "core/test_queue.h"
+#include "core/simulation.h"
 #include "draw.h"
-#include "drones/drone.h"
-#include "drones/drone_configuration.h"
 #include "imgui.h"
 #include "settings.h"
 #include "test.h"
-#include "testbed.h"
-#include "utils/base_contact_listener.h"
-#include "utils/collision_manager.h"
-#include "utils/object_types.h"
-#include "utils/tree.h"
-
 #define MAX_TIME 1200.0f
 
 struct DroneParameters {
@@ -40,13 +30,13 @@ class SandboxSimulator : public Test {
   static swarm::SimBuilder *sim_builder;
   bool draw_visual_range_ = true;
   bool draw_drone_sensor_range_ = true;
-  bool draw_trees_ = false;
+  bool draw_targets_ = false;
   bool first_run_ = true;
   bool using_queue_ = true;
   bool pause = false;
   bool next_frame = false;
   swarm::TestQueue queue_;
-  std::vector<swarm::Tree *> trees;
+  std::vector<swarm::Target *> targets;
   std::vector<b2Vec2> treePositions;
   std::vector<b2Color> treeColors;
 
@@ -186,7 +176,7 @@ class SandboxSimulator : public Test {
       }
       ImGui::SeparatorText("Visual Settings");
       ImGui::Checkbox("Draw Drone visual range", &draw_visual_range_);
-      ImGui::Checkbox("Draw Trees", &draw_trees_);
+      ImGui::Checkbox("Draw Targets", &draw_targets_);
 
       if (ImGui::Button("Reset Simulation")) {
         sim->reset();
@@ -233,7 +223,7 @@ class SandboxSimulator : public Test {
   }
   void Draw(b2World *world, DebugDraw *debugDraw,
             std::vector<int> foundTreeIDs) {
-    if (draw_trees_) {
+    if (draw_targets_) {
       if (first_run_) {
         debugDraw->DrawAllTrees(treePositions, treeColors);
         first_run_ = false;
@@ -287,7 +277,7 @@ class SandboxSimulator : public Test {
                                          b2Color(0.7f, 0.5f, 0.5f));
               break;
             }
-            case swarm::ObjectType::Tree: {
+            case swarm::ObjectType::Target: {
               break;
             }
           }

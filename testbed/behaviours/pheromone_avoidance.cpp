@@ -5,10 +5,7 @@
 #include <memory>
 #include <unordered_map>
 
-#include "behaviours/behaviour.h"
-#include "behaviours/registry.h"
-#include "drones/drone.h"
-#include "utils/raycastcallback.h"
+#include "core/simulation.h"
 namespace swarm {
 class PheromoneBehaviour : public Behaviour {
  private:

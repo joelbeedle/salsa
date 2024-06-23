@@ -3,7 +3,7 @@
 
 #include <typeindex>
 
-#include "core/entity.h"
+#include "entity/entity.h"
 #include "utils/collision_manager.h"
 
 namespace swarm {

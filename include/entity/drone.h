@@ -9,8 +9,8 @@
 #include <memory>
 
 #include "behaviours/behaviour.h"
-#include "core/entity.h"
-#include "drones/drone_configuration.h"
+#include "entity/drone_configuration.h"
+#include "entity/entity.h"
 #include "utils/collision_manager.h"
 namespace swarm {
 class Drone : public Entity {

@@ -9,6 +9,8 @@ set (MY_TESTBED_SOURCE_FILES
 	settings.cpp
 	test.cpp
 	test.h
+	targets/tree.cpp
+	targets/tree.h
 	modes/map_creator.cpp
 	modes/queue_mode.cpp
 	modes/sandbox_mode.cpp

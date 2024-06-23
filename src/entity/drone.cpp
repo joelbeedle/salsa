@@ -1,5 +1,5 @@
 // Drone.cpp
-#include "drones/drone.h"
+#include "entity/drone.h"
 
 #include <cmath>
 #include <valarray>
@@ -21,6 +21,7 @@ Drone::Drone(b2World *world, const b2Vec2 &position, Behaviour &behaviour,
       radius_(config.radius),
       mass(config.mass),
       droneDetectionRange(config.droneDetectionRange) {
+  id_prefix = 'D';
   b2CircleShape circleShape;
   circleShape.m_radius = radius_;
   b2FixtureDef fixtureDef;
@@ -88,7 +89,6 @@ void Drone::update(const std::vector<std::unique_ptr<Drone>> &drones) {
   b2Vec2 position = body_->GetPosition();
 
   body_->SetTransform(position, body_->GetAngle());
-  notifyAll({{"position", {position.x, position.y}}});
 }
 
 }  // namespace swarm

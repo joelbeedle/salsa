@@ -3,17 +3,14 @@
 #define TREE_H
 #include <box2d/box2d.h>
 
-#include "core/entity.h"
-#include "utils/collision_manager.h"
+#include "core/simulation.h"
 
-namespace swarm {
-class Tree : public Entity {
+class Tree : public swarm::Entity {
  private:
   bool diseased;
   bool mapped;
   bool currentlyMapped = false;
   float radius;
-  int treeID;
   int numMapped = 0;
 
  public:
@@ -29,8 +26,6 @@ class Tree : public Entity {
   bool isMapped() { return mapped; }
   void setMapped(bool isMapped) { mapped = isMapped; }
   b2Body *getBody() { return body_; }
-  void setID(int newID) { treeID = newID; }
-  int getID() { return treeID; }
   void addNumMapped() {
     if (!currentlyMapped) {
       numMapped++;
@@ -43,5 +38,4 @@ class Tree : public Entity {
   void render();
 };
 
-}  // namespace swarm
 #endif  // TREE_H

@@ -4,7 +4,7 @@
 
 #include "behaviours/registry.h"
 #include "core/test_queue.h"
-#include "drones/drone_configuration.h"
+#include "entity/drone_configuration.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "mock_behaviour.h"

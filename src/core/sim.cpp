@@ -16,7 +16,8 @@ Sim::Sim(b2World *world, int drone_count, int target_count,
       time_limit_(time_limit) {
   b2Vec2 gravity(0.0f, 0.0f);
   world_->SetGravity(gravity);
-  logger_ = Logger::getInstance("test.log");
+
+  logger_.switch_log_file("test.log");
   createBounds();
 
   createDrones(*behaviour_, *drone_configuration_, SpawnType::CIRCULAR);
@@ -36,8 +37,16 @@ Sim::Sim(TestConfig &config)
   is_stack_test_ = true;
   b2Vec2 gravity(0.0f, 0.0f);
   world_->SetGravity(gravity);
-  logger_ = Logger::getInstance("test.log");
   current_behaviour_name_ = config.behaviour_name;
+  auto now = std::chrono::system_clock::now();
+  auto time_t = std::chrono::system_clock::to_time_t(now);
+  auto tm = *std::localtime(&time_t);
+
+  std::ostringstream oss;
+  oss << std::put_time(&tm, "%Y-%m-%d_%H-%M-%S") << "_"
+      << current_behaviour_name_.c_str() << ".log";
+  logger_.switch_log_file(oss.str());
+
   auto behaviour_pointer =
       behaviour::Registry::getInstance().getBehaviour(current_behaviour_name_);
   auto visitor = [&](auto &&arg) { behaviour_pointer->setParameters(arg); };
@@ -54,7 +63,13 @@ Sim::~Sim() {
 void Sim::update() {
   for (auto &drone : drones_) {
     drone->update(drones_);
+    // Data logging
+    b2Vec2 position = drone->getPosition();
+    b2Vec2 velocity = drone->getVelocity();
+    drone->notifyAll({{"position", {position.x, position.y}},
+                      {"velocity", {velocity.x, velocity.y}}});
   }
+  // Simulation data logging
 }
 
 void Sim::reset() {
@@ -108,7 +123,7 @@ void Sim::createDronesRandom(Behaviour &behaviour, DroneConfiguration &config) {
         DroneFactory::createDrone(world_, b2Vec2(x, y), behaviour, config));
   }
   for (auto &drone : drones_) {
-    drone->addObserver(logger_);
+    drone->addObserver(std::shared_ptr<Logger>(&logger_, [](auto *) {}));
   }
 }
 
@@ -140,8 +155,10 @@ void Sim::createDronesCircular(Behaviour &behaviour,
     drones_.push_back(
         DroneFactory::createDrone(world_, b2Vec2(x, y), behaviour, config));
   }
+  int current_id = 0;
   for (auto &drone : drones_) {
-    drone->addObserver(logger_);
+    drone->setId(current_id++);
+    drone->addObserver(std::shared_ptr<Logger>(&logger_, [](auto *) {}));
   }
 }
 

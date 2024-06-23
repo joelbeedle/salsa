@@ -13,7 +13,7 @@
 #include "behaviours/behaviour.h"
 #include "behaviours/parameter.h"
 #include "core/map.h"
-#include "drones/drone_configuration.h"
+#include "entity/drone_configuration.h"
 namespace swarm {
 
 struct TestConfig {

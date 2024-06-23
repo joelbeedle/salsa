@@ -18,6 +18,7 @@
 #include <variant>
 #include <vector>
 
+#include "targets/tree.h"
 #include "testbed.h"
 
 #define DRONE_COUNT 512
@@ -28,19 +29,14 @@
 
 static void setupInteractions(swarm::BaseContactListener &listener) {
   listener.addCollisionHandler(
-      typeid(swarm::Drone), typeid(swarm::Tree),
+      typeid(swarm::Drone), typeid(swarm::Target),
       [](b2Fixture *droneFixture, b2Fixture *treeFixture) -> void {
-        swarm::Tree *tree = reinterpret_cast<swarm::UserData *>(
-                                treeFixture->GetUserData().pointer)
-                                ->as<swarm::Tree>();
+        swarm::Target *target = reinterpret_cast<swarm::UserData *>(
+                                    treeFixture->GetUserData().pointer)
+                                    ->as<swarm::Target>();
         swarm::Drone *drone = reinterpret_cast<swarm::UserData *>(
                                   droneFixture->GetUserData().pointer)
                                   ->as<swarm::Drone>();
-
-        if (drone && tree) {
-          tree->setMapped(true);
-          tree->addNumMapped();
-        }
       });
   listener.addCollisionHandler(
       typeid(swarm::Drone), typeid(swarm::Drone),
@@ -67,10 +63,8 @@ int main() {
 
   swarm::DroneConfiguration *smallDrone = new swarm::DroneConfiguration(
       25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f);
-  swarm::CollisionManager::registerType(typeid(swarm::Drone),
-                                        {typeid(swarm::Tree)});
-  swarm::CollisionManager::registerType(typeid(swarm::Tree),
-                                        {typeid(swarm::Drone)});
+  swarm::CollisionManager::registerType(typeid(swarm::Drone), {typeid(Tree)});
+  swarm::CollisionManager::registerType(typeid(Tree), {typeid(swarm::Drone)});
 
   auto new_flock_params = std::unordered_map<std::string, float>({
       {"Separation Distance", 300.0},

@@ -8,10 +8,10 @@
 #include "behaviours/behaviour.h"
 #include "behaviours/registry.h"
 #include "core/test_queue.h"
-#include "drones/drone.h"
-#include "drones/drone_configuration.h"
-#include "drones/drone_factory.h"
-#include "target.h"
+#include "entity/drone.h"
+#include "entity/drone_configuration.h"
+#include "entity/drone_factory.h"
+#include "entity/target.h"
 #include "utils/base_contact_listener.h"
 
 namespace swarm {
@@ -73,7 +73,7 @@ class Sim {
   bool draw_drones_ = false;
 
   // Logging
-  std::shared_ptr<Logger> logger_;
+  Logger& logger_ = Logger::getInstance();
 
   // Private methods for internal use
   void createBounds();

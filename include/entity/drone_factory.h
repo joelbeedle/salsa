@@ -6,8 +6,8 @@
 
 #include <memory>
 
-#include "drones/drone.h"
-#include "drones/drone_configuration.h"
+#include "entity/drone.h"
+#include "entity/drone_configuration.h"
 
 namespace swarm {
 class DroneFactory {

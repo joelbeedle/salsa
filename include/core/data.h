@@ -20,22 +20,10 @@ class Observer {
 
 class Logger : public Observer {
  private:
-  static std::shared_ptr<spdlog::logger> async_logger;
-  static std::shared_ptr<Logger> instance;
-  static std::mutex mutex;
+  static std::shared_ptr<spdlog::logger> logger_;
 
   // Private constructor
-  Logger(const std::string& log_filename) {
-    if (!async_logger) {  // Ensure the logger is only initialized once
-      spdlog::init_thread_pool(
-          8192, 1);  // Queue with 8192 slots and 1 background thread
-      async_logger = spdlog::basic_logger_mt<spdlog::async_factory>(
-          "async_logger", log_filename);
-      spdlog::set_default_logger(async_logger);
-      spdlog::set_level(spdlog::level::info);
-      spdlog::flush_every(std::chrono::seconds(3));
-    }
-  }
+  Logger() { init_logger("default_log.log"); }
 
  public:
   // Deleted copy constructor and assignment operator
@@ -46,16 +34,28 @@ class Logger : public Observer {
   ~Logger() { spdlog::shutdown(); }
 
   // Static method to get the logger instance
-  static std::shared_ptr<Logger> getInstance(const std::string& log_filename) {
-    std::lock_guard<std::mutex> lock(mutex);
-    if (!instance) {
-      instance = std::shared_ptr<Logger>(new Logger(log_filename));
-    }
+  static Logger& getInstance() {
+    static Logger instance;
     return instance;
   }
 
+  void init_logger(const std::string& log_file) {
+    spdlog::drop_all();  // Clean up existing loggers
+    spdlog::init_thread_pool(
+        8192, 1);  // Queue with 8192 slots and 1 background thread
+    logger_ = spdlog::basic_logger_mt<spdlog::async_factory>("async_logger",
+                                                             log_file);
+    spdlog::set_default_logger(logger_);
+    spdlog::set_level(spdlog::level::info);
+    spdlog::flush_every(std::chrono::seconds(3));
+  }
+
+  void switch_log_file(const std::string& new_log_file) {
+    init_logger(new_log_file);
+  }
+
   void update(const nlohmann::json& message) override {
-    async_logger->info(message.dump());
+    logger_->info(message.dump());
   }
 };
 
