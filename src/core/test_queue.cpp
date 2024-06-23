@@ -15,4 +15,11 @@ TestConfig TestQueue::pop() {
   tests_.erase(tests_.begin());
   return test;
 }
+
+TestConfig TestQueue::peek() {
+  if (tests_.empty()) {
+    throw std::underflow_error("Cannot peek from an empty stack");
+  }
+  return tests_.front();
+}
 }  // namespace swarm
