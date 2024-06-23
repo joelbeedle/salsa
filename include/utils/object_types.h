@@ -6,10 +6,18 @@
 #include "entity/entity.h"
 
 namespace swarm {
+
 enum class ObjectType {
   Drone,
   Target,
 };
+
+std::string demangle(const char *name);
+
+template <class T>
+std::string type(const T &t) {
+  return demangle(typeid(t).name());
+}
 
 struct UserData {
   ObjectType type;

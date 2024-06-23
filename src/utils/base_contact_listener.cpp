@@ -54,9 +54,8 @@ void BaseContactListener::BeginContact(b2Contact *contact) {
   if (handlerIt != collision_handlers_.end()) {
     handlerIt->second(fixtureA, fixtureB);
   } else {
-    auto typeA = typeid(*(userDataA->object)).name();
-    auto typeB = typeid(*(userDataB->object)).name();
-    spdlog::warn("No collision handler for types {} and {}", typeA, typeB);
+    spdlog::warn("No collision handler for types {} and {}",
+                 type(*userDataA->object), type(*userDataB->object));
   }
 }
 }  // namespace swarm

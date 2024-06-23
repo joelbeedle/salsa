@@ -69,7 +69,7 @@ class CollisionManager {
   /// @param partners A vector of type_index specifying the collision partners
   /// for the new type.
   static void registerType(std::type_index type,
-                           const std::vector<std::type_index> &partners);
+                           const std::vector<std::type_index>& partners);
 };
 }  // namespace swarm
 #endif  // SWARM_UTILS_COLLISION_MANAGER_H
