@@ -225,6 +225,8 @@ b2World *Sim::getWorld() { return world_; }
 
 void Sim::setWorld(b2World *world) { world_ = world; }
 
+map::Map Sim::getMap() { return map_; }
+
 TestConfig &Sim::test_config() { return test_config_; }
 
 std::string &Sim::current_behaviour_name() { return current_behaviour_name_; }

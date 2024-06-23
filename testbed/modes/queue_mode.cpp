@@ -100,6 +100,8 @@ class QueueSimulator : public Test {
     delete old_sim;
     sim->setCurrentBehaviour(sim->current_behaviour_name());
     m_world = sim->getWorld();
+    g_camera.m_center = sim->getMap().drone_spawn_point;
+    g_camera.m_zoom = 10.0f;
     pause = false;
     return true;
   }
@@ -132,7 +134,7 @@ class QueueSimulator : public Test {
     settings.m_pause = pause;
     std::vector<int> foundTreeIDs;
     sim->update();
-    // if (!settings.m_pause) sim->current_time() += 1.0f / settings.m_hertz;
+    if (!settings.m_pause) sim->current_time() += 1.0f / settings.m_hertz;
     m_world->DebugDraw();
     Draw(sim->getWorld(), &g_debugDraw, foundTreeIDs);
     if (next_frame) {
@@ -140,20 +142,16 @@ class QueueSimulator : public Test {
       try {
         SetNextTestFromQueue();
       } catch (const std::exception &e) {
-        std::cerr << "No more tests in queue" << std::endl;
         pause = true;
       }
       next_frame = false;
     }
-    if (using_queue_) {
-      // if (sim->current_time() >= sim->time_limit()) {
-      // This sim is finished, get the next one from the stack
-      // pause = true;
-      // next_frame = true;
-      // }
+    if (sim->current_time() >= sim->time_limit()) {
+      // This sim is finished, get the next one from the stack pause = true;
+      next_frame = true;
     }
 
-    // g_debugDraw.DrawString(5, m_textLine, "%fs", sim->current_time());
+    g_debugDraw.DrawString(5, m_textLine, "%fs", sim->current_time());
     m_textLine += m_textIncrement;
   }
 
@@ -492,12 +490,19 @@ class QueueSimulator : public Test {
       if (ImGui::BeginMenuBar()) {
         ImGui::MenuItem("Next Test", NULL, false, false);
       }
+      swarm::TestConfig next_config;
       ImGui::EndMenuBar();
-      swarm::TestConfig next_config = queue_.peek();
-      ImGui::Text("Behaviour: %s", next_config.behaviour_name.c_str());
-      ImGui::Text("Drone Count: %d", next_config.num_drones);
-      ImGui::Text("Target Count: %d", next_config.num_targets);
-      ImGui::Text("Time Limit: %f", next_config.time_limit);
+      try {
+        next_config = queue_.peek();
+        ImGui::Text("Behaviour: %s", next_config.behaviour_name.c_str());
+        ImGui::Text("Drone Count: %d", next_config.num_drones);
+        ImGui::Text("Target Count: %d", next_config.num_targets);
+        ImGui::Text("Time Limit: %f", next_config.time_limit);
+
+      } catch (const std::exception &e) {
+        ImGui::Text("No more tests in queue");
+      }
+
       ImGui::EndChild();
       static int selectedTestIndex = -1;
       static swarm::TestConfig *selectedTest = nullptr;

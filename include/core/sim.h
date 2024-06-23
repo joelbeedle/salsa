@@ -131,6 +131,7 @@ class Sim {
   float& time_limit();
   b2World* getWorld();
   void setWorld(b2World* world);
+  map::Map getMap();
   swarm::TestConfig& test_config();
   std::string& current_behaviour_name();
   const std::string& current_behaviour_name() const;
