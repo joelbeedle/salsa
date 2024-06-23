@@ -30,15 +30,15 @@ class QueueSimulator : public Test {
   static swarm::SimBuilder *sim_builder;
   bool draw_visual_range_ = true;
   bool draw_drone_sensor_range_ = true;
-  bool draw_targets_ = false;
+  bool draw_targets_ = true;
   bool first_run_ = true;
   bool using_queue_ = true;
   bool pause = false;
   bool next_frame = false;
   swarm::TestQueue queue_;
   std::vector<swarm::Target *> targets;
-  std::vector<b2Vec2> treePositions;
-  std::vector<b2Color> treeColors;
+  std::vector<b2Vec2> target_positions_;
+  std::vector<b2Color> target_colors_;
 
   bool add_new_test_ = false;
   bool added_new_test_ = false;
@@ -67,7 +67,9 @@ class QueueSimulator : public Test {
   static std::unique_ptr<Test> Create() {
     return std::make_unique<QueueSimulator>();
   }
+
   void Build() { sim_builder->build(); }
+
   void SetBuilder(swarm::SimBuilder *builder) {
     sim_builder = builder;
     builder->setWorld(m_world);
@@ -124,13 +126,23 @@ class QueueSimulator : public Test {
     std::vector<int> foundTreeIDs;
     sim->update();
     if (!settings.m_pause) sim->current_time() += 1.0f / settings.m_hertz;
-    m_world->DebugDraw();
+    // m_world->DebugDraw();
+    if (first_run_) {
+      auto targets = sim->getTargets();
+      for (auto &target : targets) {
+        target_positions_.push_back(target->getPosition());
+        target_colors_.push_back(falseColour);
+      }
+    }
+
     Draw(sim->getWorld(), &g_debugDraw, foundTreeIDs);
     if (next_frame) {
       pause = true;
       try {
         SetNextTestFromQueue();
       } catch (const std::exception &e) {
+        spdlog::error("Error: {}", e.what());
+        std::cerr << e.what() << std::endl;
         pause = true;
       }
       next_frame = false;
@@ -586,10 +598,10 @@ class QueueSimulator : public Test {
             std::vector<int> foundTreeIDs) {
     if (draw_targets_) {
       if (first_run_) {
-        debugDraw->DrawAllTrees(treePositions, treeColors);
+        debugDraw->DrawAllTargets(target_positions_, target_colors_);
         first_run_ = false;
       } else {
-        debugDraw->DrawTrees(treePositions, treeColors, foundTreeIDs);
+        debugDraw->DrawTargets(target_positions_, target_colors_, foundTreeIDs);
       }
     }
     for (b2Body *body = world->GetBodyList(); body; body = body->GetNext()) {
@@ -639,6 +651,12 @@ class QueueSimulator : public Test {
               break;
             }
             case swarm::ObjectType::Target: {
+              swarm::Target *target = userData->as<swarm::Target>();
+              b2Vec2 position = body->GetPosition();
+              std::cout << target->getRadius() << std::endl;
+              debugDraw->DrawSolidCircle(position, target->getRadius(),
+                                         transform.q.GetXAxis(),
+                                         b2Color(0.5f, 0.5f, 0.5f));
               break;
             }
           }

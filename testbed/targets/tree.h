@@ -5,7 +5,7 @@
 
 #include "core/simulation.h"
 
-class Tree : public swarm::Entity {
+class Tree : public swarm::Target {
  private:
   bool diseased;
   bool mapped;
@@ -14,11 +14,14 @@ class Tree : public swarm::Entity {
   int numMapped = 0;
 
  public:
-  Tree(b2World *world, int treeID, const b2Vec2 &position, bool diseased,
-       bool mapped = false, float radius = 1.0f);
+  Tree(b2World *world = nullptr, const b2Vec2 &position = b2Vec2(0, 0),
+       int treeID = 0, bool diseased = false, bool mapped = false,
+       float radius = 1.0f);
   ~Tree();
 
   void create_fixture() override;
+
+  std::string getType() const override { return "Tree"; }
 
   // Accessors and Mutators
   bool isDiseased() { return diseased; }

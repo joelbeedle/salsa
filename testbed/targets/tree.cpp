@@ -3,9 +3,11 @@
 #include <cstdlib>
 
 #include "core/simulation.h"
-Tree::Tree(b2World *world, int treeID, const b2Vec2 &position, bool diseased,
+#include "entity/target_factory.h"
+
+Tree::Tree(b2World *world, const b2Vec2 &position, int treeID, bool diseased,
            bool mapped, float radius)
-    : Entity(world, position, true),
+    : Target(world, position, radius),
       diseased(diseased),
       mapped(mapped),
       radius(radius) {

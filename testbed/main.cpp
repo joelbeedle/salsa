@@ -65,6 +65,8 @@ int main() {
       25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f);
   swarm::CollisionManager::registerType(typeid(swarm::Drone), {typeid(Tree)});
   swarm::CollisionManager::registerType(typeid(Tree), {typeid(swarm::Drone)});
+  swarm::TargetFactory::registerTargetType<Tree, b2World *, const b2Vec2 &, int,
+                                           bool, bool, float>("Tree");
 
   auto new_flock_params = std::unordered_map<std::string, float>({
       {"Separation Distance", 300.0},
@@ -78,19 +80,18 @@ int main() {
       {"Decay Rate", 0.5},
       {"Obstacle Avoidance Weight", 1.0},
   });
-  swarm::TestConfig config = {
-      "Flocking", pheromone_params, smallDrone, map1, 100, 0, 1200.0f,
-  };
 
-  swarm::TestConfig config2 = {
-      "Pheromone Avoidance",
-      pheromone_params,
-      smallDrone,
-      map1,
-      100,
-      0,
-      1200.0f,
-  };
+  swarm::TestConfig config = {"Flocking", flock_params, smallDrone, map1,
+                              100,        100,          1200.0f,    "Tree"};
+
+  swarm::TestConfig config2 = {"Pheromone Avoidance",
+                               pheromone_params,
+                               smallDrone,
+                               map1,
+                               100,
+                               200,
+                               1200.0f,
+                               "Tree"};
 
   swarm::TestQueue queue;
   config.num_drones = 50;

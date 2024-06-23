@@ -34,7 +34,7 @@ struct b2AABB;
 struct GLRenderPoints;
 struct GLRenderLines;
 struct GLRenderTriangles;
-struct GLRenderTrees;
+struct GLRenderTargets;
 struct GLRenderText;
 struct GLFWwindow;
 
@@ -88,11 +88,11 @@ class DebugDraw : public b2Draw {
 
   void DrawAABB(b2AABB *aabb, const b2Color &color);
 
-  void DrawTrees(const std::vector<b2Vec2> &positions,
-                 const std::vector<b2Color> &colors,
-                 const std::vector<int> &changedIDs);
-  void DrawAllTrees(const std::vector<b2Vec2> &positions,
-                    const std::vector<b2Color> &colors);
+  void DrawTargets(const std::vector<b2Vec2> &positions,
+                   const std::vector<b2Color> &colors,
+                   const std::vector<int> &changedIDs);
+  void DrawAllTargets(const std::vector<b2Vec2> &positions,
+                      const std::vector<b2Color> &colors);
   void DrawText(int x, int y, const char *string);
 
   void Flush();
@@ -101,7 +101,7 @@ class DebugDraw : public b2Draw {
   GLRenderPoints *m_points;
   GLRenderLines *m_lines;
   GLRenderTriangles *m_triangles;
-  GLRenderTrees *m_trees;
+  GLRenderTargets *m_targets;
   GLRenderText *m_text;
 };
 

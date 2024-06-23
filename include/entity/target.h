@@ -29,6 +29,11 @@ class Target : public Entity {
 
     body_->CreateFixture(&fixtureDef);
   }
+
+  virtual std::string getType() const = 0;
+
+  b2Vec2 getPosition() const { return body_->GetPosition(); }
+  float getRadius() const { return radius_; }
 };
 
 }  // namespace swarm

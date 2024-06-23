@@ -27,6 +27,7 @@ struct TestConfig {
   int num_drones;
   int num_targets;
   float time_limit;
+  std::string target_type = "null";
   bool keep = true;
   // FUTURE: std::function<void()> drone_setup;
   // FUTURE: std::function<void()> target_setup;

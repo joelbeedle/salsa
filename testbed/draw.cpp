@@ -583,7 +583,7 @@ struct GLRenderTriangles {
 };
 
 //
-struct GLRenderTrees {
+struct GLRenderTargets {
   enum { e_maxVertices = 16 };  // Number of segments in the circle
   static const int NUM_CIRCLE_VERTICES = e_maxVertices + 2;
   float circleVertices[NUM_CIRCLE_VERTICES * 2];  // Each vertex has x and y
@@ -752,7 +752,7 @@ DebugDraw::DebugDraw() {
   m_points = NULL;
   m_lines = NULL;
   m_triangles = NULL;
-  m_trees = NULL;
+  m_targets = NULL;
   m_text = NULL;
 }
 
@@ -772,8 +772,8 @@ void DebugDraw::Create() {
   m_lines->Create();
   m_triangles = new GLRenderTriangles;
   m_triangles->Create();
-  m_trees = new GLRenderTrees;
-  m_trees->Create();
+  m_targets = new GLRenderTargets;
+  m_targets->Create();
 }
 
 //
@@ -976,24 +976,24 @@ void DebugDraw::DrawAABB(b2AABB *aabb, const b2Color &c) {
   m_lines->Vertex(p1, c);
 }
 
-void DebugDraw::DrawTrees(const std::vector<b2Vec2> &positions,
-                          const std::vector<b2Color> &colors,
-                          const std::vector<int> &changedIDs) {
+void DebugDraw::DrawTargets(const std::vector<b2Vec2> &positions,
+                            const std::vector<b2Color> &colors,
+                            const std::vector<int> &changedIDs) {
   // Update the tree data. This could be optimized to only happen if data has
   // changed.
-  m_trees->UpdateTrees(positions, colors);
+  m_targets->UpdateTrees(positions, colors);
   glDepthMask(GL_FALSE);
 
-  m_trees->Flush();
+  m_targets->Flush();
   glDepthMask(GL_TRUE);
 }
 
-void DebugDraw::DrawAllTrees(const std::vector<b2Vec2> &positions,
-                             const std::vector<b2Color> &colors) {
-  m_trees->setBuffers(positions, colors);
-  m_trees->UpdateTrees(positions, colors);
+void DebugDraw::DrawAllTargets(const std::vector<b2Vec2> &positions,
+                               const std::vector<b2Color> &colors) {
+  m_targets->setBuffers(positions, colors);
+  m_targets->UpdateTrees(positions, colors);
   glDepthMask(GL_FALSE);
-  m_trees->Flush();
+  m_targets->Flush();
   glDepthMask(GL_TRUE);
 }
 
@@ -1002,5 +1002,5 @@ void DebugDraw::Flush() {
   m_triangles->Flush();
   m_lines->Flush();
   m_points->Flush();
-  // m_trees->Flush();
+  // m_targets->Flush();
 }

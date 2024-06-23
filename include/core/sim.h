@@ -12,8 +12,8 @@
 #include "entity/drone_configuration.h"
 #include "entity/drone_factory.h"
 #include "entity/target.h"
+#include "entity/target_factory.h"
 #include "utils/base_contact_listener.h"
-
 namespace swarm {
 
 struct DroneParameters {
@@ -55,7 +55,8 @@ class Sim {
   float max_force_;
 
   // Target management
-  std::vector<swarm::Target*> targets_;
+  std::string target_type_;
+  std::vector<std::shared_ptr<Target>> targets_;
   float num_targets_;
 
   // Obstacles in the environment
@@ -116,7 +117,12 @@ class Sim {
   void setDrones(std::vector<std::unique_ptr<swarm::Drone>> drones);
 
   // Target functions
+  template <typename... Params>
+  void createTargets(Params... params);
+  void setTargetType(const std::string& type);
   void setTargetCount(int count);
+  // get targets
+  std::vector<std::shared_ptr<Target>>& getTargets();
 
   // Box2D functions
   void setContactListener(BaseContactListener& listener);

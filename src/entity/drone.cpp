@@ -12,7 +12,7 @@
 namespace swarm {
 Drone::Drone(b2World *world, const b2Vec2 &position, Behaviour &behaviour,
              const DroneConfiguration &config)
-    : Entity(world, position, false),
+    : Entity(world, position, false, config.radius),
       behaviour(&behaviour),
       cameraViewRange(config.cameraViewRange),
       obstacleViewRange(config.obstacleViewRange),

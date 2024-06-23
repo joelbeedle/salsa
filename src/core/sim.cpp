@@ -33,6 +33,7 @@ Sim::Sim(TestConfig &config)
       num_targets_(config.num_targets),
       drone_configuration_(config.drone_config),
       time_limit_(config.time_limit),
+      target_type_(config.target_type),
       test_config_(config) {
   is_stack_test_ = true;
   b2Vec2 gravity(0.0f, 0.0f);
@@ -52,6 +53,7 @@ Sim::Sim(TestConfig &config)
   auto visitor = [&](auto &&arg) { behaviour_pointer->setParameters(arg); };
   std::visit(visitor, config.parameters);
   createDrones(*behaviour_, *drone_configuration_, SpawnType::CIRCULAR);
+  createTargets();
 }
 
 Sim::~Sim() {
@@ -190,7 +192,28 @@ void Sim::setDrones(std::vector<std::unique_ptr<swarm::Drone>> drones) {
   drones_ = std::move(drones);
 }
 
+template <typename... Params>
+void Sim::createTargets(Params... params) {
+  int id = 0;
+  for (int i = 0; i < num_targets_; i++) {
+    float x = (rand() % static_cast<int>(border_width_));
+    float y = (rand() % static_cast<int>(border_height_));
+    const b2Vec2 position(x, y);
+    bool diseased = false;
+    bool mapped = false;
+    float radius = 5.0f;
+    auto params = std::make_tuple();
+    auto target = TargetFactory::createTarget(
+        target_type_, world_, std::ref(position), id, diseased, mapped, radius);
+    targets_.push_back(target);
+  }
+}
+
+void Sim::setTargetType(const std::string &type) { target_type_ = type; }
+
 void Sim::setTargetCount(int count) { num_targets_ = count; }
+
+std::vector<std::shared_ptr<Target>> &Sim::getTargets() { return targets_; }
 
 void Sim::setContactListener(BaseContactListener &listener) {
   contact_listener_ = &listener;

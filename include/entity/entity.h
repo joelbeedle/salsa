@@ -13,14 +13,15 @@ class Entity {
   b2World *world_;
   char id_prefix;
   int id;
+  float radius_;
   std::vector<std::shared_ptr<Observer>> observers;
   std::chrono::steady_clock::time_point last_log_time;
   long log_interval;  // milliseconds
 
  public:
-  Entity(b2World *world, const b2Vec2 &position, bool is_static,
+  Entity(b2World *world, const b2Vec2 &position, bool is_static, float radius,
          long log_interval = 1000.0)
-      : world_(world), log_interval(log_interval) {
+      : world_(world), radius_(radius), log_interval(log_interval) {
     b2BodyDef bodyDef;
     if (is_static) {
       bodyDef.type = b2_staticBody;
@@ -41,6 +42,8 @@ class Entity {
   }
 
   virtual void create_fixture() = 0;
+
+  float getRadius() { return radius_; }
 
   void setIdPrefix(char prefix) { id_prefix = prefix; }
   void setId(int id) { this->id = id; }

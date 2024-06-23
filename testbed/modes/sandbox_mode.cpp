@@ -225,10 +225,10 @@ class SandboxSimulator : public Test {
             std::vector<int> foundTreeIDs) {
     if (draw_targets_) {
       if (first_run_) {
-        debugDraw->DrawAllTrees(treePositions, treeColors);
+        debugDraw->DrawAllTargets(treePositions, treeColors);
         first_run_ = false;
       } else {
-        debugDraw->DrawTrees(treePositions, treeColors, foundTreeIDs);
+        debugDraw->DrawTargets(treePositions, treeColors, foundTreeIDs);
       }
     }
     for (b2Body *body = world->GetBodyList(); body; body = body->GetNext()) {
