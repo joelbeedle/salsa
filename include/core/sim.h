@@ -28,6 +28,8 @@ struct DroneParameters {
 
 class Sim {
  private:
+  // Current map
+  map::Map map_;
   // Box2D world pointer
   b2World* world_;
   // Contact listener for Box2D collisions
@@ -37,6 +39,7 @@ class Sim {
   swarm::TestConfig test_config_;
   float border_height_;
   float border_width_;
+  b2Vec2 drone_spawn_position_;
   float time_limit_ = -1.0f;
   float current_time_ = 0.0f;
   bool is_stack_test_ = false;

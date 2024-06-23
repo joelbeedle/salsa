@@ -12,8 +12,8 @@
 
 #include "behaviours/behaviour.h"
 #include "behaviours/parameter.h"
+#include "core/map.h"
 #include "drones/drone_configuration.h"
-
 namespace swarm {
 
 struct TestConfig {
@@ -23,7 +23,7 @@ struct TestConfig {
   std::string behaviour_name;
   std::variant<Parameters, FloatParameters> parameters;
   DroneConfiguration *drone_config;
-  b2World *world;
+  map::Map map;
   int num_drones;
   int num_targets;
   float time_limit;
@@ -39,6 +39,7 @@ class TestQueue {
  public:
   static void push(TestConfig test);
   static TestConfig pop();
+  static TestConfig peek();
   static int size() { return tests_.size(); }
   static std::vector<TestConfig> &getTests() { return tests_; }
   static bool isEmpty() { return tests_.empty(); }

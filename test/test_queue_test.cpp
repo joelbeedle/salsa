@@ -28,10 +28,11 @@ TEST_F(TestQueueTest, PushAndPopTest) {
       "Behaviour1",
       std::variant<TestConfig::Parameters, TestConfig::FloatParameters>(),
       nullptr,
-      nullptr,
+      swarm::map::Map(),
       100,
-      2,
-      30.0f};
+      0,
+      1200.0f,
+  };
   TestQueue::push(testConfig1);
   EXPECT_EQ(1, TestQueue::size());
 
@@ -45,25 +46,26 @@ TEST_F(TestQueueTest, PopEmptyStack) {
 }
 
 TEST_F(TestQueueTest, MaintainOrder) {
-  TestConfig testConfig1 = {
+  TestConfig config1 = {
       "Behaviour1",
       std::variant<TestConfig::Parameters, TestConfig::FloatParameters>(),
       nullptr,
-      nullptr,
-      10,
-      2,
-      30.0f};
-  TestConfig testConfig2 = {
+      swarm::map::Map(),
+      100,
+      0,
+      1200.0f,
+  };
+  TestConfig config2 = {
       "Behaviour2",
       std::variant<TestConfig::Parameters, TestConfig::FloatParameters>(),
       nullptr,
-      nullptr,
-      20,
-      5,
-      60.0f};
-
-  TestQueue::push(testConfig1);
-  TestQueue::push(testConfig2);
+      swarm::map::Map(),
+      100,
+      0,
+      1200.0f,
+  };
+  TestQueue::push(config1);
+  TestQueue::push(config2);
 
   EXPECT_EQ("Behaviour1", TestQueue::pop().behaviour_name);
   EXPECT_EQ("Behaviour2", TestQueue::pop().behaviour_name);

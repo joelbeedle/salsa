@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "behaviours/registry.h"
+#include "core/map.h"
 #include "core/sim.h"
 #include "core/test_queue.h"
 #include "draw.h"
@@ -156,65 +157,6 @@ class QueueSimulator : public Test {
     m_textLine += m_textIncrement;
   }
 
-  b2World *LoadMap(const char *new_map_name) {
-    b2World *world = new b2World(b2Vec2(0.0f, 0.0f));
-    std::ifstream file("../../testbed/maps/" + std::string(new_map_name) +
-                       ".json");
-    nlohmann::json map;
-    file >> map;
-
-    for (auto &body_json : map["bodies"]) {
-      b2BodyDef body_def;
-      body_def.type = (b2BodyType)body_json["type"];
-      body_def.position.Set(body_json["position"][0], body_json["position"][1]);
-      body_def.angle = body_json["angle"];
-      body_def.linearDamping = body_json["linear_damping"];
-      body_def.angularDamping = body_json["angular_damping"];
-      body_def.gravityScale = body_json["gravity_scale"];
-      body_def.fixedRotation = body_json["fixed_rotation"];
-      body_def.bullet = body_json["bullet"];
-
-      b2Body *body = world->CreateBody(&body_def);
-      std::cout << "Created Body: " << body << std::endl;
-      std::cout << "Body Type: " << body->GetType() << std::endl;
-      std::cout << "Body Position: " << body->GetPosition().x << ", "
-                << body->GetPosition().y << std::endl;
-
-      for (auto &fixture_json : body_json["fixtures"]) {
-        b2FixtureDef fixture_def;
-        fixture_def.density = fixture_json["density"];
-        fixture_def.friction = fixture_json["friction"];
-        fixture_def.restitution = fixture_json["restitution"];
-        fixture_def.isSensor = fixture_json["is_sensor"];
-        fixture_def.filter.categoryBits = fixture_json["category_bits"];
-        fixture_def.filter.maskBits = fixture_json["mask_bits"];
-        fixture_def.filter.groupIndex = fixture_json["group_index"];
-
-        if (fixture_json.find("polygon") != fixture_json.end()) {
-          b2PolygonShape shape;
-          for (auto &vertex : fixture_json["polygon"]) {
-            shape.m_vertices[shape.m_count++] = {vertex[0], vertex[1]};
-          }
-          fixture_def.shape = &shape;
-        } else if (fixture_json.find("circle") != fixture_json.end()) {
-          b2CircleShape shape;
-          shape.m_p.Set(fixture_json["circle"]["center"][0],
-                        fixture_json["circle"]["center"][1]);
-          shape.m_radius = fixture_json["circle"]["radius"];
-          fixture_def.shape = &shape;
-        } else if (fixture_json.find("edge") != fixture_json.end()) {
-          b2EdgeShape shape;
-          shape.m_vertex1.Set(fixture_json["edge"]["start"][0],
-                              fixture_json["edge"]["start"][1]);
-          shape.m_vertex2.Set(fixture_json["edge"]["end"][0],
-                              fixture_json["edge"]["end"][1]);
-          fixture_def.shape = &shape;
-        }
-        body->CreateFixture(&fixture_def);
-      }
-    }
-    return world;
-  }
   void UpdateUI() override {
     ImGui::SetNextWindowPos(ImVec2(10.0f, 100.0f));
     ImGui::Begin("Swarm Controls", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
@@ -257,6 +199,7 @@ class QueueSimulator : public Test {
       static float new_time_limit = 0.0f;
       static bool to_change = false;
       static b2World *new_world = nullptr;
+      static swarm::map::Map new_map;
       // Get behaviour name for test
       if (ImGui::BeginCombo("Behaviour", current_name.c_str())) {
         auto behaviourNames =
@@ -299,7 +242,8 @@ class QueueSimulator : public Test {
       static char str1[128] = "";
       ImGui::InputText("Map Name", str1, IM_ARRAYSIZE(str1));
       if (ImGui::Button("Open", ImVec2(120, 0))) {
-        new_world = LoadMap(str1);
+        new_map = swarm::map::load(str1);
+        new_world = new_map.world;
       }
 
       if (new_world != nullptr) {
@@ -324,7 +268,7 @@ class QueueSimulator : public Test {
       // create new_config and add it to the queue
       if (ImGui::Button("Add Test", ImVec2(120, 0))) {
         swarm::TestConfig new_config = {
-            current_name,    new_params,       smallDrone,     new_world,
+            current_name,    new_params,       smallDrone,     new_map,
             new_drone_count, new_target_count, new_time_limit,
         };
         queue_.push(new_config);
@@ -358,6 +302,7 @@ class QueueSimulator : public Test {
       static float new_time_limit = 0.0f;
       static bool to_change = false;
       static b2World *new_world = nullptr;
+      static swarm::map::Map new_map;
       // Get behaviour name for test
       if (ImGui::BeginCombo("Behaviour", current_name.c_str())) {
         auto behaviourNames =
@@ -433,7 +378,8 @@ class QueueSimulator : public Test {
       static char str1[128] = "";
       ImGui::InputText("Map Name", str1, IM_ARRAYSIZE(str1));
       if (ImGui::Button("Open", ImVec2(120, 0))) {
-        new_world = LoadMap(str1);
+        new_map = swarm::map::load(str1);
+        new_world = new_map.world;
       }
 
       if (new_world != nullptr) {
@@ -460,7 +406,7 @@ class QueueSimulator : public Test {
       // create new_config and add it to the queue
       if (ImGui::Button("Add Test", ImVec2(120, 0))) {
         swarm::TestConfig new_config = {
-            current_name,    new_params,       smallDrone,     new_world,
+            current_name,    new_params,       smallDrone,     new_map,
             new_drone_count, new_target_count, new_time_limit,
         };
         queue_.push(new_config);
@@ -531,11 +477,27 @@ class QueueSimulator : public Test {
         ImGui::MenuItem("Current Test", NULL, false, false);
       }
       ImGui::EndMenuBar();
+
       swarm::TestConfig current_config = sim->test_config();
       ImGui::Text("Behaviour: %s", current_config.behaviour_name.c_str());
       ImGui::Text("Drone Count: %d", current_config.num_drones);
       ImGui::Text("Target Count: %d", current_config.num_targets);
       ImGui::Text("Time Limit: %f", current_config.time_limit);
+      ImGui::EndChild();
+
+      ImGui::SameLine();
+
+      ImGui::BeginChild("Next Test", ImVec2(200, 100), true,
+                        ImGuiWindowFlags_None | ImGuiWindowFlags_MenuBar);
+      if (ImGui::BeginMenuBar()) {
+        ImGui::MenuItem("Next Test", NULL, false, false);
+      }
+      ImGui::EndMenuBar();
+      swarm::TestConfig next_config = queue_.peek();
+      ImGui::Text("Behaviour: %s", next_config.behaviour_name.c_str());
+      ImGui::Text("Drone Count: %d", next_config.num_drones);
+      ImGui::Text("Target Count: %d", next_config.num_targets);
+      ImGui::Text("Time Limit: %f", next_config.time_limit);
       ImGui::EndChild();
       static int selectedTestIndex = -1;
       static swarm::TestConfig *selectedTest = nullptr;

@@ -23,8 +23,12 @@ Sim::Sim(b2World *world, int drone_count, int target_count,
 }
 
 Sim::Sim(TestConfig &config)
-    : world_(config.world),
+    : world_(config.map.world),
+      border_width_(config.map.width),
+      border_height_(config.map.height),
+      map_(config.map),
       num_drones_(config.num_drones),
+      drone_spawn_position_(config.map.drone_spawn_point),
       num_targets_(config.num_targets),
       drone_configuration_(config.drone_config),
       time_limit_(config.time_limit),
@@ -118,9 +122,8 @@ void Sim::createDronesCircular(Behaviour &behaviour,
   float requiredCircleRadius = sqrt(totalDroneArea / M_PI);
 
   // Adjust center of the circle to be the center of the map
-  // TODO: Make this the point of the drone spawn point.
-  float centerX = 1000 / 2.0f;
-  float centerY = 1000 / 2.0f;
+  float centerX = drone_spawn_position_.x;
+  float centerY = drone_spawn_position_.y;
 
   for (int i = 0; i < num_drones_; i++) {
     // generate random angle and radius within the required circle

@@ -6,11 +6,12 @@
 
 #include "box2d/b2_body.h"
 #include "box2d/b2_math.h"
+#include "core/map.h"
 #include "imgui.h"
 #include "nlohmann/json.hpp"
 #include "settings.h"
 #include "test.h"
-namespace fs = std::filesystem;
+using namespace swarm;
 
 class myQueryCallback : public b2QueryCallback {
  public:
@@ -275,146 +276,17 @@ class MapCreator : public Test {
   }
 
   void SaveMap() {
-    std::cout << "Saving Map: " << map_name << "\n";
-    PrintBodiesAndFixtures(m_world);
-    // Save map
-    nlohmann::json map;
-    map["name"] = map_name;
-    for (b2Body *body = m_world->GetBodyList(); body; body = body->GetNext()) {
-      nlohmann::json body_json;
-      body_json["type"] = body->GetType();
-      body_json["position"] = {body->GetPosition().x, body->GetPosition().y};
-      body_json["angle"] = body->GetAngle();
-      body_json["linear_damping"] = body->GetLinearDamping();
-      body_json["angular_damping"] = body->GetAngularDamping();
-      body_json["gravity_scale"] = body->GetGravityScale();
-      body_json["fixed_rotation"] = body->IsFixedRotation();
-      body_json["bullet"] = body->IsBullet();
-
-      for (b2Fixture *fixture = body->GetFixtureList(); fixture;
-           fixture = fixture->GetNext()) {
-        nlohmann::json fixture_json;
-        fixture_json["density"] = fixture->GetDensity();
-        fixture_json["friction"] = fixture->GetFriction();
-        fixture_json["restitution"] = fixture->GetRestitution();
-        fixture_json["is_sensor"] = fixture->IsSensor();
-        fixture_json["category_bits"] = fixture->GetFilterData().categoryBits;
-        fixture_json["mask_bits"] = fixture->GetFilterData().maskBits;
-        fixture_json["group_index"] = fixture->GetFilterData().groupIndex;
-
-        b2Shape *shape = fixture->GetShape();
-        if (shape->GetType() == b2Shape::e_polygon) {
-          b2PolygonShape *polygon = (b2PolygonShape *)shape;
-          nlohmann::json polygon_json;
-          for (int i = 0; i < polygon->m_count; ++i) {
-            polygon_json.push_back(
-                {polygon->m_vertices[i].x, polygon->m_vertices[i].y});
-          }
-          fixture_json["polygon"] = polygon_json;
-        } else if (shape->GetType() == b2Shape::e_circle) {
-          b2CircleShape *circle = (b2CircleShape *)shape;
-          nlohmann::json circle_json;
-          circle_json["center"] = {circle->m_p.x, circle->m_p.y};
-          circle_json["radius"] = circle->m_radius;
-          fixture_json["circle"] = circle_json;
-        } else if (shape->GetType() == b2Shape::e_edge) {
-          b2EdgeShape *edge = (b2EdgeShape *)shape;
-          nlohmann::json edge_json;
-          edge_json["start"] = {edge->m_vertex1.x, edge->m_vertex1.y};
-          edge_json["end"] = {edge->m_vertex2.x, edge->m_vertex2.y};
-          fixture_json["edge"] = edge_json;
-        }
-        body_json["fixtures"].push_back(fixture_json);
-      }
-      map["bodies"].push_back(body_json);
-    }
-
-    std::string directory = "../../testbed/maps";
-    std::string filename = std::string(map_name) + ".json";
-    std::string fullPath = directory + "/" + filename;
-
-    if (!fs::exists(directory)) {
-      // Try to create the directory
-      if (!fs::create_directories(directory)) {
-        std::cerr << "Failed to create directory: " << directory << std::endl;
-        return;
-      }
-    }
-
-    std::ofstream file(fullPath);
-    if (!file.is_open() || file.fail()) {
-      std::cerr << "Failed to open file for writing: " << filename << std::endl;
-      return;
-    }
-
-    file << map.dump(4);
-    if (file.fail()) {
-      std::cerr << "Failed to write to file: " << filename << std::endl;
-    } else {
-      std::cout << "World saved successfully to " << filename << std::endl;
-    }
-    file.close();
+    map::Map new_map = {map_name, boundary_side_length, boundary_side_length,
+                        drone_spawn_point, m_world};
+    map::save(new_map);
     pause = false;
   }
 
   void LoadMap(const char *new_map_name) {
-    b2World *world = new b2World(b2Vec2(0.0f, 0.0f));
-    std::ifstream file("../../testbed/maps/" + std::string(new_map_name) +
-                       ".json");
-    nlohmann::json map;
-    file >> map;
+    map::Map map = map::load(new_map_name);
+    b2World *world = map.world;
     std::copy(new_map_name, new_map_name + 128, map_name);
 
-    for (auto &body_json : map["bodies"]) {
-      b2BodyDef body_def;
-      body_def.type = (b2BodyType)body_json["type"];
-      body_def.position.Set(body_json["position"][0], body_json["position"][1]);
-      body_def.angle = body_json["angle"];
-      body_def.linearDamping = body_json["linear_damping"];
-      body_def.angularDamping = body_json["angular_damping"];
-      body_def.gravityScale = body_json["gravity_scale"];
-      body_def.fixedRotation = body_json["fixed_rotation"];
-      body_def.bullet = body_json["bullet"];
-
-      b2Body *body = world->CreateBody(&body_def);
-      std::cout << "Created Body: " << body << std::endl;
-      std::cout << "Body Type: " << body->GetType() << std::endl;
-      std::cout << "Body Position: " << body->GetPosition().x << ", "
-                << body->GetPosition().y << std::endl;
-
-      for (auto &fixture_json : body_json["fixtures"]) {
-        b2FixtureDef fixture_def;
-        fixture_def.density = fixture_json["density"];
-        fixture_def.friction = fixture_json["friction"];
-        fixture_def.restitution = fixture_json["restitution"];
-        fixture_def.isSensor = fixture_json["is_sensor"];
-        fixture_def.filter.categoryBits = fixture_json["category_bits"];
-        fixture_def.filter.maskBits = fixture_json["mask_bits"];
-        fixture_def.filter.groupIndex = fixture_json["group_index"];
-
-        if (fixture_json.find("polygon") != fixture_json.end()) {
-          b2PolygonShape shape;
-          for (auto &vertex : fixture_json["polygon"]) {
-            shape.m_vertices[shape.m_count++] = {vertex[0], vertex[1]};
-          }
-          fixture_def.shape = &shape;
-        } else if (fixture_json.find("circle") != fixture_json.end()) {
-          b2CircleShape shape;
-          shape.m_p.Set(fixture_json["circle"]["center"][0],
-                        fixture_json["circle"]["center"][1]);
-          shape.m_radius = fixture_json["circle"]["radius"];
-          fixture_def.shape = &shape;
-        } else if (fixture_json.find("edge") != fixture_json.end()) {
-          b2EdgeShape shape;
-          shape.m_vertex1.Set(fixture_json["edge"]["start"][0],
-                              fixture_json["edge"]["start"][1]);
-          shape.m_vertex2.Set(fixture_json["edge"]["end"][0],
-                              fixture_json["edge"]["end"][1]);
-          fixture_def.shape = &shape;
-        }
-        body->CreateFixture(&fixture_def);
-      }
-    }
     m_world->SetDebugDraw(nullptr);     // Detach from the old world
     world->SetDebugDraw(&g_debugDraw);  // Attach to the new world
 
