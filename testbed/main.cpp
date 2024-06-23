@@ -61,9 +61,6 @@ int main() {
   auto map1 = swarm::map::load("new_map");
   auto map2 = swarm::map::load("test2");
 
-  b2World *world = map1.world;
-  b2World *world2 = map2.world;
-
   auto flock_params = swarm::behaviour::Registry::getInstance()
                           .getBehaviour("Flocking")
                           ->getParameters();
