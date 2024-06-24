@@ -72,9 +72,9 @@ class CollisionManager {
     return (status == 0) ? std::string(res.get()) : std::string(name);
   }
 #else
-  namespace swarm {
-  std::string internal_demangle(const char* name) { return std::string(name); }
-  }  // namespace swarm
+  static std::string internal_demangle(const char* name) {
+    return std::string(name);
+  }
 #endif  // __GNUG__
 
  public:
