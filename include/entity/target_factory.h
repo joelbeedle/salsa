@@ -1,8 +1,6 @@
 #ifndef SWARM_ENTITY_TARGET_FACTORY_H
 #define SWARM_ENTITY_TARGET_FACTORY_H
 
-#include <cxxabi.h>
-
 #include <any>
 #include <functional>
 #include <iostream>
@@ -12,6 +10,7 @@
 #include <typeinfo>
 
 #include "entity/target.h"
+#include "utils/object_types.h"
 
 namespace swarm {
 
@@ -20,13 +19,6 @@ class TargetFactory {
   using TargetCreateFunc = std::function<std::shared_ptr<Target>(
       b2World*, const b2Vec2&, int, std::any)>;
   static std::map<std::string, TargetCreateFunc> registry;
-
-  static std::string mine(const char* name) {
-    int status = -1;
-    std::unique_ptr<char, void (*)(void*)> res{
-        abi::__cxa_demangle(name, NULL, NULL, &status), std::free};
-    return (status == 0) ? res.get() : name;
-  }
 
  public:
   template <typename T, typename... Args>
@@ -49,8 +41,8 @@ class TargetFactory {
       } catch (const std::bad_any_cast& e) {
         std::cerr << "Bad any_cast in factory creation: " << e.what() << '\n';
         std::cerr << "Expected types: "
-                  << mine(typeid(std::tuple<Args...>).name()) << '\n';
-        std::cerr << "Received type: " << mine(packedArgs.type().name())
+                  << type(typeid(std::tuple<Args...>).name()) << '\n';
+        std::cerr << "Received type: " << type(packedArgs.type().name())
                   << '\n';
         return nullptr;
       }
