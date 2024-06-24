@@ -34,6 +34,7 @@ Sim::Sim(TestConfig &config)
       drone_configuration_(config.drone_config),
       time_limit_(config.time_limit),
       target_type_(config.target_type),
+      contact_listener_(config.contact_listener),
       test_config_(config) {
   is_stack_test_ = true;
   b2Vec2 gravity(0.0f, 0.0f);
@@ -47,6 +48,8 @@ Sim::Sim(TestConfig &config)
   oss << std::put_time(&tm, "%Y-%m-%d_%H-%M-%S") << "_"
       << current_behaviour_name_.c_str() << ".log";
   logger_.switch_log_file(oss.str());
+
+  world_->SetContactListener(contact_listener_);
 
   auto behaviour_pointer =
       behaviour::Registry::getInstance().getBehaviour(current_behaviour_name_);

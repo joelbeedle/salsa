@@ -5,6 +5,7 @@
 #define SWARM_UTILS_BASE_CONTACT_LISTENER_H
 
 #include <box2d/box2d.h>
+#include <cxxabi.h>
 
 #include <functional>
 #include <map>
@@ -21,9 +22,18 @@ namespace swarm {
 /// function handlers for each unique pair of types, enabling custom responses
 /// to collisions.
 class BaseContactListener : public b2ContactListener {
+ private:
+  std::string demangle(std::string name) {
+    int status = -1;
+    std::unique_ptr<char, void (*)(void *)> res{
+        abi::__cxa_demangle(name.c_str(), NULL, NULL, &status), std::free};
+
+    return (status == 0) ? res.get() : name;
+  }
+
  protected:
   /// @brief Maps pairs of types to their respective collision handlers.
-  std::map<std::pair<std::type_index, std::type_index>,
+  std::map<std::pair<std::string, std::string>,
            std::function<void(b2Fixture *, b2Fixture *)>>
       collision_handlers_;
 
@@ -35,7 +45,7 @@ class BaseContactListener : public b2ContactListener {
   /// @param handler The function to call when objects of type_a and type_b
   /// collide.
   void addCollisionHandler(
-      std::type_index type_a, std::type_index type_b,
+      std::string type_a, std::string type_b,
       std::function<void(b2Fixture *, b2Fixture *)> handler);
 
   /// @brief Override from b2ContactListener to handle the start of a contact

@@ -238,9 +238,9 @@ class SandboxSimulator : public Test {
            fixture = fixture->GetNext()) {
         if (fixture->IsSensor()) {
           uint16 categoryBits = fixture->GetFilterData().categoryBits;
-          if (categoryBits == swarm::CollisionManager::getCollisionConfig(
-                                  typeid(swarm::Drone))
-                                  .categoryBits &&
+          if (categoryBits ==
+                  swarm::CollisionManager::getCollisionConfig<swarm::Drone>()
+                      .categoryBits &&
               draw_visual_range_) {
             // This is a drone sensor, draw if wanted
             const b2CircleShape *circleShape =
@@ -267,21 +267,24 @@ class SandboxSimulator : public Test {
             continue;
           }
           // Depending on the type, draw the object
-          switch (userData->type) {
-            case swarm::ObjectType::Drone: {
-              swarm::Drone *drone = userData->as<swarm::Drone>();
-              // Draw drone
-              b2Vec2 position = body->GetPosition();
-              debugDraw->DrawSolidCircle(position, drone->getRadius(),
-                                         transform.q.GetXAxis(),
-                                         b2Color(0.7f, 0.5f, 0.5f));
-              break;
-            }
-            case swarm::ObjectType::Target: {
-              break;
-            }
+          std::string name = typeid(*(userData->object)).name();
+          std::cout << name << std::endl;
+          if (name.compare("swarm::Drone")) {
+            std::cout << "Drawing drone" << std::endl;
+            swarm::Drone *drone = userData->as<swarm::Drone>();
+            // Draw drone
+            b2Vec2 position = body->GetPosition();
+            debugDraw->DrawSolidCircle(position, drone->getRadius(),
+                                       transform.q.GetXAxis(),
+                                       b2Color(0.7f, 0.5f, 0.5f));
           }
-          continue;
+          if (name.compare("swarm::Target")) {
+            swarm::Target *target = userData->as<swarm::Target>();
+            b2Vec2 position = body->GetPosition();
+            debugDraw->DrawSolidCircle(position, target->getRadius(),
+                                       transform.q.GetXAxis(),
+                                       b2Color(0.5f, 0.5f, 0.5f));
+          }
         }
 
         // Draw everything else that's not anything above with default values

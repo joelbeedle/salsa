@@ -4,7 +4,7 @@
 
 #include "entity/drone.h"
 #include "entity/entity.h"
-
+#include "entity/target.h"
 namespace swarm {
 
 enum class ObjectType {
@@ -19,8 +19,12 @@ std::string type(const T &t) {
   return demangle(typeid(t).name());
 }
 
+template <typename T>
+std::string get_type() {
+  return demangle(typeid(T).name());
+}
+
 struct UserData {
-  ObjectType type;
   Entity *object;  // Point to any object derived from EnvironmentObject
 
   UserData() : object(nullptr) {}

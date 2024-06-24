@@ -14,6 +14,7 @@
 #include "behaviours/parameter.h"
 #include "core/map.h"
 #include "entity/drone_configuration.h"
+#include "utils/base_contact_listener.h"
 namespace swarm {
 
 struct TestConfig {
@@ -29,6 +30,7 @@ struct TestConfig {
   float time_limit;
   std::string target_type = "null";
   std::any target_parameters;
+  BaseContactListener *contact_listener;
   bool keep = true;
   // FUTURE: std::function<void()> drone_setup;
   // FUTURE: std::function<void()> target_setup;

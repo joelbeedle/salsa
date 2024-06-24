@@ -5,12 +5,16 @@
 #define SWARM_UTILS_COLLISION_MANAGER_H
 
 #include <box2d/box2d.h>
+#include <cxxabi.h>
 
 #include <bitset>
 #include <cstdint>
+#include <iostream>
 #include <map>
 #include <typeindex>
 #include <vector>
+
+#include "spdlog/spdlog.h"
 
 namespace swarm {
 
@@ -34,13 +38,20 @@ struct CollisionConfig {
 /// registered types and their partners.
 class CollisionManager {
  private:
-  /// @brief Stores collision configuration for each registered type.
-  static std::map<std::type_index, CollisionConfig> configurations_;
-  /// @brief Maps each type to its collision partners.
-  static std::map<std::type_index, std::vector<std::type_index>>
-      collision_partners_;
   /// @brief Tracks the next available category bit for registering new types.
   static uint16_t next_category_bit_;
+  template <typename T>
+  struct TypeKey {
+    static inline const char* value() { return typeid(T).name(); }
+  };
+  /// @brief Stores collision configuration for each registered type.
+  static std::unordered_map<std::string, CollisionConfig,
+                            std::hash<std::string>, std::equal_to<>>
+      configurations_;
+  /// @brief Maps each type to its collision partners.
+  static std::unordered_map<std::string, std::vector<std::string>,
+                            std::hash<std::string>, std::equal_to<>>
+      collision_partners_;
 
   /// @brief Updates the mask bits for all registered types based on their
   /// collision partners.
@@ -49,6 +60,13 @@ class CollisionManager {
   /// by combining the category bits of its collision partners, and updates the
   /// mask bits accordingly.
   static void updateMaskBits();
+  static std::string demangle(std::string name) {
+    int status = -1;
+    std::unique_ptr<char, void (*)(void*)> res{
+        abi::__cxa_demangle(name.c_str(), NULL, NULL, &status), std::free};
+
+    return (status == 0) ? res.get() : name;
+  }
 
  public:
   /// @brief Retrieves the collision configuration for a specific type.
@@ -56,7 +74,17 @@ class CollisionManager {
   /// @param type The type_index of the object to retrieve configuration for.
   /// @return The CollisionConfig structure containing the collision settings
   /// for the type.
-  static CollisionConfig getCollisionConfig(std::type_index type);
+  template <typename T>
+  static CollisionConfig getCollisionConfig() {
+    std::string type_name = typeid(T).name();
+    auto it = configurations_.find(type_name);
+    if (it != configurations_.end()) {
+      return it->second;
+    } else {
+      std::cout << "Type not registered: " << demangle(type_name) << std::endl;
+      throw std::runtime_error("Type not registered");
+    }
+  }
 
   /// @brief Registers a new type and its collision partners in the system.
   ///
@@ -68,8 +96,31 @@ class CollisionManager {
   /// @param type The type_index of the new type to register.
   /// @param partners A vector of type_index specifying the collision partners
   /// for the new type.
-  static void registerType(std::type_index type,
-                           const std::vector<std::type_index>& partners);
+  template <typename T>
+  static void registerType(const std::vector<std::string>& partners) {
+    std::string type_name = TypeKey<T>::value();
+    spdlog::info("Registering type {}", demangle(type_name));
+
+    if (configurations_.find(type_name) == configurations_.end()) {
+      uint16_t category_bit = next_category_bit_;
+      std::bitset<16> catBits(category_bit);
+      spdlog::info("Registering type {} with category bit {}",
+                   demangle(type_name), category_bit);
+
+      next_category_bit_ <<= 1;
+      configurations_[type_name] = {category_bit, 0};
+    }
+    collision_partners_[type_name] = partners;
+
+    updateMaskBits();
+    for (const auto& config : configurations_) {
+      spdlog::info("Now registered types: {}", demangle(config.first));
+
+      std::bitset<16> catBits(config.second.categoryBits);
+      std::cout << catBits << std::endl;
+      spdlog::info("Mask bits: {}", config.second.maskBits);
+    }
+  }
 };
 }  // namespace swarm
 #endif  // SWARM_UTILS_COLLISION_MANAGER_H

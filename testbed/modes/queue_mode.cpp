@@ -91,9 +91,22 @@ class QueueSimulator : public Test {
     delete old_sim;
     sim->setCurrentBehaviour(sim->current_behaviour_name());
     m_world = sim->getWorld();
+
     g_camera.m_center = sim->getMap().drone_spawn_point;
     g_camera.m_zoom = 10.0f;
     pause = false;
+    first_run_ = true;
+    target_positions_.clear();
+    target_colors_.clear();
+    auto targets = sim->getTargets();
+    int size = targets.size();
+    target_positions_.reserve(size);
+    target_colors_.reserve(size);
+    for (auto &target : targets) {
+      target_positions_.push_back(target->getPosition());
+      target_colors_.push_back(falseColour);
+    }
+
     return true;
   }
   void SetWorld(b2World *world) { sim_builder->setWorld(world); }
@@ -123,19 +136,16 @@ class QueueSimulator : public Test {
     // Run simulation steps here
     Test::Step(settings);
     settings.m_pause = pause;
-    std::vector<int> foundTreeIDs;
+    std::vector<int> foundIds;
+    if (first_run_) {
+    }
     sim->update();
+    for (auto &target : sim->getTargetsFoundThisStep()) {
+      target_colors_[target->getId()] = trueColour;
+    }
     if (!settings.m_pause) sim->current_time() += 1.0f / settings.m_hertz;
     // m_world->DebugDraw();
-    if (first_run_) {
-      auto targets = sim->getTargets();
-      for (auto &target : targets) {
-        target_positions_.push_back(target->getPosition());
-        target_colors_.push_back(falseColour);
-      }
-    }
-
-    Draw(sim->getWorld(), &g_debugDraw, foundTreeIDs);
+    Draw(sim->getWorld(), &g_debugDraw, foundIds);
     if (next_frame) {
       pause = true;
       try {
@@ -611,9 +621,9 @@ class QueueSimulator : public Test {
            fixture = fixture->GetNext()) {
         if (fixture->IsSensor()) {
           uint16 categoryBits = fixture->GetFilterData().categoryBits;
-          if (categoryBits == swarm::CollisionManager::getCollisionConfig(
-                                  typeid(swarm::Drone))
-                                  .categoryBits &&
+          if (categoryBits ==
+                  swarm::CollisionManager::getCollisionConfig<swarm::Drone>()
+                      .categoryBits &&
               draw_visual_range_) {
             // This is a drone sensor, draw if wanted
             const b2CircleShape *circleShape =
@@ -626,10 +636,6 @@ class QueueSimulator : public Test {
             // skip this fixture as it's been dealt with
             continue;
           }
-          if (categoryBits == 0x0002) {
-            // This is fixture tree sensor, but we deal with trees
-            // individually later
-          }
         }
 
         if (fixture->GetUserData().pointer != 0) {
@@ -639,25 +645,21 @@ class QueueSimulator : public Test {
             std::cout << "User data is null" << std::endl;
             continue;
           }
-          // Depending on the type, draw the object
-          switch (userData->type) {
-            case swarm::ObjectType::Drone: {
-              swarm::Drone *drone = userData->as<swarm::Drone>();
-              // Draw drone
-              b2Vec2 position = body->GetPosition();
-              debugDraw->DrawSolidCircle(position, drone->getRadius(),
-                                         transform.q.GetXAxis(),
-                                         b2Color(0.7f, 0.5f, 0.5f));
-              break;
-            }
-            case swarm::ObjectType::Target: {
-              swarm::Target *target = userData->as<swarm::Target>();
-              b2Vec2 position = body->GetPosition();
-              debugDraw->DrawSolidCircle(position, target->getRadius(),
-                                         transform.q.GetXAxis(),
-                                         b2Color(0.5f, 0.5f, 0.5f));
-              break;
-            }
+          // Draw Drones
+          std::string name = swarm::type(*(userData->object));
+          if (name.compare("swarm::Drone") == 0) {
+            swarm::Drone *drone = userData->as<swarm::Drone>();
+            // Draw drone
+            b2Vec2 position = body->GetPosition();
+            debugDraw->DrawSolidCircle(position, drone->getRadius(),
+                                       transform.q.GetXAxis(),
+                                       drone->getColor());
+          } else if (name.compare("b2_groundBody") && draw_targets_) {
+            // swarm::Target *target = userData->as<swarm::Target>();
+            // b2Vec2 position = body->GetPosition();
+            // debugDraw->DrawSolidCircle(position, target->getRadius(),
+            //                           transform.q.GetXAxis(),
+            //                           target->getColor());
           }
           continue;
         }

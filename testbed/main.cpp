@@ -18,6 +18,7 @@
 #include <variant>
 #include <vector>
 
+#include "spdlog/sinks/stdout_color_sinks.h"
 #include "targets/tree.h"
 #include "testbed.h"
 
@@ -29,17 +30,20 @@
 
 static void setupInteractions(swarm::BaseContactListener &listener) {
   listener.addCollisionHandler(
-      typeid(swarm::Drone), typeid(swarm::Target),
+      "swarm::Drone", "Tree",
       [](b2Fixture *droneFixture, b2Fixture *treeFixture) -> void {
-        swarm::Target *target = reinterpret_cast<swarm::UserData *>(
-                                    treeFixture->GetUserData().pointer)
-                                    ->as<swarm::Target>();
         swarm::Drone *drone = reinterpret_cast<swarm::UserData *>(
                                   droneFixture->GetUserData().pointer)
                                   ->as<swarm::Drone>();
+        Tree *tree = reinterpret_cast<swarm::UserData *>(
+                         treeFixture->GetUserData().pointer)
+                         ->as<Tree>();
+        tree->setFound(true);
+        drone->addTargetFound(tree);
+        tree->addNumMapped();
       });
   listener.addCollisionHandler(
-      typeid(swarm::Drone), typeid(swarm::Drone),
+      "swarm::Drone", "swarm::Drone",
       [](b2Fixture *droneFixture1, b2Fixture *droneFixture2) -> void {
         swarm::Drone *drone1 = reinterpret_cast<swarm::UserData *>(
                                    droneFixture1->GetUserData().pointer)
@@ -47,9 +51,6 @@ static void setupInteractions(swarm::BaseContactListener &listener) {
         swarm::Drone *drone2 = reinterpret_cast<swarm::UserData *>(
                                    droneFixture2->GetUserData().pointer)
                                    ->as<swarm::Drone>();
-        if (droneFixture1->IsSensor() && droneFixture2->IsSensor()) {
-          return;
-        }
       });
 }
 
@@ -63,8 +64,8 @@ int main() {
 
   swarm::DroneConfiguration *smallDrone = new swarm::DroneConfiguration(
       25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f);
-  swarm::CollisionManager::registerType(typeid(swarm::Drone), {typeid(Tree)});
-  swarm::CollisionManager::registerType(typeid(Tree), {typeid(swarm::Drone)});
+  swarm::CollisionManager::registerType<swarm::Drone>({typeid(Tree).name()});
+  swarm::CollisionManager::registerType<Tree>({typeid(swarm::Drone).name()});
   swarm::TargetFactory::registerTargetType<Tree, bool, bool, float>("Tree");
 
   auto new_flock_params = std::unordered_map<std::string, float>({
@@ -80,24 +81,26 @@ int main() {
       {"Obstacle Avoidance Weight", 1.0},
   });
 
-  swarm::TestConfig config = {
-      "Flocking", flock_params, smallDrone,
-      map1,       100,          100,
-      1200.0f,    "Tree",       std::tuple(false, false, 5.0f)};
+  auto contactListener = std::make_shared<swarm::BaseContactListener>();
+  setupInteractions(*contactListener);
 
-  swarm::TestConfig config2 = {"Pheromone Avoidance",
-                               pheromone_params,
-                               smallDrone,
-                               map1,
-                               100,
-                               200,
-                               1200.0f,
-                               "Tree"};
+  swarm::TestConfig config = {"Flocking",
+                              flock_params,
+                              smallDrone,
+                              map1,
+                              100,
+                              100,
+                              1200.0f,
+                              "Tree",
+                              std::tuple(false, false, 5.0f),
+                              contactListener.get()};
 
   swarm::TestQueue queue;
-  config.num_drones = 50;
+  config.num_drones = 1024;
+  config.num_targets = 10;
   queue.push(config);
-  queue.push(config2);
+  config.behaviour_name = "Pheromone Avoidance";
+  queue.push(config);
   config.num_drones = 50;
   queue.push(config);
 
