@@ -1,10 +1,32 @@
 # swarm-sim
 
-Swarm Intelligence Algorithms in Box2D
+Swarm Algorithm Simulation library and Testbed, written in C++.
 
-`testbed` folder code is adapted from the [Box2D testbed](https://github.com/erincatto/box2d), with modifications. All code attributed to Erin Catto has their license at the top.
+`testbed` folder code is originally adapted from the [Box2D testbed](https://github.com/erincatto/box2d).
 
 ## Getting Started
+
+### Installation
+
+#### Prerequisites
+
+- CMake 3.14+
+- A C++17 compatible compiler (gcc, clang, cl)
+- Git
+- OpenGL and GLFW
+- Optional: Doxygen
+
+#### Steps
+
+1. Clone the github directory using `git clone --recursive https://github.com/joelbeedle/swarm-sim.git`
+   - Note: the `--recursive` tag is important, as this also clones the Box2D submodule
+2. Set up the Box2D submodule using `git submodule update --init --recursive`
+3. To configure, inside the root `swarm-sim` folder, run `cmake -S . -B build`
+   - If you have Ninja installed, you can run: `cmake -S . -B build -GNinja`
+4. To build, run `cmake --build build`
+   - To run tests, `cmake --build build --target test`
+5. To build docs (this requires Doxygen, docs can be found in `build/docs/html`), run `cmake --build --target docs`
+6. To run the testbed, then navigate to `build/testbed` and run `./testbed`.
 
 The directory is split between a library, `libswarm-sim`, and a binary testbed `swarm-testbed`.
 
@@ -58,29 +80,6 @@ testbed::run();
 ```
 
 ## Installation
-
-### Dependencies
-
-- CMake 3.14+
-- A C++17 compatible compiler (gcc, clang, cl)
-- Git
-- Doxygen (optional)
-- OpenGL and GLFW
-- Box2D (packaged with directory as submodule)
-- spdlog (should be downloaded automatically)
-- nhlohmann_json (should be downloaded automatically)
-
-### Steps
-
-1. Clone the github directory using `git clone --recursive https://github.com/joelbeedle/swarm-sim.git`
-   - Note: the `--recursive` tag is important, as this also clones the Box2D submodule
-2. Set up the Box2D submodule using `git submodule update --init --recursive`
-3. To configure, inside the root `swarm-sim` folder, run `cmake -S . -B build`
-   - If you have Ninja installed, you can run: `cmake -S . -B build -GNinja`
-4. To build, run `cmake --build build`
-   - To run tests, `cmake --build build --target test`
-5. To build docs (this requires Doxygen, docs can be found in `build/docs/html`), run `cmake --build --target docs`
-6. To run the testbed, then navigate to `build/testbed` and run `./testbed`.
 
 ## Design
 
