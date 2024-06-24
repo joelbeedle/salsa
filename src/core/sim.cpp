@@ -141,7 +141,7 @@ void Sim::createDronesCircular(Behaviour &behaviour,
                                DroneConfiguration &config) {
   // Calculate the total area needed for all drones
   float droneArea = M_PI * std::pow(config.radius, 2);
-  float totalDroneArea = num_drones_ * droneArea;
+  float totalDroneArea = std::pow(num_drones_, 2) * droneArea;
 
   // Calculate the radius of the circle needed to fit all drones
   float requiredCircleRadius = sqrt(totalDroneArea / M_PI);
@@ -167,6 +167,7 @@ void Sim::createDronesCircular(Behaviour &behaviour,
   }
   int current_id = 0;
   for (auto &drone : drones_) {
+    drone->setColor(b2Color(0.7f, 0.5f, 0.5f));
     drone->setId(current_id++);
     drone->addObserver(std::shared_ptr<Logger>(&logger_, [](auto *) {}));
   }
