@@ -35,6 +35,7 @@ fs::path getExecutablePath() {
 
 Map load(const char *new_map_name) {
   std::filesystem::path exec_path = getExecutablePath();
+  std::cout << "Executable path: " << exec_path << std::endl;
   std::filesystem::path file_path = exec_path / ".." / ".." / "testbed" /
                                     "maps" /
                                     (std::string(new_map_name) + ".json");
