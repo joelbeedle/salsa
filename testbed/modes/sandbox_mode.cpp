@@ -268,9 +268,7 @@ class SandboxSimulator : public Test {
           }
           // Depending on the type, draw the object
           std::string name = typeid(*(userData->object)).name();
-          std::cout << name << std::endl;
           if (name.compare("swarm::Drone")) {
-            std::cout << "Drawing drone" << std::endl;
             swarm::Drone *drone = userData->as<swarm::Drone>();
             // Draw drone
             b2Vec2 position = body->GetPosition();
