@@ -96,3 +96,4 @@ settings.ini
 test.log
 imgui.ini
 settings.ini
+__pycache__

@@ -11,6 +11,8 @@ set (MY_TESTBED_SOURCE_FILES
 	test.h
 	user.cpp
 	user.h
+	plot/plot.cpp
+	plot/plot.h
 	targets/tree.cpp
 	targets/tree.h
 	modes/map_creator.cpp
@@ -40,10 +42,13 @@ FetchContent_MakeAvailable(cli11_proj)
 
 FetchContent_MakeAvailable(nlohmann_json)
 
+find_package (Python REQUIRED
+        COMPONENTS Interpreter Development)
+
 add_executable(testbed ${MY_TESTBED_SOURCE_FILES})
-target_include_directories(testbed PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(testbed PRIVATE  ${Python_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_features(testbed PRIVATE cxx_std_20)
-target_link_libraries(testbed PRIVATE glad glfw imgui box2d spdlog::spdlog nlohmann_json::nlohmann_json CLI11::CLI11 swarm-sim)
+target_link_libraries(testbed PRIVATE glad glfw imgui box2d spdlog::spdlog nlohmann_json::nlohmann_json CLI11::CLI11 ${Python_LIBRARIES} swarm-sim)
 
 # message(STATUS "runtime = ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 # message(STATUS "binary = ${CMAKE_CURRENT_BINARY_DIR}")
