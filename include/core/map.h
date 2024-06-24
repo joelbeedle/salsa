@@ -3,8 +3,10 @@
 
 #include <box2d/box2d.h>
 
+#include <exception>
 #include <fstream>
 #include <iostream>
+#include <string>
 
 #include "nlohmann/json.hpp"
 #if defined(_WIN32)
