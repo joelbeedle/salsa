@@ -7,7 +7,7 @@
 
 Tree::Tree(b2World *world, const b2Vec2 &position, int treeID, bool diseased,
            bool mapped, float radius)
-    : Target(world, position, radius, swarm::type(*this)),
+    : Target(world, position, radius, "Tree"),
       diseased(diseased),
       mapped(mapped),
       radius(radius) {

@@ -59,9 +59,6 @@ static void setupInteractions(swarm::BaseContactListener &listener) {
 }
 
 void user() {
-  auto map1 = swarm::map::load("new_map");
-  auto map2 = swarm::map::load("test2");
-
   auto flock_params = swarm::behaviour::Registry::getInstance()
                           .getBehaviour("Flocking")
                           ->getParameters();
@@ -87,7 +84,8 @@ void user() {
 
   auto contactListener = std::make_shared<swarm::BaseContactListener>();
   setupInteractions(*contactListener);
-
+  swarm::map::Map map1 = {"Map1", BORDER_WIDTH, BORDER_HEIGHT, b2Vec2(0, 0),
+                          new b2World(b2Vec2(0.0f, 0.0f))};
   swarm::TestConfig config = {"Flocking",
                               flock_params,
                               smallDrone,
@@ -100,7 +98,7 @@ void user() {
                               contactListener.get()};
 
   swarm::TestQueue queue;
-  config.num_targets = 0;
+  config.num_targets = 10;
   config.num_drones = 2;
   config.time_limit = 100.0f;
   queue.push(config);
