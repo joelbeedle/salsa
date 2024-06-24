@@ -210,11 +210,6 @@ class DSPBehaviour : public Behaviour {
     acceleration.SetZero();
   }
 
-  std::unordered_map<std::string, behaviour::Parameter *> getParameters()
-      override {
-    return parameters_;
-  }
-
   void clean(const std::vector<std::unique_ptr<Drone>> &drones) override {
     for (auto &point : dspPoints) {
       b2World *world = point->body->GetWorld();

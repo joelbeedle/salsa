@@ -40,11 +40,12 @@ class Logger : public Observer {
   }
 
   void init_logger(const std::string& log_file) {
-    spdlog::drop_all();  // Clean up existing loggers
+    spdlog::drop("async_logger");
     spdlog::init_thread_pool(
         8192, 1);  // Queue with 8192 slots and 1 background thread
     logger_ = spdlog::basic_logger_mt<spdlog::async_factory>("async_logger",
                                                              log_file);
+    logger_->set_pattern("[%m-%d %H:%M:%S.%e] %v");
     spdlog::set_default_logger(logger_);
     spdlog::set_level(spdlog::level::info);
     spdlog::flush_every(std::chrono::seconds(3));
@@ -55,7 +56,10 @@ class Logger : public Observer {
   }
 
   void update(const nlohmann::json& message) override {
-    logger_->info(message.dump());
+    std::string caller_info = message["caller_type"];
+    int id = message["id"];
+    std::string the_rest = message["message"];
+    logger_->info("[{} {}] {}", caller_info, id, the_rest);
   }
 };
 

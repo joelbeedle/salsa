@@ -9,6 +9,8 @@ set (MY_TESTBED_SOURCE_FILES
 	settings.cpp
 	test.cpp
 	test.h
+	user.cpp
+	user.h
 	targets/tree.cpp
 	targets/tree.h
 	modes/map_creator.cpp
@@ -27,12 +29,21 @@ FetchContent_Declare(
 	nlohmann_json
 	GIT_REPOSITORY https://github.com/nlohmann/json.git
 	GIT_TAG        v3.11.3)
+
+FetchContent_Declare(
+	cli11_proj
+	QUIET
+	GIT_REPOSITORY https://github.com/CLIUtils/CLI11.git
+	GIT_TAG 6c7b07a878ad834957b98d0f9ce1dbe0cb204fc9)
+
+FetchContent_MakeAvailable(cli11_proj)
+
 FetchContent_MakeAvailable(nlohmann_json)
 
-add_executable(my_testbed ${MY_TESTBED_SOURCE_FILES})
-target_include_directories(my_testbed PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_compile_features(my_testbed PRIVATE cxx_std_20)
-target_link_libraries(my_testbed PRIVATE glad glfw imgui box2d nlohmann_json::nlohmann_json swarm-sim)
+add_executable(testbed ${MY_TESTBED_SOURCE_FILES})
+target_include_directories(testbed PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_compile_features(testbed PRIVATE cxx_std_20)
+target_link_libraries(testbed PRIVATE glad glfw imgui box2d nlohmann_json::nlohmann_json CLI11::CLI11 swarm-sim)
 
 # message(STATUS "runtime = ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 # message(STATUS "binary = ${CMAKE_CURRENT_BINARY_DIR}")

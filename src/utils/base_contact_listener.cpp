@@ -1,26 +1,28 @@
 #include "utils/base_contact_listener.h"
 
 #include "box2d/b2_body.h"
+#include "core/logger.h"
+#include "core/simulation.h"
 #include "spdlog/spdlog.h"
 #include "utils/object_types.h"
 namespace swarm {
+
 void BaseContactListener::addCollisionHandler(
     std::string type1, std::string type2,
     std::function<void(b2Fixture *, b2Fixture *)> handler) {
-  std::cout << "Adding collision handler for types: " << type1 << " and "
-            << type2 << std::endl;
+  get_logger()->info("Adding collision handler for types: {} and {}", type1,
+                     type2);
   if (handler) {
-    std::cout << "Handler is not null" << std::endl;
+    get_logger()->info("Handler is not null");
   }
   if (collision_handlers_.size() == 0) {
-    std::cout << "Collision handlers is empty" << std::endl;
+    get_logger()->info("Collision handlers map is empty");
   }
   collision_handlers_[{type1, type2}] = handler;
-  std::cout << "Collision handlers size: " << collision_handlers_.size()
-            << std::endl;
+
   for (auto &handler : collision_handlers_) {
-    std::cout << "Handler: " << handler.first.first << " and "
-              << handler.first.second << std::endl;
+    get_logger()->info("Handler: {} and {}", handler.first.first,
+                       handler.first.second);
   }
 
   // Ensure symmetric handling, no matter the order of contact
@@ -45,7 +47,7 @@ void BaseContactListener::BeginContact(b2Contact *contact) {
     return;
   }
   if (!userDataA->object || !userDataB->object) {
-    std::cout << "Error: One of the UserData objects is null." << std::endl;
+    get_logger()->error("One of the UserData objects is null.");
     return;
   }
   auto handlerIt =
@@ -55,9 +57,9 @@ void BaseContactListener::BeginContact(b2Contact *contact) {
   if (handlerIt != collision_handlers_.end()) {
     handlerIt->second(fixtureA, fixtureB);
   } else {
-    std::cout << "No collision handler for types "
-              << demangle(typeid(*(userDataA->object)).name()) << " and "
-              << demangle(typeid(*(userDataB->object)).name()) << std::endl;
+    get_logger()->error("No collision handler for types {} and {}",
+                        demangle(typeid(*(userDataA->object)).name()),
+                        demangle(typeid(*(userDataB->object)).name()));
   }
 }
 }  // namespace swarm

@@ -66,10 +66,6 @@ Map load(const char *new_map_name) {
     body_def.bullet = body_json["bullet"];
 
     b2Body *body = world->CreateBody(&body_def);
-    std::cout << "Created Body: " << body << std::endl;
-    std::cout << "Body Type: " << body->GetType() << std::endl;
-    std::cout << "Body Position: " << body->GetPosition().x << ", "
-              << body->GetPosition().y << std::endl;
 
     for (auto &fixture_json : body_json["fixtures"]) {
       b2FixtureDef fixture_def;

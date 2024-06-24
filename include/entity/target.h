@@ -13,7 +13,8 @@ class Target : public Entity {
   bool found_ = false;
 
  public:
-  Target(b2World *world, const b2Vec2 &position, float radius);
+  Target(b2World *world, const b2Vec2 &position, float radius,
+         std::string type_name);
 
   virtual std::string getType() const = 0;
 

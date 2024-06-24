@@ -65,11 +65,6 @@ class PheromoneBehaviour : public Behaviour {
     }
   }
 
-  std::unordered_map<std::string, behaviour::Parameter *> getParameters()
-      override {
-    return parameters_;
-  }
-
  private:
   void updatePheromones() {
     for (auto it = pheromones.begin(); it != pheromones.end();) {

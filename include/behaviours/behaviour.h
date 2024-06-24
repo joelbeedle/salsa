@@ -20,6 +20,9 @@ class Drone;
 
 /// @brief Abstract base class for all swarm behaviours to inherit from.
 class Behaviour {
+ protected:
+  std::unordered_map<std::string, behaviour::Parameter *> parameters_;
+
  public:
   virtual ~Behaviour() = default;
 
@@ -37,8 +40,9 @@ class Behaviour {
   /// behaviour parameters on the fly.
   ///
   /// @return Unordered map of parameter names to their settings.
-  virtual std::unordered_map<std::string, behaviour::Parameter *>
-  getParameters() = 0;
+  std::unordered_map<std::string, behaviour::Parameter *> getParameters() {
+    return parameters_;
+  }
 
   /// @brief Cleans up any resources or states specific to the behavior.
   ///

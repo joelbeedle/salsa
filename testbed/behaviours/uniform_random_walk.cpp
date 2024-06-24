@@ -40,11 +40,6 @@ class UniformRandomWalkBehaviour : public Behaviour {
     std::srand(std::time(nullptr));
   }
 
-  std::unordered_map<std::string, behaviour::Parameter *> getParameters()
-      override {
-    return parameters_;
-  }
-
   virtual ~UniformRandomWalkBehaviour() override {}
 
   void execute(const std::vector<std::unique_ptr<Drone>> &drones,

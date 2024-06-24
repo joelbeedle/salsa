@@ -3,9 +3,15 @@
 
 #include <box2d/box2d.h>
 
+#include <chrono>
+#include <cstdio>
 #include <vector>
 
 #include "core/data.h"
+#include "spdlog/cfg/env.h"  // support for loading levels from the environment variable
+#include "spdlog/fmt/ostr.h"  // support for user defined types
+#include "spdlog/spdlog.h"
+#include "utils/object_types.h"
 namespace swarm {
 class Entity {
  protected:
@@ -15,24 +21,14 @@ class Entity {
   int id;
   float radius_;
   b2Color color_;
+  std::string type_name_;
   std::vector<std::shared_ptr<Observer>> observers;
   std::chrono::steady_clock::time_point last_log_time;
   long log_interval;  // milliseconds
 
  public:
   Entity(b2World *world, const b2Vec2 &position, bool is_static, float radius,
-         long log_interval = 1000.0)
-      : world_(world), radius_(radius), log_interval(log_interval) {
-    b2BodyDef bodyDef;
-    if (is_static) {
-      bodyDef.type = b2_staticBody;
-    } else {
-      bodyDef.type = b2_dynamicBody;
-    }
-    bodyDef.position = position;
-    this->body_ = world_->CreateBody(&bodyDef);
-    last_log_time = std::chrono::steady_clock::now();
-  }
+         std::string type_name, long log_interval = 1000.0);
 
   Entity() = default;
 
@@ -43,7 +39,6 @@ class Entity {
   }
 
   float getRadius() { return radius_; }
-
   void setIdPrefix(char prefix) { id_prefix = prefix; }
   void setId(int id) { this->id = id; }
   void setColor(b2Color color) { color_ = color; }
@@ -56,21 +51,7 @@ class Entity {
     observers.push_back(observer);
   }
 
-  void notifyAll(const nlohmann::json &message) {
-    auto now = std::chrono::steady_clock::now();
-    long duration = std::chrono::duration_cast<std::chrono::milliseconds>(
-                        now - last_log_time)
-                        .count();
-    if (duration > log_interval) {
-      nlohmann::json message_with_id = message;
-      message_with_id["id"] = id_prefix + id;  // Prepend entity ID
-
-      for (auto &observer : observers) {
-        observer->update(message_with_id);
-      }
-      last_log_time = now;  // Update last log time
-    }
-  }
+  void notifyAll(const nlohmann::json &message);
 };
 
 }  // namespace swarm

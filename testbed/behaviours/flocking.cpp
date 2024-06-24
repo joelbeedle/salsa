@@ -19,8 +19,6 @@ class DroneQueryCallback : public b2QueryCallback {
 
 class FlockingBehaviour : public Behaviour {
  private:
-  std::unordered_map<std::string, behaviour::Parameter *> parameters_;
-
   std::vector<b2Body *> obstacles;
 
   behaviour::Parameter separation_distance_;
@@ -148,11 +146,6 @@ class FlockingBehaviour : public Behaviour {
     acceleration.SetZero();
   }
 
-  std::unordered_map<std::string, behaviour::Parameter *> getParameters()
-      override {
-    return parameters_;
-  }
-
  private:
   b2Vec2 align(const std::vector<std::unique_ptr<Drone>> &drones,
                Drone &currentDrone) {
@@ -236,9 +229,7 @@ class FlockingBehaviour : public Behaviour {
   }
 };
 
-auto flock =
-    std::make_unique<swarm::FlockingBehaviour>(250.0, 1.6, 1.0, 3.0, 3.0);
-
-auto flocking =
-    behaviour::Registry::getInstance().add("Flocking", std::move(flock));
+auto flocking = behaviour::Registry::getInstance().add(
+    "Flocking",
+    std::make_unique<swarm::FlockingBehaviour>(250.0, 1.6, 1.0, 3.0, 4.0));
 }  // namespace swarm
