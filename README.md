@@ -69,16 +69,24 @@ Now that the build is complete, to run the testbed:
 
 1. Navigate to the `build/testbed` directory and execute `./testbed`. The testbed can also be ran headless in it's Simulator Queue mode using `./testbed --headless`. Use `./testbed --help` for a full list of commands.
 
-The testbed, when opened, presents the main menu. From here, we can access the following feators:
+The testbed, when opened, presents the main menu. From here, we can access the following features:
 - Simulators
    - Queue Mode
    - Sandbox Mode
 - Map Creator
 
-### Extensibility
+It comes prepackaged with a few swarm algorithms, a drone configuration, and `Tree`s as targets.
+
+## Extensibility
 Users can extend the functionality of the testbed. They can add custom swarm algorithms, targets for the drones to find, custom contact listeners and contact managers, as well as custom drone configurations. Users can create their own maps for the simulations and could set new custom data to log. It is also possible to add custom testbed modes, similar to the current `Queue` and `Sandbox` modes.
 
-#### Adding new Swarm Algorithms
+For more information on extending the various aspects of the testbed, expand a section below.
+
+<details>
+  
+<summary>Adding new Swarm Algorithms</summary>
+
+### Add a Custom Swarm Algorithm
 To add a custom swarm algorithm:
 Create a new `.cpp` file inside `testbed/behaviors`, and name it, etc `my_alg.cpp`.
 
@@ -135,7 +143,13 @@ auto alg = behaviour::Registry::getInstance().add(
 
 This behaviour will now appear in the testbed, and can be set in a TestConfig using the behaviour namme specified, e.g. `My Alg`
 
-#### Adding new Targets
+</details>
+
+<details>
+  
+<summary>Adding new Targets</summary>
+
+### Add a custom Target
 Create a `.cpp` and `.h` file in `testbed/targets`, and name it, etc. `my_target.h`.
 
 In the header file, include `<core/simulation.h>` and create a class that extends `swarm::Target`
@@ -198,7 +212,13 @@ Now the type is fully registered and can be included in the simulation through T
                               contact_listener.get()};
    ```
 
-#### Adding Contact Listeners
+</details>
+
+<details>
+
+<summary>Adding custom Contact Listeners</summary>
+
+### Adding a new Contact Listener
 After registering types as shown above, collisions between them can be controlled via the `swarm::BaseContactListener` class. (This class could also be extended, if the user wishes)
 To do this, in the main testbed entrypoint `main.cpp`, create a new shared instance of `swarm::BaseContactListener`:
    ```cpp
@@ -239,14 +259,23 @@ Here's an example of adding a collision handler between a `Drone` and a `MyTarge
 
 We then pass this listener into the TestConfig for it to be used by a simulation.
 
-#### Adding a Drone Configuration
+</details>
+
+<details>
+
+<summary>Adding custom Drone Configurations</summary>
+  
+### Adding a new Drone Configuration
 Drone configurations are simple to add. We simply register them with the configuration register.
 
- 
-### Running the Testbed
+</details>
 
-```cpp
-#include <testbed.h>
+ 
+## Example Testbed Configuration
+
+```user.cpp
+// user.cpp
+#include "testbed.h"
 
 // Create Parameters for CustomBehaviour
 auto behaviour_parameters = std::make_unique<CustomBehaviour>(250.0, 1.6, 1.0, 3.0, 3.0);
@@ -288,15 +317,5 @@ queue.push(test);
 testbed::run();
 ```
 
-## Design
-
-The user facing design can be split into three distinct components:
-
-1. Algorithms
-   - The user designed algorithms to run in the simulation
-2. Data
-   - The data that the user wants the simulation to output.
-   - Features common to investigating Swarm Algorithms can be selected (e.g. avg. Agent distance), and custom data to be added can be defined by the user.
-3. Test Stack
-   - The algorithm, and simulation parameters to run a test for.
-   - Can be ran headless, or with a GUI.
+## Architecture
+TODO: is this necessary? If so, I will complete it
