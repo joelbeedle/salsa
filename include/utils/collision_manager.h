@@ -117,7 +117,6 @@ class CollisionManager {
       spdlog::info("Now registered types: {}", demangle(config.first));
 
       std::bitset<16> catBits(config.second.categoryBits);
-      std::cout << catBits << std::endl;
       spdlog::info("Mask bits: {}", config.second.maskBits);
     }
   }
