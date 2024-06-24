@@ -9,6 +9,7 @@
 
 #include <functional>
 #include <map>
+#include <string>
 #include <typeindex>
 
 namespace swarm {

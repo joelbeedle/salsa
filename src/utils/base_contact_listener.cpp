@@ -1,5 +1,7 @@
 #include "utils/base_contact_listener.h"
 
+#include <string>
+
 #include "box2d/b2_body.h"
 #include "core/logger.h"
 #include "core/simulation.h"
