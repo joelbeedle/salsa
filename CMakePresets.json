@@ -3,7 +3,7 @@
     "configurePresets": [
         {
             "name": "vcpkg_config",
-            "displayName": "Configure preset using toolchain file",
+            "displayName": "VCPK Config",
             "description": "Sets Ninja generator, build and install directory",
             "generator": "Ninja",
             "binaryDir": "${sourceDir}/build/",
@@ -13,11 +13,10 @@
                 "CMAKE_INSTALL_PREFIX": "${sourceDir}/build/install/${presetName}",
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "1"
             }
-
         },
         {
             "name": "default",
-            "displayName": "Second preset using toolchain file",
+            "displayName": "Debug Ninja Configure Preset",
             "description": "Sets Ninja generator, build and install directory",
             "generator": "Ninja",
             "binaryDir": "${sourceDir}/build/",
@@ -25,17 +24,33 @@
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "YES",
                 "BUILD_TESTING": "ON"
-
+            }
+        },
+        {
+            "name": "release",
+            "displayName": "Release Configure Preset",
+            "description": "Sets Ninja generator, build and install directory",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "YES"
             }
         }
     ],
     "buildPresets": [
-    {
-      "name": "build-default",
-      "displayName": "Build Default Configuration",
-      "description": "Build the project using the default configuration",
-      "configurePreset": "default"
-    }
-  ]
-
+        {
+            "name": "build-default",
+            "displayName": "Build Default Configuration",
+            "description": "Build the project using the default configuration",
+            "configurePreset": "default"
+        },
+        {
+            "name": "build-release",
+            "description": "Build Release Configuration",
+            "displayName": "Build the project using the release configuration",
+            "configurePreset": "release"
+        }
+    ]
 }
