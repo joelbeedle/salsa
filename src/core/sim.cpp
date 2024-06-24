@@ -63,8 +63,13 @@ Sim::~Sim() {
 }
 
 void Sim::update() {
+  targets_found_this_step_.clear();
   for (auto &drone : drones_) {
     drone->update(drones_);
+    targets_found_this_step_.insert(targets_found_this_step_.end(),
+                                    drone->getTargetsFound().begin(),
+                                    drone->getTargetsFound().end());
+    drone->clearLists();
     // Data logging
     b2Vec2 position = drone->getPosition();
     b2Vec2 velocity = drone->getVelocity();
@@ -203,6 +208,10 @@ void Sim::createTargets(Params... params) {
         target_type_, world_, std::ref(position), id++, params...);
     targets_.push_back(target);
   }
+  for (auto &target : targets_) {
+    target->setColor(b2Color(0.5f * 0.95294f, 0.5f * 0.50588f, 0.5f * 0.50588f,
+                             0.5f * 0.25f));
+  }
 }
 
 void Sim::setTargetType(const std::string &type) { target_type_ = type; }
@@ -277,6 +286,10 @@ DroneConfiguration *Sim::getDroneConfiguration() {
 
 const DroneConfiguration *Sim::drone_configuration() const {
   return drone_configuration_;
+}
+
+std::vector<Target *> &Sim::getTargetsFoundThisStep() {
+  return targets_found_this_step_;
 }
 
 void Sim::setCurrentDroneConfiguration(DroneConfiguration &configuration) {

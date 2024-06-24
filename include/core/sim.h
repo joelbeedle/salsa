@@ -57,6 +57,7 @@ class Sim {
   // Target management
   std::string target_type_;
   std::vector<std::shared_ptr<Target>> targets_;
+  std::vector<Target*> targets_found_this_step_;
   float num_targets_;
 
   // Obstacles in the environment
@@ -123,6 +124,7 @@ class Sim {
   void setTargetCount(int count);
   // get targets
   std::vector<std::shared_ptr<Target>>& getTargets();
+  std::vector<Target*>& getTargetsFoundThisStep();
 
   // Box2D functions
   void setContactListener(BaseContactListener& listener);

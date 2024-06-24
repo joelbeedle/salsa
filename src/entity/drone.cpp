@@ -33,7 +33,6 @@ Drone::Drone(b2World *world, const b2Vec2 &position, Behaviour &behaviour,
 
   fixtureDef.density = density_box2d;
   UserData *userData = new UserData();
-  userData->type = ObjectType::Drone;
   userData->object = this;
 
   fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(userData);
@@ -63,11 +62,10 @@ void Drone::create_fixture() {
   fixtureDef.shape = &shape;
   fixtureDef.isSensor = true;
 
-  CollisionConfig config = CollisionManager::getCollisionConfig(typeid(Drone));
+  CollisionConfig config = CollisionManager::getCollisionConfig<Drone>();
   fixtureDef.filter.categoryBits = config.categoryBits;
   fixtureDef.filter.maskBits = config.maskBits;
   UserData *userData = new UserData();
-  userData->type = ObjectType::Drone;
   userData->object = this;
 
   fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(userData);
@@ -80,7 +78,7 @@ void Drone::updateSensorRange() {
   create_fixture();
 }
 
-void Drone::clearLists() { this->foundDiseasedTreePositions.clear(); }
+void Drone::clearLists() { targets_found_.clear(); }
 
 void Drone::update(const std::vector<std::unique_ptr<Drone>> &drones) {
   if (behaviour) {

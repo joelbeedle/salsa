@@ -14,6 +14,7 @@ class Entity {
   char id_prefix;
   int id;
   float radius_;
+  b2Color color_;
   std::vector<std::shared_ptr<Observer>> observers;
   std::chrono::steady_clock::time_point last_log_time;
   long log_interval;  // milliseconds
@@ -41,13 +42,13 @@ class Entity {
     }
   }
 
-  virtual void create_fixture() = 0;
-
   float getRadius() { return radius_; }
 
   void setIdPrefix(char prefix) { id_prefix = prefix; }
   void setId(int id) { this->id = id; }
-
+  void setColor(b2Color color) { color_ = color; }
+  b2Color getColor() { return color_; }
+  int getId() { return id; }
   long getLogInterval() { return log_interval; }
   void setLogInterval(long interval) { log_interval = interval; }
 

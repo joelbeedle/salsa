@@ -19,7 +19,7 @@ class Tree : public swarm::Target {
        float radius = 1.0f);
   ~Tree();
 
-  void create_fixture() override;
+  void create_fixture();
 
   std::string getType() const override { return "Tree"; }
 
@@ -27,7 +27,7 @@ class Tree : public swarm::Target {
   bool isDiseased() { return diseased; }
   void setDiseased(bool isDiseased) { diseased = isDiseased; }
   bool isMapped() { return mapped; }
-  void setMapped(bool isMapped) { mapped = isMapped; }
+  void setMapped(bool isMapped) { setFound(isMapped); }
   b2Body *getBody() { return body_; }
   void addNumMapped() {
     if (!currentlyMapped) {
@@ -38,7 +38,6 @@ class Tree : public swarm::Target {
   void resetMapping() { currentlyMapped = false; }
   void resetNumMapped() { numMapped = 0; }
   int getNumMapped() { return numMapped; }
-  void render();
 };
 
 #endif  // TREE_H

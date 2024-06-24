@@ -11,11 +11,12 @@
 #include "behaviours/behaviour.h"
 #include "entity/drone_configuration.h"
 #include "entity/entity.h"
+#include "entity/target.h"
 #include "utils/collision_manager.h"
 namespace swarm {
 class Drone : public Entity {
  private:
-  std::vector<b2Vec2 *> foundDiseasedTreePositions;
+  std::vector<Target *> targets_found_;
   b2Fixture *viewSensor;  ///< Sensor used for detecting targets
   Behaviour *behaviour;   ///< Current swarm `Behaviour` of the drone
 
@@ -33,7 +34,7 @@ class Drone : public Entity {
   virtual ~Drone();
   Drone() = default;
 
-  void create_fixture() override;
+  void create_fixture();
 
   /// @brief Updates one step of the simulation for this drone, where the drone
   /// runs its behaviours' `execute` function, which tells the drone what move
@@ -72,9 +73,9 @@ class Drone : public Entity {
 
   float getRadius() { return radius_; }
 
-  std::vector<b2Vec2 *> getFoundDiseasedTreePositions() {
-    return foundDiseasedTreePositions;
-  }
+  void addTargetFound(Target *target) { targets_found_.push_back(target); }
+
+  std::vector<Target *> &getTargetsFound() { return targets_found_; }
 
   void clearLists();
 };

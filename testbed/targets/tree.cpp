@@ -33,13 +33,12 @@ void Tree::create_fixture() {
   b2FixtureDef fixtureDef;
   fixtureDef.shape = &shape;
   fixtureDef.isSensor = true;
-  auto config = swarm::CollisionManager::getCollisionConfig(typeid(Tree));
+  auto config = swarm::CollisionManager::getCollisionConfig<Tree>();
 
   fixtureDef.filter.categoryBits = config.categoryBits;
   fixtureDef.filter.maskBits = config.maskBits;
 
   swarm::UserData *userData = new swarm::UserData();
-  userData->type = swarm::ObjectType::Target;
   userData->object = this;
 
   fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(userData);
