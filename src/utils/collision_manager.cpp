@@ -18,7 +18,7 @@ uint16_t CollisionManager::next_category_bit_ = 0x0001;
 
 void CollisionManager::updateMaskBits() {
   for (auto& config : configurations_) {
-    uint16_t mask_bits = 0x0001;
+    uint16_t mask_bits = 1;
     for (auto& partner_type : collision_partners_[config.first]) {
       if (configurations_.find(partner_type) != configurations_.end()) {
         mask_bits |= configurations_[partner_type].categoryBits;
