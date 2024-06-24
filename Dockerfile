@@ -11,7 +11,7 @@ ENV VNC_PASSWD=123456
 ENV APT_INSTALL_PRE="apt -o Acquire::ForceIPv4=true update && DEBIAN_FRONTEND=noninteractive apt -o Acquire::ForceIPv4=true install -y --no-install-recommends"
 ENV APT_INSTALL_POST="&& apt clean -y && rm -rf /var/lib/apt/lists/*"
 # Make sure the dependencies are met
-RUN eval ${APT_INSTALL_PRE} pkg-config libspdlog-dev wayland-protocols libwayland-dev ninja-build tigervnc-standalone-server tigervnc-common tigervnc-tools fluxbox eterm cmake g++ gcc xterm git net-tools python3 python3-numpy ca-certificates scrot libx11-dev libxrandr-dev libxcursor-dev libudev-dev libopenal-dev libflac-dev libogg-dev libvorbis-dev libopenal-dev libpthread-stubs0-dev libxinerama-dev libglfw3 libglfw3-dev libxi-dev libxkbcommon-dev ${APT_INSTALL_POST}
+RUN eval ${APT_INSTALL_PRE} gdb pkg-config libspdlog-dev wayland-protocols libwayland-dev ninja-build tigervnc-standalone-server tigervnc-common tigervnc-tools fluxbox eterm cmake g++ gcc xterm git net-tools python3 python3-numpy ca-certificates scrot libx11-dev libxrandr-dev libxcursor-dev libudev-dev libopenal-dev libflac-dev libogg-dev libvorbis-dev libopenal-dev libpthread-stubs0-dev libxinerama-dev libglfw3 libglfw3-dev libxi-dev libxkbcommon-dev ${APT_INSTALL_POST}
 
 # Install VNC. Requires net-tools, python and python-numpy
 RUN git clone --branch v1.4.0 --single-branch https://github.com/novnc/noVNC.git /opt/noVNC
@@ -42,17 +42,15 @@ RUN mkdir /opt/startup_scripts
 
 USER root
 
-WORKDIR /usr/src/testbed
+WORKDIR /root/testbed
 
 COPY . .
 
 RUN git submodule update --init --recursive
 RUN rm -rf build && mkdir build
-#RUN cmake -S . -B build -GNinja
-#RUN cmake --build build
-#RUN mkdir -p /usr/src/app/testbed/maps
-#COPY testbed/maps /usr/src/app/testbed/maps
-#USER dockerUser
-#WORKDIR /
+RUN cmake -S . -B build -GNinja
+RUN cmake --build build
+# USER dockerUser
+# WORKDIR /
 
 ENTRYPOINT ["/opt/container_startup.sh"]
