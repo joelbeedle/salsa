@@ -120,7 +120,7 @@ class SandboxSimulator : public Test {
   void Step(Settings &settings) override {
     // Run simulation steps here
     Test::Step(settings);
-    settings.m_pause = pause;
+    pause = settings.m_pause;
     std::vector<int> foundTreeIDs;
     sim->update();
     // if (!settings.m_pause) sim->current_time() += 1.0f / settings.m_hertz;

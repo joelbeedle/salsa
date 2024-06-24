@@ -51,6 +51,7 @@ class QueueSimulator : public Test {
 
  public:
   QueueSimulator() {
+    pause = true;
     swarm::DroneConfiguration *smallDrone = new swarm::DroneConfiguration(
         25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f);
 
@@ -61,8 +62,6 @@ class QueueSimulator : public Test {
     auto &registry = swarm::behaviour::Registry::getInstance();
     auto behaviour_names = registry.getBehaviourNames();
     sim->setCurrentBehaviour(behaviour_names[0]);
-
-    // m_world->SetContactListener(contactListener_);
   }
   static std::unique_ptr<Test> Create() {
     return std::make_unique<QueueSimulator>();
@@ -135,7 +134,7 @@ class QueueSimulator : public Test {
   void Step(Settings &settings) override {
     // Run simulation steps here
     Test::Step(settings);
-    settings.m_pause = pause;
+    pause = settings.m_pause;
     std::vector<int> foundIds;
     if (first_run_) {
     }
@@ -143,8 +142,7 @@ class QueueSimulator : public Test {
     for (auto &target : sim->getTargetsFoundThisStep()) {
       target_colors_[target->getId()] = trueColour;
     }
-    if (!settings.m_pause) sim->current_time() += 1.0f / settings.m_hertz;
-    // m_world->DebugDraw();
+    if (!pause) sim->current_time() += 1.0f / settings.m_hertz;
     Draw(sim->getWorld(), &g_debugDraw, foundIds);
     if (next_frame) {
       pause = true;
