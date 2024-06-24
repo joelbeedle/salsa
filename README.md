@@ -49,13 +49,14 @@ It may also be neccessary to install some extra dependencies on Linux (or just d
    cd swarm-sim
    cmake -S . -B build
    ```
+    - If you have Ninja installed, for a faster build time:
+   ```bash
+   cmake -S . -B build -GNinja
+   ```
+
 4. Build the project:
    ```bash
    cmake --build build
-   ```
-   - If you have Ninja installed, for a faster build time:
-   ```bash
-   cmake --build build -GNinja
    ```
 5. Optionally, build documentation (requires Doxygen):
    ```bash
