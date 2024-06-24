@@ -57,7 +57,7 @@ class MapCreator : public Test {
   bool pause = false;
 
  public:
-  MapCreator() {}
+  MapCreator() { g_debugDraw.SetFlags(b2Draw::e_shapeBit); }
   void DeleteBoundary() {
     for (b2Body *body : boundary_bodies) {
       m_world->DestroyBody(body);
@@ -316,8 +316,6 @@ class MapCreator : public Test {
     Test::Step(settings);
     settings.m_pause = pause;
     m_world->DebugDraw();
-    std::cout << "Step\n";
-    PrintBodiesAndFixtures(m_world);
     // g_debugDraw.DrawString(drone_spawn_point, "Drone Spawn Point");
     g_debugDraw.DrawCircle(drone_spawn_point, 5.0f, b2Color(0.0f, 1.0f, 0.0f));
     if (line_drawing) {

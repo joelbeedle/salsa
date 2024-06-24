@@ -96,8 +96,8 @@ int main() {
                               contactListener.get()};
 
   swarm::TestQueue queue;
-  config.num_drones = 1024;
-  config.num_targets = 10;
+  config.num_drones = 100;
+  config.num_targets = 0;
   queue.push(config);
   config.behaviour_name = "Pheromone Avoidance";
   queue.push(config);

@@ -11,12 +11,12 @@
                     "density": 0.0,
                     "edge": {
                         "end": [
-                            991.4309692382813,
-                            2872.178955078125
+                            2597.239501953125,
+                            2350.118408203125
                         ],
                         "start": [
-                            1282.25390625,
-                            2469.96435546875
+                            3004.29931640625,
+                            1895.9603271484375
                         ]
                     },
                     "friction": 0.20000000298023224,
@@ -45,12 +45,12 @@
                     "density": 0.0,
                     "edge": {
                         "end": [
-                            1282.25390625,
-                            2469.96435546875
+                            3004.29931640625,
+                            1895.9603271484375
                         ],
                         "start": [
-                            2278.500244140625,
-                            2838.88720703125
+                            2263.847412109375,
+                            1802.9432373046875
                         ]
                     },
                     "friction": 0.20000000298023224,
@@ -79,12 +79,12 @@
                     "density": 0.0,
                     "edge": {
                         "end": [
-                            2278.500244140625,
-                            2838.88720703125
+                            2263.847412109375,
+                            1802.9432373046875
                         ],
                         "start": [
-                            2067.766845703125,
-                            3286.695068359375
+                            3188.396728515625,
+                            1130.6859130859375
                         ]
                     },
                     "friction": 0.20000000298023224,
@@ -113,18 +113,226 @@
                     "density": 0.0,
                     "edge": {
                         "end": [
-                            2067.766845703125,
-                            3286.695068359375
+                            3188.396728515625,
+                            1130.6859130859375
                         ],
                         "start": [
-                            991.4309692382813,
-                            2872.178955078125
+                            3468.7109375,
+                            2001.020263671875
                         ]
                     },
                     "friction": 0.20000000298023224,
                     "group_index": 0,
                     "is_sensor": false,
                     "mask_bits": 65535,
+                    "restitution": 0.0
+                }
+            ],
+            "gravity_scale": 1.0,
+            "linear_damping": 0.0,
+            "position": [
+                0.0,
+                0.0
+            ],
+            "type": 0
+        },
+        {
+            "angle": 0.0,
+            "angular_damping": 0.0,
+            "bullet": false,
+            "fixed_rotation": false,
+            "fixtures": [
+                {
+                    "category_bits": 1,
+                    "density": 0.0,
+                    "edge": {
+                        "end": [
+                            3468.7109375,
+                            2001.020263671875
+                        ],
+                        "start": [
+                            2597.239501953125,
+                            2350.118408203125
+                        ]
+                    },
+                    "friction": 0.20000000298023224,
+                    "group_index": 0,
+                    "is_sensor": false,
+                    "mask_bits": 65535,
+                    "restitution": 0.0
+                }
+            ],
+            "gravity_scale": 1.0,
+            "linear_damping": 0.0,
+            "position": [
+                0.0,
+                0.0
+            ],
+            "type": 0
+        },
+        {
+            "angle": 0.0,
+            "angular_damping": 0.0,
+            "bullet": false,
+            "fixed_rotation": false,
+            "fixtures": [
+                {
+                    "category_bits": 1,
+                    "density": 0.0,
+                    "edge": {
+                        "end": [
+                            384.3266906738281,
+                            2479.453857421875
+                        ],
+                        "start": [
+                            794.839599609375,
+                            2157.978515625
+                        ]
+                    },
+                    "friction": 0.20000000298023224,
+                    "group_index": 0,
+                    "is_sensor": false,
+                    "mask_bits": 65535,
+                    "restitution": 0.0
+                }
+            ],
+            "gravity_scale": 1.0,
+            "linear_damping": 0.0,
+            "position": [
+                0.0,
+                0.0
+            ],
+            "type": 0
+        },
+        {
+            "angle": 0.0,
+            "angular_damping": 0.0,
+            "bullet": false,
+            "fixed_rotation": false,
+            "fixtures": [
+                {
+                    "category_bits": 1,
+                    "density": 0.0,
+                    "edge": {
+                        "end": [
+                            794.839599609375,
+                            2157.978515625
+                        ],
+                        "start": [
+                            1477.4979248046875,
+                            2378.28857421875
+                        ]
+                    },
+                    "friction": 0.20000000298023224,
+                    "group_index": 0,
+                    "is_sensor": false,
+                    "mask_bits": 65535,
+                    "restitution": 0.0
+                }
+            ],
+            "gravity_scale": 1.0,
+            "linear_damping": 0.0,
+            "position": [
+                0.0,
+                0.0
+            ],
+            "type": 0
+        },
+        {
+            "angle": 0.0,
+            "angular_damping": 0.0,
+            "bullet": false,
+            "fixed_rotation": false,
+            "fixtures": [
+                {
+                    "category_bits": 1,
+                    "density": 0.0,
+                    "edge": {
+                        "end": [
+                            1477.4979248046875,
+                            2378.28857421875
+                        ],
+                        "start": [
+                            1132.231689453125,
+                            2796.94970703125
+                        ]
+                    },
+                    "friction": 0.20000000298023224,
+                    "group_index": 0,
+                    "is_sensor": false,
+                    "mask_bits": 65535,
+                    "restitution": 0.0
+                }
+            ],
+            "gravity_scale": 1.0,
+            "linear_damping": 0.0,
+            "position": [
+                0.0,
+                0.0
+            ],
+            "type": 0
+        },
+        {
+            "angle": 0.0,
+            "angular_damping": 0.0,
+            "bullet": false,
+            "fixed_rotation": false,
+            "fixtures": [
+                {
+                    "category_bits": 1,
+                    "density": 0.0,
+                    "edge": {
+                        "end": [
+                            1132.231689453125,
+                            2796.94970703125
+                        ],
+                        "start": [
+                            384.3266906738281,
+                            2479.453857421875
+                        ]
+                    },
+                    "friction": 0.20000000298023224,
+                    "group_index": 0,
+                    "is_sensor": false,
+                    "mask_bits": 65535,
+                    "restitution": 0.0
+                }
+            ],
+            "gravity_scale": 1.0,
+            "linear_damping": 0.0,
+            "position": [
+                0.0,
+                0.0
+            ],
+            "type": 0
+        },
+        {
+            "angle": 0.0,
+            "angular_damping": 0.0,
+            "bullet": false,
+            "fixed_rotation": false,
+            "fixtures": [
+                {
+                    "category_bits": 1,
+                    "density": 0.0,
+                    "friction": 0.20000000298023224,
+                    "group_index": 0,
+                    "is_sensor": false,
+                    "mask_bits": 65535,
+                    "polygon": [
+                        [
+                            3286.34033203125,
+                            2705.848388671875
+                        ],
+                        [
+                            2763.672119140625,
+                            3499.777587890625
+                        ],
+                        [
+                            1098.734619140625,
+                            3197.7353515625
+                        ]
+                    ],
                     "restitution": 0.0
                 }
             ],
@@ -242,8 +450,8 @@
         }
     ],
     "drone_spawn_point": [
-        1977.784423828125,
-        1913.5118408203125
+        1752.8846435546875,
+        1824.1339111328125
     ],
     "height": 4000.0,
     "name": "new_map",
