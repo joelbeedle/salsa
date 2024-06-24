@@ -72,7 +72,7 @@ class CollisionManager {
     return (status == 0) ? std::string(res.get()) : std::string(name);
   }
 #else
-  static std::string internal_demangle(const char* name) {
+  static std::string internal_demangle(std::string name) {
     return std::string(name);
   }
 #endif  // __GNUG__
