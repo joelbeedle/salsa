@@ -29,9 +29,9 @@ Once it has built, run the container using
 docker run --shm-size=256m -it -p 5901:5901 -e VNC_PASSWD=123456 swarm-test/testbed
 ```
 
-We can then connect to the virtual machine by going to `http://localhost:5901` in this case, and connect using password `123456`.
+We can then connect to the virtual machine by going to `http://localhost:5901` and enter the password `123456`.
 
-Right clicking, selecting `Applications > Terminal > Bash` allows you to open a terminal, and you will find yourself already in the cloned repository.
+Then, right click, select `Applications > Terminal > Bash` and you will find yourself already in a terminal in the repository.
 
 The testbed application can be found at `./build/testbed/`
 
