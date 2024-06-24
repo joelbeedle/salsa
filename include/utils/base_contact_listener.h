@@ -5,7 +5,6 @@
 #define SWARM_UTILS_BASE_CONTACT_LISTENER_H
 
 #include <box2d/box2d.h>
-#include <cxxabi.h>
 
 #include <functional>
 #include <map>
@@ -24,15 +23,6 @@ namespace swarm {
 /// function handlers for each unique pair of types, enabling custom responses
 /// to collisions.
 class BaseContactListener : public b2ContactListener {
- private:
-  std::string demangle(std::string name) {
-    int status = -1;
-    std::unique_ptr<char, void (*)(void *)> res{
-        abi::__cxa_demangle(name.c_str(), NULL, NULL, &status), std::free};
-
-    return (status == 0) ? res.get() : name;
-  }
-
  protected:
   /// @brief Maps pairs of types to their respective collision handlers.
   std::map<std::pair<std::string, std::string>,

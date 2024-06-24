@@ -5,8 +5,10 @@
 #define SWARM_UTILS_COLLISION_MANAGER_H
 
 #include <box2d/box2d.h>
-#include <cxxabi.h>
 
+#ifdef __GNUG__
+#include <cxxabi.h>
+#endif  // __GNUG__
 #include <bitset>
 #include <cstdint>
 #include <iostream>
@@ -60,13 +62,20 @@ class CollisionManager {
   /// by combining the category bits of its collision partners, and updates the
   /// mask bits accordingly.
   static void updateMaskBits();
-  static std::string demangle(std::string name) {
+
+#ifdef __GNUG__
+  static std::string internal_demangle(std::string name) {
     int status = -1;
     std::unique_ptr<char, void (*)(void*)> res{
         abi::__cxa_demangle(name.c_str(), NULL, NULL, &status), std::free};
 
-    return (status == 0) ? res.get() : name;
+    return (status == 0) ? std::string(res.get()) : std::string(name);
   }
+#else
+  namespace swarm {
+  std::string internal_demangle(const char* name) { return std::string(name); }
+  }  // namespace swarm
+#endif  // __GNUG__
 
  public:
   /// @brief Retrieves the collision configuration for a specific type.
@@ -81,7 +90,8 @@ class CollisionManager {
     if (it != configurations_.end()) {
       return it->second;
     } else {
-      std::cout << "Type not registered: " << demangle(type_name) << std::endl;
+      std::cout << "Type not registered: " << internal_demangle(type_name)
+                << std::endl;
       throw std::runtime_error("Type not registered");
     }
   }
@@ -99,13 +109,13 @@ class CollisionManager {
   template <typename T>
   static void registerType(const std::vector<std::string>& partners) {
     std::string type_name = TypeKey<T>::value();
-    spdlog::info("Registering type {}", demangle(type_name));
+    spdlog::info("Registering type {}", internal_demangle(type_name));
 
     if (configurations_.find(type_name) == configurations_.end()) {
       uint16_t category_bit = next_category_bit_;
       std::bitset<16> catBits(category_bit);
       spdlog::info("Registering type {} with category bit {}",
-                   demangle(type_name), category_bit);
+                   internal_demangle(type_name), category_bit);
 
       next_category_bit_ <<= 1;
       configurations_[type_name] = {category_bit, 0};
@@ -114,7 +124,7 @@ class CollisionManager {
 
     updateMaskBits();
     for (const auto& config : configurations_) {
-      spdlog::info("Now registered types: {}", demangle(config.first));
+      spdlog::info("Now registered types: {}", internal_demangle(config.first));
 
       std::bitset<16> catBits(config.second.categoryBits);
       spdlog::info("Mask bits: {}", config.second.maskBits);
