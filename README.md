@@ -2,8 +2,6 @@
 
 Swarm Algorithm Simulation library and Testbed, written in C++.
 
-`testbed` folder code is originally adapted from the [Box2D testbed](https://github.com/erincatto/box2d).
-
 ## Getting Started
 There is a virtual image with Ubuntu available [here](). 
 
@@ -13,27 +11,29 @@ There is also a Docker container available. It opens a localhost noVNC web app w
 
 ### Using the Docker container
 
-Clone the repository
+- **Clone the repository:**
 ```bash
 git clone --recursive https://github.com/joelbeedle/swarm-sim.git
 git submodule update --init --recursive
 ```
 
-Then, build the docker image
+- **Build the docker image:**
 ```bash
 docker build -t swarm-test/testbed .
 ```
 
-Once it has built, run the container using
+- **Run the container:**
 ```bash
 docker run --shm-size=256m -it -p 5901:5901 -e VNC_PASSWD=123456 swarm-test/testbed
 ```
 
-We can then connect to the virtual machine by going to `http://localhost:5901` and enter the password `123456`.
+We can then connect to the virtual machine
 
-Then, right click, select `Applications > Terminal > Bash` and you will find yourself already in a terminal in the repository.
+- Go to `http://localhost:5901` and enter the password `123456`
 
-The testbed application can be found at `./build/testbed/`
+- Right click, select `Applications > Terminal > Bash` and you will find yourself already in a terminal in the repository.
+
+- The testbed application can be found at `./build/testbed/`
 
 ### Installation
 `swarm-sim` was designed with to be cros-platform.
@@ -43,6 +43,7 @@ The testbed application can be found at `./build/testbed/`
 - A **C++17** compatible compiler (gcc, clang, cl)
 - Git
 - OpenGL
+- Python3
 - Optional: [Doxygen](https://github.com/doxygen/doxygen), [Ninja](https://github.com/ninja-build/ninja)
 
 Requirements in bold are **essential**.
@@ -61,46 +62,48 @@ These requirements are all either managed as git submodules, or are fetched and 
 It may also be neccessary to install some extra dependencies on Linux (or just do `sudo apt-get install -y build-essentials ubuntu-desktop`). If you get build errors, install the missing packages. 
 
 #### Steps
-1. Clone the repository and all submodules:
+- **Clone the repository and all submodules:**
    ```bash
    git clone --recursive https://github.com/joelbeedle/swarm-sim.git
    ```
-   - Note: the `--recursive` tag is important, as this also clones the submodules, which are needed.
-2. Initialise and update the submodules:
+   > **Note**: the `--recursive` tag is important, as this also clones the submodules, which are needed.
+- **Initialise and update the submodules:**
    ```bash
    git submodule update --init --recursive
    ```
-3. Configure the project with CMake:
+- **Configure the project with CMake:**
    ```bash
    cd swarm-sim
    cmake -S . -B build
    ```
-    - If you have Ninja installed, for a faster build time:
-   ```bash
-   cmake -S . -B build -GNinja
-   ```
+  > If you have Ninja installed, for a faster build time use:
+  > ```bash
+  >  cmake -S . -B build -GNinja
+  > ```
 
-4. Build the project:
+- **Build the project:**
    ```bash
    cmake --build build
    ```
-5. Optionally, build documentation (requires Doxygen):
+- **To build documentation (requires Doxygen):**
    ```bash
    cmake --build build --target docs
    ```
-   - Documentation can then be found in `build/docs/html/index.html`
-There are also some common build configurations found in `CMakePresents.json`.
+  > Documentation can then be found in `build/docs/html/index.html`
+
+> There are also some common build configurations found in `CMakePresents.json`.
 
 ### Running the Testbed
 Now that the build is complete, to run the testbed:
 
-1. Navigate to the `build/testbed` directory and execute `./testbed`. The testbed can also be ran headless in it's Simulator Queue mode using `./testbed --headless`. Use `./testbed --help` for a full list of commands.
+- Navigate to the `build/testbed` directory and execute `./testbed`.
+- Use `./testbed --help` for a list of command line parameters
 
 The testbed, when opened, presents the main menu. From here, we can access the following features:
-- Simulators
+- **Simulators**
    - Queue Mode
    - Sandbox Mode
-- Map Creator
+- **Map Creator**
 
 It comes prepackaged with a few swarm algorithms, a drone configuration, and `Tree`s as targets.
 
