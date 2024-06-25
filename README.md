@@ -7,7 +7,7 @@ There is a virtual image with Ubuntu available [here]().
 
 The `swarm-sim` files were installed on the disk image using the following instructions, and can be found at `~/swarm-sim`. You can use the CMake commands in the Installation section to re-configure and re-build this when modifying the code.
 
-There is also a Docker container available. It opens a localhost noVNC web app with `swarm-sim` pre-installed.
+There is also a Docker container available. It opens a noVNC web app on `localhost` with `swarm-sim` pre-installed.
 
 ### Using the Docker container
 
@@ -27,7 +27,7 @@ docker build -t swarm-test/testbed .
 docker run --shm-size=256m -it -p 5901:5901 -e VNC_PASSWD=123456 swarm-test/testbed
 ```
 
-To connect to the virtual machine:
+To use the virtual machine:
 
 - Go to `http://localhost:5901` and enter the password `123456`
 
