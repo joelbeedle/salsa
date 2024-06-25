@@ -27,7 +27,7 @@ docker build -t swarm-test/testbed .
 docker run --shm-size=256m -it -p 5901:5901 -e VNC_PASSWD=123456 swarm-test/testbed
 ```
 
-We can then connect to the virtual machine
+To connect to the virtual machine:
 
 - Go to `http://localhost:5901` and enter the password `123456`
 
