@@ -28,7 +28,7 @@ class Entity {
 
  public:
   Entity(b2World *world, const b2Vec2 &position, bool is_static, float radius,
-         std::string type_name, long log_interval = 1000.0);
+         std::string type_name, long log_interval = 100.0);
 
   Entity() = default;
 

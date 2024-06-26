@@ -28,7 +28,7 @@ Tree::~Tree() {}
 
 void Tree::create_fixture() {
   b2CircleShape shape;
-  shape.m_radius = radius;
+  shape.m_radius = radius_;
 
   b2FixtureDef fixtureDef;
   fixtureDef.shape = &shape;

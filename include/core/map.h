@@ -8,6 +8,7 @@
 #include <iostream>
 #include <string>
 
+#include "logger.h"
 #include "nlohmann/json.hpp"
 #if defined(_WIN32)
 #include <windows.h>

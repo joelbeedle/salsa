@@ -77,7 +77,9 @@ class Sim {
 
   // Logging
   Logger& logger_ = Logger::getInstance();
-
+  std::chrono::steady_clock::time_point last_log_time;
+  std::vector<std::shared_ptr<Observer>> observers;
+  long log_interval = 100;  // milliseconds
   // Private methods for internal use
   void createBounds();
   void applyCurrentBehaviour();
@@ -99,6 +101,9 @@ class Sim {
   // Simulation control
   void update();
   void reset();
+  void addObserver(std::shared_ptr<Observer> observer) {
+    observers.push_back(observer);
+  }
 
   // Behaviour functions
   void addBehaviour(const std::string& name,

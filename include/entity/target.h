@@ -8,8 +8,7 @@
 
 namespace swarm {
 class Target : public Entity {
- private:
-  float radius_;
+ protected:
   bool found_ = false;
 
  public:

@@ -64,17 +64,17 @@ void user() {
                           ->getParameters();
 
   swarm::DroneConfiguration *smallDrone = new swarm::DroneConfiguration(
-      25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f);
+      15.0f, 50.2f, 10.0f, 0.3f, 1.0f, 1.5f, 134.0f);
   swarm::CollisionManager::registerType<swarm::Drone>({typeid(Tree).name()});
   swarm::CollisionManager::registerType<Tree>({typeid(swarm::Drone).name()});
   swarm::TargetFactory::registerTargetType<Tree, bool, bool, float>("Tree");
 
   auto new_flock_params = std::unordered_map<std::string, float>({
-      {"Separation Distance", 300.0},
-      {"Alignment Weight", 1.6},
-      {"Cohesion Weight", 1.0},
-      {"Separation Weight", 1.0},
-      {"Obstacle Avoidance Weight", 1.0},
+      {"Separation Distance", 173.0},
+      {"Alignment Weight", 1.4},
+      {"Cohesion Weight", 0.69},
+      {"Separation Weight", 4.76},
+      {"Obstacle Avoidance Weight", 4.00},
   });
 
   auto pheromone_params = std::unordered_map<std::string, float>({
@@ -84,12 +84,13 @@ void user() {
 
   auto contactListener = std::make_shared<swarm::BaseContactListener>();
   setupInteractions(*contactListener);
+  swarm::map::Map map = swarm::map::load("playground");
   swarm::map::Map map1 = {"Map1", BORDER_WIDTH, BORDER_HEIGHT, b2Vec2(0, 0),
                           new b2World(b2Vec2(0.0f, 0.0f))};
   swarm::TestConfig config = {"Flocking",
-                              flock_params,
+                              new_flock_params,
                               smallDrone,
-                              map1,
+                              map,
                               100,
                               100,
                               1200.0f,
@@ -98,8 +99,8 @@ void user() {
                               contactListener.get()};
 
   swarm::TestQueue queue;
-  config.num_targets = 10;
-  config.num_drones = 2;
+  config.num_targets = 500;
+  config.num_drones = 100;
   config.time_limit = 100.0f;
   queue.push(config);
 
