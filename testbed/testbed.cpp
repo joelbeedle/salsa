@@ -130,6 +130,7 @@ static void KeyCallback(GLFWwindow *window, int key, int scancode, int action,
       case GLFW_KEY_ESCAPE:
         // Quit
         start_menu = !start_menu;
+        s_settings.m_pause = !s_settings.m_pause;
         // glfwSetWindowShouldClose(g_mainWindow, GL_TRUE);
         break;
 
@@ -316,16 +317,16 @@ static void ScrollCallback(GLFWwindow *window, double dx, double dy) {
 
 static void UpdateUI() {
   float menuWidth = 180.0f * s_displayScale;
-  if (start_menu) {
-    s_settings.m_pause = true;
-    ImGui::SetNextWindowPos({g_camera.m_width / 2 - menuWidth / 2,
-                             g_camera.m_height / 2 - menuWidth / 2});
-    ImGui::SetNextWindowSize({menuWidth, 200});
-
-    ImGui::Begin("Start Menu", &start_menu,
-                 ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
-                     ImGuiWindowFlags_NoCollapse);
-
+  ImGuiIO &io = ImGui::GetIO();
+  ImGui::SetNextWindowPos(
+      ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f),
+      ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+  ImGui::SetNextWindowSize(
+      ImVec2(float(g_camera.m_width) / 4, float(g_camera.m_height) / 4));
+  if (ImGui::BeginPopupModal("Menu", &start_menu,
+                             ImGuiWindowFlags_NoMove |
+                                 ImGuiWindowFlags_NoResize |
+                                 ImGuiWindowFlags_NoCollapse)) {
     if (ImGui::Button("Start in Queue mode", ImVec2(-1, 0))) {
       start_menu = false;
       s_settings.m_pause = false;
@@ -347,9 +348,9 @@ static void UpdateUI() {
     if (ImGui::Button("Exit", ImVec2(-1, 0))) {
       glfwSetWindowShouldClose(g_mainWindow, GL_TRUE);
     }
-
-    ImGui::End();
+    ImGui::EndPopup();
   }
+
   if (!start_menu && g_debugDraw.m_showUI) {
     ImGui::SetNextWindowPos({g_camera.m_width - menuWidth - 10.0f, 10.0f});
     ImGui::SetNextWindowSize({menuWidth, g_camera.m_height - 20.0f});
@@ -413,7 +414,7 @@ static void UpdateUI() {
       ImGuiTreeNodeFlags nodeFlags =
           ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
 
-      if (ImGui::BeginTabItem("Tests")) {
+      if (ImGui::BeginTabItem("Modes")) {
         int categoryIndex = 0;
         const char *category = g_testEntries[categoryIndex].category;
         int i = 0;
@@ -583,6 +584,10 @@ int run() {
 
     s_test->Step(s_settings);
 
+    if (start_menu) {
+      ImGui::OpenPopup("Menu");
+      s_settings.m_pause = true;
+    }
     UpdateUI();
 
     // ImGui::ShowDemoWindow();
