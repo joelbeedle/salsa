@@ -97,3 +97,6 @@ test.log
 imgui.ini
 settings.ini
 __pycache__
+testbed/plot/2024*
+testbed/plot/*.pdf
+testbed/plot/*.svg
