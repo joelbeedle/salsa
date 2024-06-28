@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.spatial import distance_matrix
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+from matplotlib.transforms import ScaledTranslation
 import matplotlib.image as mpimg
 
 
@@ -91,8 +92,12 @@ def plot_targets_found(data_frame, ax):
         sim_data["time_seconds"],
         sim_data["targets_percentage"],
         marker="",
+        color="g",
     )
     ax.grid(True)
+    ax.set_ylabel("Targets Found (%)")
+    ax.set_xlabel("Time (s)")
+
     plt.savefig("targets_found.pdf")
     return ax
 
@@ -110,21 +115,28 @@ def plot_speed(data_frame, ax):
     speed_points.set_index("timestamp", inplace=True)
 
     speed_stats = (
-        speed_points["speed"].resample("100L").agg(["min", "mean", "max"]).dropna()
+        speed_points["speed"]
+        .resample("100L")
+        .agg(["min", "mean", "max", "std"])
+        .dropna()
     )
 
     # Reset index if you want 'timestamp' as a column for plotting
     speed_stats.reset_index(inplace=True)
 
     ax.set_xlim(0, 100)
-    ax.set_ylim(0, 10)
+    ax.set_ylim(0, speed_stats["mean"].max() + speed_stats["std"].max())
+    ax.set_ylabel("Speed (m/s)")
+    ax.set_xlabel("Time (s)")
+
     ax.plot(speed_stats.index, speed_stats["mean"], label="avg. speed", color="blue")
+
     ax.fill_between(
         speed_stats.index,
-        speed_stats["min"],
-        speed_stats["max"],
+        speed_stats["mean"] - speed_stats["std"],
+        speed_stats["mean"] + speed_stats["std"],
         color="blue",
-        label="min/max speed",
+        label="speed std. dev",
         alpha=0.2,
     )
     return ax
@@ -209,19 +221,22 @@ def plot_nearest_neighbor_distance(data_frame, ax):
             min_val = np.min(min_distances)
             mean_val = np.mean(min_distances)
             max_val = np.max(min_distances)
+            std_val = np.std(min_distances)
 
-            stats.append((timestamp, mean_val, min_val, max_val))
+            stats.append((timestamp, mean_val, min_val, max_val, std_val))
 
-    stats_df = pd.DataFrame(stats, columns=["timestamp", "mean", "min", "max"])
+    stats_df = pd.DataFrame(stats, columns=["timestamp", "mean", "min", "max", "std"])
     stats_df.set_index("timestamp", inplace=True)
 
     resampled_stats = (
         stats_df.resample("1000L")
-        .agg({"min": "min", "mean": "mean", "max": "max"})
+        .agg({"min": "min", "mean": "mean", "max": "max", "std": "std"})
         .dropna()
     )
 
     resampled_stats.reset_index(inplace=True)
+    ax.set_ylabel("Distance (m)")
+    ax.set_xlabel("Time (s)")
     ax.plot(
         resampled_stats.index,
         resampled_stats["mean"],
@@ -230,11 +245,11 @@ def plot_nearest_neighbor_distance(data_frame, ax):
     )
     ax.fill_between(
         resampled_stats.index,
-        resampled_stats["min"],
-        resampled_stats["max"],
+        resampled_stats["mean"] - resampled_stats["std"],
+        resampled_stats["mean"] + resampled_stats["std"],
         color="red",
         alpha=0.2,
-        label="min/max distance",
+        label="distance std. dev",
     )
     plt.savefig("nearest_neighbor_distance.pdf")
     return ax
@@ -261,6 +276,18 @@ def plot_trace(data_frame, ax, border_size: str):
             label=f"Drone {drone_id}",
             linewidth=1,
         )
+    ax.plot(
+        396.24749755859375,
+        299.29345703125,
+        marker="x",
+        color="black",
+        markersize=10,
+        mew=4,
+        linewidth=4,
+        label="Spawn",
+    )
+    ax.set_ylabel("Height (m)")
+    ax.set_xlabel("Width (m)")
     return ax
 
 
@@ -296,6 +323,8 @@ def plot_heatmap(data_frame, ax, bin_size: str, border_size: str):
     # fig.colorbar(im, ax=ax, pad=0.001, location="bottom")
     ax.grid(False)
     ax.grid(False, which="minor")
+    ax.set_ylabel("Height (m)")
+    ax.set_xlabel("Width (m)")
 
     return im, ax
 
@@ -352,36 +381,58 @@ if __name__ == "__main__":
     od = create_dataframe("2024-06-26_11-21-37_Flocking.log")
 
     mosaic = """
-        FAD
-        BCE
+        fad
+        bce
+    """
+    mosaic = """
+        abc
+        def
     """
     fig = plt.figure(figsize=(10, 6), layout="constrained")
-    ax_dict = fig.subplot_mosaic(mosaic)
+    ax_dict = fig.subplot_mosaic(
+        mosaic,
+    )
 
     image_path = "testbed_screenshot.png"
-    ax_dict["F"].imshow(mpimg.imread(image_path))
-    ax_dict["F"].axis("off")
+    ax_dict["a"].imshow(mpimg.imread(image_path))
+    ax_dict["a"].axis("off")
 
-    plot_targets_found(td, ax_dict["A"])
-    plot_speed(od, ax_dict["B"])
+    plot_targets_found(td, ax_dict["b"])
+    plot_speed(od, ax_dict["d"])
 
-    plot_nearest_neighbor_distance(od, ax_dict["C"])
+    plot_nearest_neighbor_distance(od, ax_dict["e"])
     fig.legend(loc="outside lower center", ncols=4)
 
-    plot_trace(od, ax_dict["D"], "500")
-    im, _ = plot_heatmap(od, ax_dict["E"], "50", "500")
+    plot_trace(od, ax_dict["c"], "500")
+    im, _ = plot_heatmap(od, ax_dict["f"], "50", "500")
     axins = inset_axes(
-        ax_dict["E"],
+        ax_dict["f"],
         width="5%",  # width: 5% of parent_bbox width
         height="50%",  # height: 50%
         loc="lower left",
         bbox_to_anchor=(1.05, 0.0, 1, 1),
-        bbox_transform=ax_dict["E"].transAxes,
+        bbox_transform=ax_dict["f"].transAxes,
         borderpad=0.0,
     )
     fig.colorbar(im, cax=axins)
-
-    fig.get_layout_engine().set(w_pad=2 / 32, h_pad=4 / 72, hspace=0.05, wspace=0.0)
+    for label, ax in ax_dict.items():
+        # Use ScaledTranslation to put the label
+        # - at the top left corner (axes fraction (0, 1)),
+        # - offset 20 pixels left and 7 pixels up (offset points (-20, +7)),
+        # i.e. just outside the axes.
+        new_label = f"({label})"
+        ax.text(
+            0.5,
+            0.0,
+            new_label,
+            transform=(
+                ax.transAxes + ScaledTranslation(-4 / 72, -50 / 72, fig.dpi_scale_trans)
+            ),
+            fontsize="medium",
+            va="bottom",
+            fontfamily="serif",
+        )
+    fig.get_layout_engine().set(w_pad=4 / 72, h_pad=4 / 72, hspace=0.0, wspace=0.0)
     fig.savefig("testbed_results.svg", bbox_inches="tight")
 
     plt.show()
