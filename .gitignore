@@ -100,4 +100,3 @@ __pycache__
 testbed/plot/2024*
 testbed/plot/*.pdf
 testbed/plot/*.svg
-testbed/plot/targets_found.pdf
