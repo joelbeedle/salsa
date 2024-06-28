@@ -632,7 +632,7 @@ struct GLRenderTargets {
     circleVertices[0] = 0.0f;  // Center of circle
     circleVertices[1] = 0.0f;
     const float increment = 2.0f * M_PI / e_maxVertices;
-    const float radius = 2.5f;  // New radius for the circle
+    const float radius = 5.0f;  // New radius for the circle
     for (int i = 0; i <= e_maxVertices; ++i) {
       circleVertices[2 + i * 2] =
           cosf(i * increment) * radius;  // Scale x coordinate

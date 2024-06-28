@@ -13,7 +13,7 @@ swarm::Entity::Entity(b2World *world, const b2Vec2 &position, bool is_static,
     bodyDef.type = b2_dynamicBody;
   }
   bodyDef.position = position;
-  this->body_ = world_->CreateBody(&bodyDef);
+  body_ = world_->CreateBody(&bodyDef);
   last_log_time = std::chrono::steady_clock::now();
 }
 

@@ -35,10 +35,11 @@ fs::path getExecutablePath() {
 
 Map load(const char *new_map_name) {
   std::filesystem::path exec_path = getExecutablePath();
-  std::cout << "Executable path: " << exec_path << std::endl;
+  get_logger()->info("Executable path: {}", exec_path.string());
   std::filesystem::path file_path = exec_path / ".." / ".." / "testbed" /
                                     "maps" /
                                     (std::string(new_map_name) + ".json");
+  get_logger()->info("Loading map from: {}", file_path.string());
 
   b2World *world = new b2World(b2Vec2(0.0f, 0.0f));
   Map new_map;
@@ -80,9 +81,12 @@ Map load(const char *new_map_name) {
 
       if (fixture_json.find("polygon") != fixture_json.end()) {
         b2PolygonShape shape;
+        std::vector<b2Vec2> vertices;
         for (auto &vertex : fixture_json["polygon"]) {
-          shape.m_vertices[shape.m_count++] = {vertex[0], vertex[1]};
+          vertices.emplace_back(vertex[0], vertex[1]);
         }
+        shape.Set(&vertices[0],
+                  (int32)vertices.size());  // Properly set the vertices
         fixture_def.shape = &shape;
       } else if (fixture_json.find("circle") != fixture_json.end()) {
         b2CircleShape shape;

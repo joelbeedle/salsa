@@ -127,7 +127,12 @@ class MapCreator : public Test {
     b2PolygonShape shape;
     shape.Set(&vertices[0], (int32)vertices.size());
 
-    body->CreateFixture(&shape, 0.0f);
+    b2FixtureDef fixtureDef;
+    fixtureDef.shape = &shape;
+    fixtureDef.density = 1.0f;  // Example density
+
+    body->CreateFixture(&fixtureDef);
+
     line_drawing = false;
   }
 
@@ -201,7 +206,6 @@ class MapCreator : public Test {
 
   void RightMouseDown(const b2Vec2 &p) override {
     m_mouseWorld = p;
-    std::cout << "RightMouseDown\n";
     if (m_mouseJoint != NULL) {
       return;
     }
@@ -216,7 +220,6 @@ class MapCreator : public Test {
     myQueryCallback callback;
     m_world->QueryAABB(&callback, aabb);
     for (auto body : callback.bodies) {
-      std::cout << "Body: " << body << std::endl;
       body_popup = true;
       selected_body = body;
     }
@@ -535,6 +538,8 @@ class MapCreator : public Test {
       if (selected_body) {
         ImGui::Text("BodyID: %p", selected_body);
         ImGui::Text("BodyType: %d", (b2BodyType)selected_body->GetType());
+        ImGui::Text("Position: (%f, %f)", selected_body->GetPosition().x,
+                    selected_body->GetPosition().y);
         if (ImGui::Button("Delete")) {
           m_world->DestroyBody(selected_body);
           selected_body = nullptr;

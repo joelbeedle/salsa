@@ -84,7 +84,7 @@ void user() {
 
   auto contactListener = std::make_shared<swarm::BaseContactListener>();
   setupInteractions(*contactListener);
-  swarm::map::Map map = swarm::map::load("playground");
+  swarm::map::Map map = swarm::map::load("poly");
   swarm::map::Map map1 = {"Map1", BORDER_WIDTH, BORDER_HEIGHT, b2Vec2(0, 0),
                           new b2World(b2Vec2(0.0f, 0.0f))};
   swarm::TestConfig config = {"Flocking",

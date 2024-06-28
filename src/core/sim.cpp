@@ -50,6 +50,7 @@ Sim::Sim(TestConfig &config)
   logger_.switch_log_file(oss.str());
 
   world_->SetContactListener(contact_listener_);
+  addObserver(std::shared_ptr<Logger>(&logger_, [](auto *) {}));
 
   auto behaviour_pointer =
       behaviour::Registry::getInstance().getBehaviour(current_behaviour_name_);
@@ -79,7 +80,27 @@ void Sim::update() {
     drone->notifyAll({{"position", {position.x, position.y}},
                       {"velocity", {velocity.x, velocity.y}}});
   }
-  // Simulation data logging
+  int i = 0;
+  for (auto &target : targets_) {
+    if (target->isFound()) {
+      i++;
+    }
+  }
+  const nlohmann::json &old_message = {{"targets_found", i}};
+  auto now = std::chrono::steady_clock::now();
+  long duration =
+      std::chrono::duration_cast<std::chrono::milliseconds>(now - last_log_time)
+          .count();
+  if (duration > log_interval) {
+    nlohmann::json message;
+    message["message"] = old_message.dump();
+    message["id"] = 0;
+    message["caller_type"] = "Sim";
+
+    for (auto &observer : observers) {
+      observer->update(message);
+    }
+  }  // Simulation data logging
 }
 
 void Sim::reset() {
