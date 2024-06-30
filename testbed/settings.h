@@ -48,6 +48,7 @@ struct Settings {
     m_enableSleep = true;
     m_pause = false;
     m_singleStep = false;
+    m_simulationSpeed = 1.0f;
   }
 
   void Save();
@@ -75,4 +76,5 @@ struct Settings {
   bool m_enableSleep;
   bool m_pause;
   bool m_singleStep;
+  float m_simulationSpeed;
 };

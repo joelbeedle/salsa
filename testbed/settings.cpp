@@ -88,6 +88,7 @@ void Settings::Load() {
   m_enableContinuous = j.value("enableContinuous", m_enableContinuous);
   m_enableSubStepping = j.value("enableSubStepping", m_enableSubStepping);
   m_enableSleep = j.value("enableSleep", m_enableSleep);
+  m_simulationSpeed = j.value("simulationSpeed", m_simulationSpeed);
 }
 
 void Settings::Save() {
@@ -112,6 +113,7 @@ void Settings::Save() {
   j["enableContinuous"] = m_enableContinuous;
   j["enableSubStepping"] = m_enableSubStepping;
   j["enableSleep"] = m_enableSleep;
+  j["simulationSpeed"] = m_simulationSpeed;
 
   std::ofstream o(fileName);
   o << j.dump(4);  // serialize with pretty printing, use a tab width of 4

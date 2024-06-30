@@ -184,7 +184,9 @@ class QueueSimulator : public Test {
     for (auto &target : sim->getTargetsFoundThisStep()) {
       target_colors_[target->getId()] = trueColour;
     }
-    if (!pause) sim->current_time() += 1.0f / settings.m_hertz;
+    if (!pause)
+      sim->current_time() +=
+          (1.0f / settings.m_hertz) * settings.m_simulationSpeed;
     Draw(sim->getWorld(), &g_debugDraw, foundIds);
     if (next_frame) {
       pause = true;

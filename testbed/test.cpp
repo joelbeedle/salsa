@@ -277,16 +277,15 @@ void Test::Step(Settings &settings) {
   m_world->SetSubStepping(settings.m_enableSubStepping);
 
   m_pointCount = 0;
-
-  m_world->Step(timeStep, settings.m_velocityIterations,
-                settings.m_positionIterations);
-
+  for (int i = 0; i < settings.m_simulationSpeed; i++) {
+    m_world->Step(timeStep, settings.m_velocityIterations,
+                  settings.m_positionIterations);
+    if (timeStep > 0.0f) {
+      ++m_stepCount;
+    }
+  }
   // m_world->DebugDraw();
   g_debugDraw.Flush();
-
-  if (timeStep > 0.0f) {
-    ++m_stepCount;
-  }
 
   if (settings.m_drawStats) {
     int32 bodyCount = m_world->GetBodyCount();

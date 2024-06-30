@@ -365,6 +365,8 @@ static void UpdateUI() {
         ImGui::SliderInt("Pos Iters", &s_settings.m_positionIterations, 0, 50);
         ImGui::SliderFloat("Hertz", &s_settings.m_hertz, 5.0f, 120.0f,
                            "%.0f hz");
+        ImGui::SliderFloat("Simulation Speed", &s_settings.m_simulationSpeed,
+                           0.1f, 20.0f, "%.1f x");
 
         ImGui::Separator();
 
