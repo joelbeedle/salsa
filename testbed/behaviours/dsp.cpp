@@ -70,8 +70,6 @@ class DSPBehaviour : public Behaviour {
   std::vector<DSPPoint *> dspPoints;
   float firstRun = true;
 
-  std::unordered_map<std::string, behaviour::Parameter *> parameters_ = {};
-
   struct DroneInfo {
     bool isAtDSPPoint;
     b2Vec2 dspPoint;

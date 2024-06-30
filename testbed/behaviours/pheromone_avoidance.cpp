@@ -16,7 +16,6 @@ class PheromoneBehaviour : public Behaviour {
 
   std::map<int, Pheromone> pheromones;
   int pheromoneCount = 0;
-  std::unordered_map<std::string, behaviour::Parameter *> parameters_;
   behaviour::Parameter decay_rate_;
   behaviour::Parameter obstacle_avoidance_weight_;
 
