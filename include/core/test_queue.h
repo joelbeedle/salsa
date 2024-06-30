@@ -17,6 +17,10 @@
 #include "utils/base_contact_listener.h"
 namespace swarm {
 
+void loadPermutations(std::vector<std::vector<float>> &permutations,
+                      std::vector<std::string> &parameter_names,
+                      std::string filename);
+
 struct TestConfig {
   typedef std::unordered_map<std::string, behaviour::Parameter *> Parameters;
   typedef std::unordered_map<std::string, float> FloatParameters;
@@ -42,6 +46,10 @@ class TestQueue {
 
  public:
   static void push(TestConfig test);
+  static void addPermutedTests(
+      const TestConfig &base,
+      const std::vector<std::vector<float>> &permutations,
+      const std::vector<std::string> &parameter_names);
   static TestConfig pop();
   static TestConfig peek();
   static int size() { return tests_.size(); }

@@ -87,8 +87,8 @@ void user() {
   swarm::map::Map map = swarm::map::load("poly");
   swarm::map::Map map1 = {"Map1", BORDER_WIDTH, BORDER_HEIGHT, b2Vec2(0, 0),
                           new b2World(b2Vec2(0.0f, 0.0f))};
-  swarm::TestConfig config = {"Flocking",
-                              new_flock_params,
+  swarm::TestConfig config = {"Pheromone Avoidance",
+                              pheromone_params,
                               smallDrone,
                               map,
                               100,
@@ -97,8 +97,12 @@ void user() {
                               "Tree",
                               std::tuple(false, false, 5.0f),
                               contactListener.get()};
-
+  std::vector<std::vector<float>> loaded_permutations;
+  std::vector<std::string> loaded_parameter_names;
+  swarm::loadPermutations(loaded_permutations, loaded_parameter_names,
+                          "permutations.json");
   swarm::TestQueue queue;
+  queue.addPermutedTests(config, loaded_permutations, loaded_parameter_names);
   config.num_targets = 500;
   config.num_drones = 100;
   config.time_limit = 100.0f;

@@ -483,6 +483,14 @@ class QueueSimulator : public Test {
         std::vector<std::vector<float>> permutations;
         generatePermutations(permutations, lists);
 
+        nlohmann::json j;
+        j["permutations"] = permutations;
+        j["parameter_names"] = parameter_names;
+
+        std::ofstream file("permutations.json");
+        file << j.dump(4);
+        file.close();
+
         for (const auto &combination : permutations) {
           std::ostringstream oss;
           for (float value : combination) {
