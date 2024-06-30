@@ -131,6 +131,48 @@ class QueueSimulator : public Test {
 
   void SetDroneCount(int count) { sim_builder->setDroneCount(count); }
 
+  void generatePermutations(std::vector<std::vector<float>> &results,
+                            const std::vector<std::vector<float>> &lists,
+                            std::vector<float> current = {}, size_t depth = 0) {
+    if (depth == lists.size()) {
+      results.push_back(current);
+      return;
+    }
+
+    for (const auto &item : lists[depth]) {
+      current.push_back(item);
+      generatePermutations(results, lists, current, depth + 1);
+      current.pop_back();
+    }
+  }
+
+  // Function to parse a list of values from a string
+  std::vector<float> parseList(const std::string &str) {
+    std::vector<float> list;
+    std::istringstream iss(str);
+    std::string value;
+    while (std::getline(iss, value, ' ')) {
+      try {
+        list.push_back(std::stof(value));
+      } catch (const std::invalid_argument &e) {
+        std::cerr << "Invalid float: " << value << std::endl;
+      }
+    }
+    return list;
+  }
+
+  // Function to generate a list of values from a range
+  std::vector<float> generateRange(float min, float max, float step) {
+    std::vector<float> range;
+    for (float value = min; value <= max + step / 2; value += step) {
+      value = std::round(value * 1e6) / 1e6;  // Reduce precision issues
+      if (value <= max) {
+        range.push_back(value);
+      }
+    }
+    return range;
+  }
+
   void Step(Settings &settings) override {
     // Run simulation steps here
     Test::Step(settings);
@@ -310,11 +352,9 @@ class QueueSimulator : public Test {
       static bool to_change = false;
       static b2World *new_world = nullptr;
       static swarm::map::Map new_map;
+
       // Get behaviour name for test
       if (ImGui::BeginCombo("Behaviour", current_name.c_str())) {
-        auto behaviourNames =
-            swarm::behaviour::Registry::getInstance().getBehaviourNames();
-
         for (auto &name : behaviourNames) {
           bool isSelected = (current_name == name);
           if (ImGui::Selectable(name.c_str(), isSelected)) {
@@ -327,41 +367,46 @@ class QueueSimulator : public Test {
         }
         ImGui::EndCombo();
       }
+
       // Get parameters for test
       auto chosen_behaviour =
           swarm::behaviour::Registry::getInstance().getBehaviour(current_name);
       auto chosen_params = chosen_behaviour->getParameters();
-      static std::unordered_map<std::string, swarm::behaviour::Parameter *>
-          new_params;
-      if (new_params.empty() || to_change) {
-        new_params.clear();
+      static std::unordered_map<std::string, std::string> input_storage;
+      static std::vector<std::string> parameter_names;
+      static std::vector<int> selections;
+      static std::unordered_map<std::string, std::vector<float>> range_storage;
+
+      if (to_change) {
+        input_storage.clear();
+        parameter_names.clear();
+        selections.clear();
+        range_storage.clear();
         for (const auto &pair : chosen_params) {
-          new_params[pair.first] = pair.second->clone();
-          to_change = false;
+          parameter_names.push_back(pair.first);
+          input_storage[pair.first] =
+              std::string(128, '\0');  // Initialize with null characters
+          selections.push_back(0);
+          range_storage[pair.first] = {0.0f, 0.0f, 0.0f};
         }
+        to_change = false;
       }
+
       ImGui::Separator();
       ImGui::Text("Select Range or List for each parameter");
       ImGui::Text("For Range: Input min, max, and step values");
       ImGui::Text("For List: Input a list of values separated by spaces");
-      int index = 0;
-      static char buf[16][128];
-      const char *combo_items[] = {"Range", "List"};
-      static std::vector<int> selections;
 
-      if (selections.size() != new_params.size()) {
-        selections.resize(new_params.size(), 0);
-      }
-
-      for (auto [name, parameter] : new_params) {
+      for (size_t i = 0; i < parameter_names.size(); ++i) {
+        const auto &name = parameter_names[i];
         ImGui::PushItemWidth(80.0f);
-        std::string comboLabel = "##combo" + std::to_string(index);
+        std::string comboLabel = "##combo" + std::to_string(i);
         if (ImGui::BeginCombo(comboLabel.c_str(),
-                              combo_items[selections[index]])) {
-          for (int n = 0; n < IM_ARRAYSIZE(combo_items); n++) {
-            bool is_selected = (selections[index] == n);
-            if (ImGui::Selectable(combo_items[n], is_selected)) {
-              selections[index] = n;
+                              (selections[i] == 0) ? "Range" : "List")) {
+          for (int n = 0; n < 2; n++) {
+            bool is_selected = (selections[i] == n);
+            if (ImGui::Selectable((n == 0) ? "Range" : "List", is_selected)) {
+              selections[i] = n;
             }
             if (is_selected) {
               ImGui::SetItemDefaultFocus();
@@ -372,13 +417,24 @@ class QueueSimulator : public Test {
         ImGui::PopItemWidth();
         ImGui::SetItemAllowOverlap();
         ImGui::SameLine();
-        static float vec4f[4] = {0.0, 0.0, 0.0, 0.0};
-        if (selections[index] == 0) {
-          ImGui::InputFloat3(name.c_str(), vec4f);
-        } else {
-          ImGui::InputText(name.c_str(), buf[index], IM_ARRAYSIZE(buf[index]));
+
+        if (selections[i] == 0) {  // Range
+          ImGui::InputFloat3(name.c_str(), range_storage[name].data());
+          // Store the range values as a string for later parsing
+          std::ostringstream oss;
+          oss << range_storage[name][0] << " " << range_storage[name][1] << " "
+              << range_storage[name][2];
+          input_storage[name] = oss.str();
+        } else {  // List
+          char buffer[1024];
+          std::strncpy(buffer, input_storage[name].c_str(), sizeof(buffer));
+          buffer[sizeof(buffer) - 1] = '\0';
+          if (ImGui::InputTextWithHint(name.c_str(),
+                                       "Enter values separated by spaces",
+                                       buffer, sizeof(buffer))) {
+            input_storage[name] = buffer;
+          }
         }
-        index++;
       }
 
       // Get world map for test
@@ -399,26 +455,59 @@ class QueueSimulator : public Test {
       swarm::DroneConfiguration *smallDrone = new swarm::DroneConfiguration(
           25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f);
 
-      // Set number of drones
       ImGui::InputInt("Drone Count", &new_drone_count);
-      // Set number of targets
       ImGui::InputInt("Target Count", &new_target_count);
-      // Set time limit
       ImGui::InputFloat("Time Limit", &new_time_limit);
 
       if (new_world == nullptr) {
         ImGui::BeginDisabled();
       }
 
-      // create new_config and add it to the queue
-      if (ImGui::Button("Add Test", ImVec2(120, 0))) {
-        swarm::TestConfig new_config = {
-            current_name,    new_params,       smallDrone,     new_map,
-            new_drone_count, new_target_count, new_time_limit,
-        };
-        queue_.push(new_config);
-        added_test_permutation_ = true;
-        ImGui::CloseCurrentPopup();
+      if (ImGui::Button("Generate Permutations")) {
+        std::vector<std::vector<float>> lists;
+
+        // Parse parameters
+        for (size_t i = 0; i < parameter_names.size(); ++i) {
+          const auto &name = parameter_names[i];
+          if (selections[i] == 0) {  // Range
+            std::istringstream iss(input_storage[name]);
+            float min, max, step;
+            iss >> min >> max >> step;
+            lists.push_back(generateRange(min, max, step));
+          } else {  // List
+            lists.push_back(parseList(input_storage[name]));
+          }
+        }
+
+        // Generate permutations
+        std::vector<std::vector<float>> permutations;
+        generatePermutations(permutations, lists);
+
+        for (const auto &combination : permutations) {
+          std::ostringstream oss;
+          for (float value : combination) {
+            oss << value << " ";
+          }
+          std::cout << oss.str() << std::endl;
+        }
+        for (const auto &combination : permutations) {
+          std::unordered_map<std::string, swarm::behaviour::Parameter *>
+              new_params;
+          for (size_t j = 0; j < parameter_names.size(); ++j) {
+            const auto &name = parameter_names[j];
+            new_params[name] = chosen_params[name]->clone();
+            *(new_params[name]) = static_cast<float>(combination[j]);
+          }
+
+          swarm::TestConfig new_config = {
+              current_name,    new_params,       smallDrone,     new_map,
+              new_drone_count, new_target_count, new_time_limit,
+          };
+
+          queue_.push(new_config);
+          added_test_permutation_ = true;
+          ImGui::CloseCurrentPopup();
+        }
       }
 
       if (new_world == nullptr) {
