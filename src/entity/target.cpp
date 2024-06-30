@@ -15,6 +15,7 @@ Target::Target(b2World *world, const b2Vec2 &position, float radius)
   userData->object = this;
 
   fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(userData);
+  fixtureDef.filter.groupIndex = -1;
   body_->CreateFixture(&fixtureDef);
 }
 }  // namespace swarm

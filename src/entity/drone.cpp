@@ -36,6 +36,7 @@ Drone::Drone(b2World *world, const b2Vec2 &position, Behaviour &behaviour,
   userData->object = this;
 
   fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(userData);
+  fixtureDef.filter.groupIndex = -1;
   body_->CreateFixture(&fixtureDef);
 
   // Create tree detecting sensor (downwards camera)
