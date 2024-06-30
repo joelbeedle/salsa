@@ -82,7 +82,7 @@ void user() {
       {"Obstacle Avoidance Weight", 1.0},
   });
 
-  auto contactListener = std::make_shared<swarm::BaseContactListener>();
+  static auto contactListener = std::make_shared<swarm::BaseContactListener>();
   setupInteractions(*contactListener);
   swarm::map::Map map = swarm::map::load("poly");
   swarm::map::Map map1 = {"Map1", BORDER_WIDTH, BORDER_HEIGHT, b2Vec2(0, 0),
@@ -108,8 +108,6 @@ void user() {
   config.num_drones = 100;
   config.time_limit = 100.0f;
   queue.push(config);
-
-  testbed::run();
 }
 
 }  // namespace testbed

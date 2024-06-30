@@ -24,8 +24,11 @@ int main(int argc, char** argv) {
   testbed::plot();
   if (headless) {
     // Run in headless mode
-    std::cout << "Running in headless mode" << std::endl;
+    testbed::user();
+    testbed::run_headless();
+  } else {
+    testbed::user();
+    testbed::run();
   }
-  testbed::user();
   return 0;
 }

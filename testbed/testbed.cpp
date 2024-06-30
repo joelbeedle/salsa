@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#include "core/test_queue.h"
 #define _CRT_SECURE_NO_WARNINGS
 #define IMGUI_DISABLE_OBSOLETE_FUNCTIONS 1
 
@@ -31,6 +32,7 @@
 
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
+#include "core/simulation.h"
 #include "draw.h"
 #include "imgui.h"
 #include "settings.h"
@@ -468,6 +470,33 @@ static void UpdateUI() {
   }
 }
 
+int run_headless() {
+  s_settings.Load();
+
+  s_settings.m_testIndex = b2Clamp(s_settings.m_testIndex, 0, g_testCount - 1);
+  s_testSelection = s_settings.m_testIndex;
+  s_test = std::move(g_testEntries[s_settings.m_testIndex].instance());
+
+  swarm::TestQueue queue;
+  while (true) {
+    auto test = queue.pop();
+    swarm::Sim *sim = new swarm::Sim(test);
+    std::cout << "Running test " << test.behaviour_name << std::endl;
+
+    while (sim->current_time() < test.time_limit) {
+      sim->update();
+      sim->getWorld()->Step(1 / 60.0f, 8, 3);
+      sim->current_time() += (1.0f / 60.0f) * 1.0f;
+      std::cout << sim->current_time() << std::endl;
+    }
+  }
+
+  s_test = nullptr;
+
+  s_settings.Save();
+
+  return 0;
+}
 //
 int run() {
 #if defined(_WIN32)
