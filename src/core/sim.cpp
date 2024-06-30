@@ -56,6 +56,23 @@ Sim::Sim(TestConfig &config)
       behaviour::Registry::getInstance().getBehaviour(current_behaviour_name_);
   auto visitor = [&](auto &&arg) { behaviour_pointer->setParameters(arg); };
   std::visit(visitor, config.parameters);
+  nlohmann::json old_message;
+  std::unordered_map<std::string, behaviour::Parameter *> params =
+      behaviour_pointer->getParameters();
+  for (const auto &[key, value] : params) {
+    old_message[key] = value->value();
+  }
+  old_message["behaviour"] = current_behaviour_name_;
+
+  nlohmann::json message;
+  message["message"] = old_message.dump();
+  message["id"] = 0;
+  message["caller_type"] = "Sim";
+
+  for (auto &observer : observers) {
+    observer->update(message);
+  }
+
   createDrones(*behaviour_, *drone_configuration_, SpawnType::CIRCULAR);
   createTargets(config.target_parameters);
 }

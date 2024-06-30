@@ -126,7 +126,7 @@ class FlockingBehaviour : public Behaviour {
     b2Vec2 acceleration =
         (alignment_weight_ * alignment) + (separation_weight_ * separation) +
         (cohesion_weight_ * cohesion) +
-        (obstacle_avoidance_weight_ * obstacleAvoidance) + 2.0 * toPoint;
+        (obstacle_avoidance_weight_ * obstacleAvoidance) + 0.0 * toPoint;
     b2Vec2 velocity = currentDrone.getVelocity();
     b2Vec2 position = currentDrone.getPosition();
 
