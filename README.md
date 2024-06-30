@@ -314,8 +314,9 @@ auto behaviour_parameters = std::make_unique<CustomBehaviour>(250.0, 1.6, 1.0, 3
 auto *drone_config = new swarm::DroneConfiguration(
     25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f);
 
-// Set up the listener to listen for collisions
-auto listener = std::make_shared<swarm::BaseContactListener>();
+// Set up the listener to listen for collisions.
+// Has to be static
+static auto listener = std::make_shared<swarm::BaseContactListener>();
 
 // Add a collision handler between Drone and Target types, when this collision is detected, userHandlingFunction is called to handle the collision.
 listener.addColisionHandler(typeid(swarm::Drone), typeid(swarm::Target), userHandlingFunction)
@@ -342,10 +343,9 @@ swarm::TestConfig test = {
 // Create queue and add test to it
 swarm::TestQueue queue;
 queue.push(test);
-
-// Begin the simulation 
-testbed::run();
 ```
+
+When the executable is ran, it will run this code first, intialising everything, before beginning the simulations.
 
 ## Architecture
 TODO: is this necessary? If so, I will complete it
