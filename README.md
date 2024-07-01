@@ -3,11 +3,7 @@
 Swarm Algorithm Simulation library and Testbed, written in C++.
 
 ## Getting Started
-There is a virtual image with Ubuntu available [here](). 
-
-The `swarm-sim` files were installed on the disk image using the following instructions, and can be found at `~/swarm-sim`. You can use the CMake commands in the Installation section to re-configure and re-build this when modifying the code.
-
-There is also a Docker container available. It opens a noVNC web app on `localhost` with `swarm-sim` pre-installed.
+There is a Docker container available. It opens a noVNC web app on `localhost` with `swarm-sim` pre-installed.
 
 ### Using the Docker container
 
