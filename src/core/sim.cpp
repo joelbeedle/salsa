@@ -19,6 +19,7 @@ Sim::Sim(b2World *world, int drone_count, int target_count,
 
   logger_.switch_log_file("test.log");
   createBounds();
+  drone_spawn_position_ = b2Vec2(border_width_ / 2, border_height_ / 2);
 
   createDrones(*behaviour_, *drone_configuration_, SpawnType::CIRCULAR);
 }

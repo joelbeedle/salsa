@@ -58,12 +58,11 @@ class SandboxSimulator : public Test {
 
     g_debugDraw.SetFlags(b2Draw::e_shapeBit | b2Draw::e_jointBit);
     m_world = new b2World(b2Vec2(0.0f, 0.0f));
-    sim = new swarm::Sim(m_world, 1, 0, smallDrone, 2000, 2000, 0);
+    sim = new swarm::Sim(m_world, 1, 0, smallDrone, 2000, 2000, 1000.0);
     new_count = 1;
     auto &registry = swarm::behaviour::Registry::getInstance();
     auto behaviour_names = registry.getBehaviourNames();
     sim->setCurrentBehaviour(behaviour_names[0]);
-
     // m_world->SetContactListener(contactListener_);
   }
   static std::unique_ptr<Test> Create() {
@@ -120,11 +119,19 @@ class SandboxSimulator : public Test {
   void Step(Settings &settings) override {
     // Run simulation steps here
     Test::Step(settings);
+    float timeStep =
+        settings.m_hertz > 0.0f ? 1.0f / settings.m_hertz : float(0.0f);
     pause = settings.m_pause;
     std::vector<int> foundTreeIDs;
-    sim->update();
-    // if (!settings.m_pause) sim->current_time() += 1.0f / settings.m_hertz;
-    m_world->DebugDraw();
+    for (int i = 0; i < settings.m_simulationSpeed; i++) {
+      m_world->Step(timeStep, settings.m_velocityIterations,
+                    settings.m_positionIterations);
+      sim->update();
+      if (timeStep > 0.0f) {
+        ++m_stepCount;
+      }
+    }
+    if (!settings.m_pause) sim->current_time() += 1.0f / settings.m_hertz;
     Draw(sim->getWorld(), &g_debugDraw, foundTreeIDs);
     if (update_drone_count_) {
       sim->setDroneCount(new_count);
@@ -223,14 +230,6 @@ class SandboxSimulator : public Test {
   }
   void Draw(b2World *world, DebugDraw *debugDraw,
             std::vector<int> foundTreeIDs) {
-    if (draw_targets_) {
-      if (first_run_) {
-        debugDraw->DrawAllTargets(treePositions, treeColors);
-        first_run_ = false;
-      } else {
-        debugDraw->DrawTargets(treePositions, treeColors, foundTreeIDs);
-      }
-    }
     for (b2Body *body = world->GetBodyList(); body; body = body->GetNext()) {
       const b2Transform &transform = body->GetTransform();
 
@@ -253,10 +252,6 @@ class SandboxSimulator : public Test {
             // skip this fixture as it's been dealt with
             continue;
           }
-          if (categoryBits == 0x0002) {
-            // This is fixture tree sensor, but we deal with trees
-            // individually later
-          }
         }
 
         if (fixture->GetUserData().pointer != 0) {
@@ -266,23 +261,23 @@ class SandboxSimulator : public Test {
             std::cout << "User data is null" << std::endl;
             continue;
           }
-          // Depending on the type, draw the object
-          std::string name = typeid(*(userData->object)).name();
-          if (name.compare("swarm::Drone")) {
+          // Draw Drones
+          std::string name = swarm::type(*(userData->object));
+          if (name.compare("swarm::Drone") == 0) {
             swarm::Drone *drone = userData->as<swarm::Drone>();
             // Draw drone
             b2Vec2 position = body->GetPosition();
             debugDraw->DrawSolidCircle(position, drone->getRadius(),
                                        transform.q.GetXAxis(),
-                                       b2Color(0.7f, 0.5f, 0.5f));
+                                       drone->getColor());
+          } else if (name.compare("b2_groundBody") && draw_targets_) {
+            // swarm::Target *target = userData->as<swarm::Target>();
+            // b2Vec2 position = body->GetPosition();
+            // debugDraw->DrawSolidCircle(position, target->getRadius(),
+            //                           transform.q.GetXAxis(),
+            //                           target->getColor());
           }
-          if (name.compare("swarm::Target")) {
-            swarm::Target *target = userData->as<swarm::Target>();
-            b2Vec2 position = body->GetPosition();
-            debugDraw->DrawSolidCircle(position, target->getRadius(),
-                                       transform.q.GetXAxis(),
-                                       b2Color(0.5f, 0.5f, 0.5f));
-          }
+          continue;
         }
 
         // Draw everything else that's not anything above with default values

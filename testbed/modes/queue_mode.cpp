@@ -180,8 +180,6 @@ class QueueSimulator : public Test {
         settings.m_hertz > 0.0f ? 1.0f / settings.m_hertz : float(0.0f);
     pause = settings.m_pause;
     std::vector<int> foundIds;
-    if (first_run_) {
-    }
     for (int i = 0; i < settings.m_simulationSpeed; i++) {
       m_world->Step(timeStep, settings.m_velocityIterations,
                     settings.m_positionIterations);
