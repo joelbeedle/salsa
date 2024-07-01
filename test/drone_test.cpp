@@ -20,8 +20,8 @@ class DroneTest : public ::testing::Test {
   void SetUp() override {
     world = new b2World(b2Vec2(0.0f, 0.0f));
     MockBehaviour behaviour;
-    config = new swarm::DroneConfiguration(5.0f, 3.0f, 2.0f, 1.0f, 0.5f, 1.0f,
-                                           10.0f);
+    config = new swarm::DroneConfiguration("test", 5.0f, 3.0f, 2.0f, 1.0f, 0.5f,
+                                           1.0f, 10.0f);
   }
 
   void TearDown() override { delete world; }

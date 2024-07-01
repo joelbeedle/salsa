@@ -59,7 +59,7 @@ void user() {
                           ->getParameters();
 
   swarm::DroneConfiguration *smallDrone = new swarm::DroneConfiguration(
-      15.0f, 50.2f, 10.0f, 0.3f, 1.0f, 1.5f, 134.0f);
+      "Small", 15.0f, 50.2f, 10.0f, 0.3f, 1.0f, 1.5f, 134.0f);
   swarm::CollisionManager::registerType<swarm::Drone>({typeid(Tree).name()});
   swarm::CollisionManager::registerType<Tree>({typeid(swarm::Drone).name()});
   swarm::TargetFactory::registerTarget<Tree, bool, bool, float>("Tree", false,

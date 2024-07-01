@@ -27,7 +27,8 @@ class SimTest : public ::testing::Test {
     swarm::behaviour::Registry::getInstance().add(behaviour_name,
                                                   std::move(mockBehaviour));
 
-    config = new DroneConfiguration(5.0f, 3.0f, 2.0f, 1.0f, 0.5f, 1.0f, 10.0f);
+    config = new DroneConfiguration("test", 5.0f, 3.0f, 2.0f, 1.0f, 0.5f, 1.0f,
+                                    10.0f);
     sim = std::make_unique<Sim>(&world, 5, 3, config, 100.0f, 100.0f, 120.0f);
     sim->setCurrentBehaviour(behaviour_name);
     std::cout << sim->getDroneCount() << std::endl;
@@ -53,7 +54,7 @@ TEST_F(SimTest, CorrectBehaviourTest) {
 
 TEST_F(SimTest, SetDroneConfigurationTest) {
   DroneConfiguration newConfig =
-      DroneConfiguration(10.0f, 5.0f, 3.0f, 2.0f, 1.0f, 0.5f, 20.0f);
+      DroneConfiguration("test", 10.0f, 5.0f, 3.0f, 2.0f, 1.0f, 0.5f, 20.0f);
   sim->setDroneConfiguration(&newConfig);
   EXPECT_EQ(&newConfig, sim->getDroneConfiguration());
 }

@@ -10,6 +10,7 @@
 
 #include "core/simulation.h"
 #include "draw.h"
+#include "entity/drone_configuration.h"
 #include "imgui.h"
 #include "settings.h"
 #include "test.h"
@@ -53,7 +54,7 @@ class QueueSimulator : public Test {
   QueueSimulator() {
     pause = true;
     swarm::DroneConfiguration *smallDrone = new swarm::DroneConfiguration(
-        25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f);
+        "hidden", 25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f);
 
     g_debugDraw.SetFlags(b2Draw::e_shapeBit | b2Draw::e_jointBit);
     m_world = new b2World(b2Vec2(0.0f, 0.0f));
@@ -332,9 +333,26 @@ class QueueSimulator : public Test {
           swarm::BaseContactListener::GetListenerByName(current_listener_name);
 
       // Get drone configuration for test
-      ImGui::SeparatorText("Drone Configuration");
-      swarm::DroneConfiguration *smallDrone = new swarm::DroneConfiguration(
-          25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f);
+      auto droneConfigNames =
+          swarm::DroneConfiguration::getDroneConfigurationNames();
+      static std::string current_drone_config_name = droneConfigNames[0];
+      if (ImGui::BeginCombo("Drone Configuration",
+                            current_drone_config_name.c_str())) {
+        for (auto &name : droneConfigNames) {
+          bool isSelected = (current_drone_config_name == name);
+          if (ImGui::Selectable(name.c_str(), isSelected)) {
+            current_drone_config_name = name;
+          }
+          if (isSelected) {
+            ImGui::SetItemDefaultFocus();
+          }
+        }
+        ImGui::EndCombo();
+      }
+
+      static auto *drone_config =
+          swarm::DroneConfiguration::getDroneConfigurationByName(
+              current_drone_config_name);
 
       auto targetNames = swarm::TargetFactory::getTargetNames();
       std::string current_target_name = targetNames[0];
@@ -364,7 +382,7 @@ class QueueSimulator : public Test {
       // create new_config and add it to the queue
       if (ImGui::Button("Add Test", ImVec2(120, 0))) {
         swarm::TestConfig new_config = {
-            current_name,   new_params,          smallDrone,
+            current_name,   new_params,          drone_config,
             new_map,        new_drone_count,     new_target_count,
             new_time_limit, current_target_name, listener};
         queue_.push(new_config);
@@ -498,10 +516,26 @@ class QueueSimulator : public Test {
       }
 
       // Get drone configuration for test
-      ImGui::Text("Drone Configuration");
-      swarm::DroneConfiguration *smallDrone = new swarm::DroneConfiguration(
-          25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f);
+      auto droneConfigNames =
+          swarm::DroneConfiguration::getDroneConfigurationNames();
+      static std::string current_drone_config_name = droneConfigNames[0];
+      if (ImGui::BeginCombo("Drone Configuration",
+                            current_drone_config_name.c_str())) {
+        for (auto &name : droneConfigNames) {
+          bool isSelected = (current_drone_config_name == name);
+          if (ImGui::Selectable(name.c_str(), isSelected)) {
+            current_drone_config_name = name;
+          }
+          if (isSelected) {
+            ImGui::SetItemDefaultFocus();
+          }
+        }
+        ImGui::EndCombo();
+      }
 
+      static auto *drone_config =
+          swarm::DroneConfiguration::getDroneConfigurationByName(
+              current_drone_config_name);
       ImGui::InputInt("Drone Count", &new_drone_count);
       ImGui::InputInt("Target Count", &new_target_count);
       ImGui::InputFloat("Time Limit", &new_time_limit);
@@ -555,7 +589,7 @@ class QueueSimulator : public Test {
           }
 
           swarm::TestConfig new_config = {
-              current_name,    new_params,       smallDrone,     new_map,
+              current_name,    new_params,       drone_config,   new_map,
               new_drone_count, new_target_count, new_time_limit,
           };
 
@@ -717,8 +751,6 @@ class QueueSimulator : public Test {
         next_frame = true;
       }
       if (sim->getDroneConfiguration() == nullptr) {
-        sim->setDroneConfiguration(new swarm::DroneConfiguration(
-            25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f));
       }
     }
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);

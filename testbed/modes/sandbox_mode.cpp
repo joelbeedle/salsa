@@ -54,7 +54,7 @@ class SandboxSimulator : public Test {
  public:
   SandboxSimulator() {
     swarm::DroneConfiguration *smallDrone = new swarm::DroneConfiguration(
-        25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f);
+        "sandbox_default", 25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f);
 
     g_debugDraw.SetFlags(b2Draw::e_shapeBit | b2Draw::e_jointBit);
     m_world = new b2World(b2Vec2(0.0f, 0.0f));
