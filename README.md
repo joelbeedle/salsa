@@ -32,7 +32,7 @@ To use the virtual machine:
 - The testbed application can be found at `./build/testbed/`
 
 ### Installation
-`swarm-sim` was designed with to be cros-platform.
+`swarm-sim` was designed with to be cross-platform.
 
 #### Requirements
 - CMake **3.14+**
@@ -46,7 +46,7 @@ Requirements in bold are **essential**.
 
 `swarm-sim` uses the following packages directly:
 - [Box2D](https://github.com/erincatto/box2d)
-- [GLAD](https://github.com/Dav1dde/glad) and [GLFW]()
+- [GLAD](https://github.com/Dav1dde/glad) and [GLFW](https://www.glfw.org/)
 - [spdlog](https://github.com/gabime/spdlog)
 - [nlohmann_json](https://github.com/nlohmann/json)
 - [CLI11](https://github.com/CLIUtils/CLI11)
@@ -55,7 +55,7 @@ Requirements in bold are **essential**.
   
 These requirements are all either managed as git submodules, or are fetched and installed into `build/_deps` when configuring using CMake's [FetchContent](https://cmake.org/cmake/help/latest/module/FetchContent.html) module automatically, so you shouldn't have to do anything to set them up.
 
-It may also be neccessary to install some extra dependencies on Linux (or just do `sudo apt-get install -y build-essentials ubuntu-desktop`). If you get build errors, install the missing packages. 
+It may be neccessary to install some extra dependencies on Linux (or just do `sudo apt-get install -y build-essentials ubuntu-desktop`). If you get build errors, install the missing packages. 
 
 #### Steps
 - **Clone the repository and all submodules:**
