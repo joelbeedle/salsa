@@ -2,6 +2,7 @@
 #ifndef SWARM_SIM_UTILS_DRONE_CONFIGURATION_H
 #define SWARM_SIM_UTILS_DRONE_CONFIGURATION_H
 
+#include <string>
 #include <vector>
 namespace swarm {
 class DroneConfiguration {
