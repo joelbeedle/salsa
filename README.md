@@ -336,9 +336,8 @@ swarm::TestConfig test = {
    time_limit,
 };
 
-// Create queue and add test to it
-swarm::TestQueue queue;
-queue.push(test);
+// Add test to the Simulator's TestQueue
+swarm::TestQueue::push(test);
 ```
 
 When the executable is ran, it will run this code first, intialising everything, before beginning the simulations.
