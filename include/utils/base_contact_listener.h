@@ -29,7 +29,14 @@ class BaseContactListener : public b2ContactListener {
            std::function<void(b2Fixture *, b2Fixture *)>>
       collision_handlers_;
 
+  std::string name_;
+  static std::vector<BaseContactListener *> registry_;
+
  public:
+  BaseContactListener(std::string name) : name_(name) {
+    registry_.push_back(this);
+  }
+
   /// @brief Adds a collision handler for a specific pair of object types.
   ///
   /// @param type_a The std::type_index of the first object type.
@@ -49,6 +56,28 @@ class BaseContactListener : public b2ContactListener {
   ///
   /// @param contact The contact point information about the collision.
   void BeginContact(b2Contact *contact) override;
+  static const std::vector<BaseContactListener *> &GetRegistry() {
+    return registry_;
+  }
+
+  const std::string &GetName() const { return name_; }
+
+  static std::vector<std::string> GetListenerNames() {
+    std::vector<std::string> names;
+    for (const auto *listener : registry_) {
+      names.push_back(listener->GetName());
+    }
+    return names;
+  }
+
+  static BaseContactListener *GetListenerByName(const std::string &name) {
+    for (auto *listener : registry_) {
+      if (listener->GetName() == name) {
+        return listener;
+      }
+    }
+    return nullptr;  // No listener found with the specified name
+  }
 };
 
 }  // namespace swarm

@@ -8,6 +8,7 @@
 #include "spdlog/spdlog.h"
 #include "utils/object_types.h"
 namespace swarm {
+std::vector<BaseContactListener *> BaseContactListener::registry_;
 
 void BaseContactListener::addCollisionHandler(
     std::string type1, std::string type2,

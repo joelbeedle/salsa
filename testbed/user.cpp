@@ -49,12 +49,7 @@ static void setupInteractions(swarm::BaseContactListener &listener) {
   listener.addCollisionHandler(
       "swarm::Drone", "swarm::Drone",
       [](b2Fixture *droneFixture1, b2Fixture *droneFixture2) -> void {
-        swarm::Drone *drone1 = reinterpret_cast<swarm::UserData *>(
-                                   droneFixture1->GetUserData().pointer)
-                                   ->as<swarm::Drone>();
-        swarm::Drone *drone2 = reinterpret_cast<swarm::UserData *>(
-                                   droneFixture2->GetUserData().pointer)
-                                   ->as<swarm::Drone>();
+
       });
 }
 
@@ -67,7 +62,8 @@ void user() {
       15.0f, 50.2f, 10.0f, 0.3f, 1.0f, 1.5f, 134.0f);
   swarm::CollisionManager::registerType<swarm::Drone>({typeid(Tree).name()});
   swarm::CollisionManager::registerType<Tree>({typeid(swarm::Drone).name()});
-  swarm::TargetFactory::registerTargetType<Tree, bool, bool, float>("Tree");
+  swarm::TargetFactory::registerTarget<Tree, bool, bool, float>("Tree", false,
+                                                                false, 5.0f);
 
   auto new_flock_params = std::unordered_map<std::string, float>({
       {"Separation Distance", 173.0},
@@ -82,28 +78,22 @@ void user() {
       {"Obstacle Avoidance Weight", 1.0},
   });
 
-  static auto contactListener = std::make_shared<swarm::BaseContactListener>();
+  static auto contactListener =
+      std::make_shared<swarm::BaseContactListener>("Default");
   setupInteractions(*contactListener);
   swarm::map::Map map = swarm::map::load("poly");
   swarm::map::Map map1 = {"Map1", BORDER_WIDTH, BORDER_HEIGHT, b2Vec2(0, 0),
                           new b2World(b2Vec2(0.0f, 0.0f))};
-  swarm::TestConfig config = {"Flocking",
-                              flock_params,
-                              smallDrone,
-                              map,
-                              100,
-                              100,
-                              1200.0f,
-                              "Tree",
-                              std::tuple(false, false, 5.0f),
-                              contactListener.get()};
+  swarm::TestConfig config = {"Flocking", flock_params, smallDrone,
+                              map,        100,          100,
+                              1200.0f,    "Tree",       contactListener.get()};
   std::vector<std::vector<float>> loaded_permutations;
   std::vector<std::string> loaded_parameter_names;
   // swarm::loadPermutations(loaded_permutations, loaded_parameter_names,
   //                         "permutations.json");
   // queue.addPermutedTests(config, loaded_permutations,
   // loaded_parameter_names);
-  config.num_targets = 500;
+  config.num_targets = 50;
   config.num_drones = 100;
   config.time_limit = 100.0f;
   swarm::TestQueue::push(config);

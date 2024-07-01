@@ -259,6 +259,7 @@ class QueueSimulator : public Test {
       static bool to_change = false;
       static b2World *new_world = nullptr;
       static swarm::map::Map new_map;
+      static std::string new_target_type = "";
       // Get behaviour name for test
       if (ImGui::BeginCombo("Behaviour", current_name.c_str())) {
         auto behaviourNames =
@@ -310,10 +311,46 @@ class QueueSimulator : public Test {
         ImGui::Text("Map Loaded");
       }
 
+      auto listenerNames = swarm::BaseContactListener::GetListenerNames();
+      static std::string current_listener_name =
+          listenerNames.empty() ? "" : listenerNames[0];
+
+      if (ImGui::BeginCombo("Listener Type", current_listener_name.c_str())) {
+        for (auto &name : listenerNames) {
+          bool isSelected = (current_listener_name == name);
+          if (ImGui::Selectable(name.c_str(), isSelected)) {
+            current_listener_name = name;
+          }
+          if (isSelected) {
+            ImGui::SetItemDefaultFocus();
+          }
+        }
+        ImGui::EndCombo();
+      }
+
+      static auto *listener =
+          swarm::BaseContactListener::GetListenerByName(current_listener_name);
+
       // Get drone configuration for test
       ImGui::SeparatorText("Drone Configuration");
       swarm::DroneConfiguration *smallDrone = new swarm::DroneConfiguration(
           25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f);
+
+      auto targetNames = swarm::TargetFactory::getTargetNames();
+      std::string current_target_name = targetNames[0];
+      // Get target type from TargetFactory Registry
+      if (ImGui::BeginCombo("Target Type", current_target_name.c_str())) {
+        for (auto &name : targetNames) {
+          bool isSelected = (current_target_name == name);
+          if (ImGui::Selectable(name.c_str(), isSelected)) {
+            current_target_name = name;
+          }
+          if (isSelected) {
+            ImGui::SetItemDefaultFocus();
+          }
+        }
+        ImGui::EndCombo();
+      }
 
       // Set number of drones
       ImGui::InputInt("Drone Count", &new_drone_count);
@@ -327,9 +364,9 @@ class QueueSimulator : public Test {
       // create new_config and add it to the queue
       if (ImGui::Button("Add Test", ImVec2(120, 0))) {
         swarm::TestConfig new_config = {
-            current_name,    new_params,       smallDrone,     new_map,
-            new_drone_count, new_target_count, new_time_limit,
-        };
+            current_name,   new_params,          smallDrone,
+            new_map,        new_drone_count,     new_target_count,
+            new_time_limit, current_target_name, listener};
         queue_.push(new_config);
         added_new_test_ = true;
         ImGui::CloseCurrentPopup();
