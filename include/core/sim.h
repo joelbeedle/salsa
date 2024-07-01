@@ -132,6 +132,7 @@ class Sim {
   // get targets
   std::vector<std::shared_ptr<Target>>& getTargets();
   std::vector<Target*>& getTargetsFoundThisStep();
+  int countFoundTargets();
 
   // Box2D functions
   void setContactListener(BaseContactListener& listener);

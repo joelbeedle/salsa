@@ -1,7 +1,9 @@
 #include "core/sim.h"
 
-#include "behaviours/registry.h"
+#include <algorithm>
+#include <execution>
 
+#include "behaviours/registry.h"
 namespace swarm {
 
 Sim::Sim(b2World *world, int drone_count, int target_count,
@@ -104,7 +106,7 @@ void Sim::update() {
                           {"velocity", {velocity.x, velocity.y}}});
       }
     }
-    int i = 0;
+    int i = countFoundTargets();
     nlohmann::json old_message = {{"targets_found", i}};
     if (num_time_steps_ >= log_interval_) {
       nlohmann::json message;
@@ -343,6 +345,11 @@ const DroneConfiguration *Sim::drone_configuration() const {
 
 std::vector<Target *> &Sim::getTargetsFoundThisStep() {
   return targets_found_this_step_;
+}
+
+int Sim::countFoundTargets() {
+  return std::count_if(targets_.begin(), targets_.end(),
+                       [](auto &target) { return target->isFound(); });
 }
 
 void Sim::setCurrentDroneConfiguration(DroneConfiguration &configuration) {
