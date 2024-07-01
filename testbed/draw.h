@@ -92,7 +92,7 @@ class DebugDraw : public b2Draw {
                    const std::vector<b2Color> &colors,
                    const std::vector<int> &changedIDs);
   void DrawAllTargets(const std::vector<b2Vec2> &positions,
-                      const std::vector<b2Color> &colors);
+                      const std::vector<b2Color> &colors, const float radius);
   void DrawText(int x, int y, const char *string);
 
   void Flush();

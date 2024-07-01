@@ -11,22 +11,7 @@ Tree::Tree(b2World *world, const b2Vec2 &position, int treeID, bool diseased,
       diseased(diseased),
       mapped(mapped),
       radius(radius) {
-  // Create Box2D fixture
-  create_fixture();
-  id = treeID;
-  id_prefix = 'T';
-  // Set diseased status of dree
-  float infectionChance = 0.05f;
-  float randomValue =
-      static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
-  this->diseased = randomValue < infectionChance ? true : diseased;
-
-  // CollisionManager::registerType(typeid(Tree), {typeid(Drone)});
-}
-
-Tree::~Tree() {}
-
-void Tree::create_fixture() {
+  // Create the sensor for the tree Target.
   b2CircleShape shape;
   shape.m_radius = radius_;
 
@@ -43,4 +28,8 @@ void Tree::create_fixture() {
 
   fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(userData);
   body_->CreateFixture(&fixtureDef);
+  id = treeID;
+  id_prefix = 'T';
 }
+
+Tree::~Tree() {}

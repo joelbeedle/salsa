@@ -47,13 +47,11 @@ class FlockingBehaviour : public Behaviour {
   void execute(const std::vector<std::unique_ptr<Drone>> &drones,
                Drone &currentDrone) override {
     // Using ray casting to find neighbours and obstacles
-    DroneQueryCallback queryCallback;
-    b2AABB aabb = currentDrone.getViewSensor()->GetAABB(0);
-    currentDrone.getBody()->GetWorld()->QueryAABB(&queryCallback, aabb);
+    // DroneQueryCallback queryCallback;
+    // b2AABB aabb = currentDrone.getViewSensor()->GetAABB(0);
+    // currentDrone.getBody()->GetWorld()->QueryAABB(&queryCallback, aabb);
     RayCastCallback callback;
-    if (queryCallback.foundWalls.size() > 0) {
-      performRayCasting(currentDrone, callback);
-    }
+    performRayCasting(currentDrone, callback);
     std::vector<b2Vec2> obstaclePoints = callback.obstaclePoints;
     b2Vec2 alignSteering(0, 0);
     b2Vec2 cohereSteering(0, 0);

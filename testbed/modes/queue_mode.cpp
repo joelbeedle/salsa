@@ -37,10 +37,10 @@ class QueueSimulator : public Test {
   bool pause = false;
   bool next_frame = false;
   swarm::TestQueue queue_;
-  std::vector<swarm::Target *> targets;
+  std::vector<std::unique_ptr<swarm::Target>> targets;
   std::vector<b2Vec2> target_positions_;
   std::vector<b2Color> target_colors_;
-
+  float target_radius_ = 10.0f;
   bool add_new_test_ = false;
   bool added_new_test_ = false;
   bool add_test_permutation_ = false;
@@ -102,7 +102,12 @@ class QueueSimulator : public Test {
     int size = targets.size();
     target_positions_.reserve(size);
     target_colors_.reserve(size);
+    bool radius_set = false;
     for (auto &target : targets) {
+      if (!radius_set) {
+        target_radius_ = target->getRadius();
+        radius_set = true;
+      }
       target_positions_.push_back(target->getPosition());
       target_colors_.push_back(falseColour);
     }
@@ -182,12 +187,7 @@ class QueueSimulator : public Test {
     pause = settings.m_pause;
     std::vector<int> foundIds;
     for (int i = 0; i < settings.m_simulationSpeed; i++) {
-      m_world->Step(timeStep, settings.m_velocityIterations,
-                    settings.m_positionIterations);
       sim->update();
-      if (timeStep > 0.0f) {
-        ++m_stepCount;
-      }
     }
 
     for (auto &target : sim->getTargetsFoundThisStep()) {
@@ -782,7 +782,8 @@ class QueueSimulator : public Test {
             std::vector<int> foundTreeIDs) {
     if (draw_targets_) {
       if (first_run_) {
-        debugDraw->DrawAllTargets(target_positions_, target_colors_);
+        debugDraw->DrawAllTargets(target_positions_, target_colors_,
+                                  target_radius_);
         first_run_ = false;
       } else {
         debugDraw->DrawTargets(target_positions_, target_colors_, foundTreeIDs);

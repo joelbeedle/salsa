@@ -93,8 +93,8 @@ void user() {
   //                         "permutations.json");
   // queue.addPermutedTests(config, loaded_permutations,
   // loaded_parameter_names);
-  config.num_targets = 50;
-  config.num_drones = 100;
+  config.num_targets = 1000;
+  config.num_drones = 10;
   config.time_limit = 100.0f;
   swarm::TestQueue::push(config);
 }

@@ -105,11 +105,6 @@ void Sim::update() {
       }
     }
     int i = 0;
-    for (auto &target : targets_) {
-      if (target->isFound()) {
-        i++;
-      }
-    }
     nlohmann::json old_message = {{"targets_found", i}};
     if (num_time_steps_ >= log_interval_) {
       nlohmann::json message;
@@ -158,6 +153,7 @@ void Sim::setCurrentBehaviour(Behaviour *behaviour) {
 
 void Sim::createDrones(Behaviour &behaviour, DroneConfiguration &configuration,
                        SpawnType mode) {
+  get_logger()->info("Creating {} drones", num_drones_);
   switch (mode) {
     case SpawnType::CIRCULAR:
       createDronesCircular(behaviour, configuration);
@@ -167,6 +163,7 @@ void Sim::createDrones(Behaviour &behaviour, DroneConfiguration &configuration,
     default:
       createDronesRandom(behaviour, configuration);
   }
+  get_logger()->info("Created {} drones", drones_.size());
 }
 
 void Sim::createDronesRandom(Behaviour &behaviour, DroneConfiguration &config) {
@@ -249,6 +246,7 @@ void Sim::setDrones(std::vector<std::unique_ptr<swarm::Drone>> drones) {
 template <typename... Params>
 void Sim::createTargets(Params... params) {
   int id = 0;
+  get_logger()->info("Creating {} targets", num_targets_);
   for (int i = 0; i < num_targets_; i++) {
     float x = (rand() % static_cast<int>(border_width_));
     float y = (rand() % static_cast<int>(border_height_));
@@ -257,7 +255,7 @@ void Sim::createTargets(Params... params) {
         target_type_, world_, std::ref(position), id++, std::any());
     targets_.push_back(target);
   }
-  std::cout << targets_.size() << std::endl;
+  get_logger()->info("Created {} targets", targets_.size());
   for (auto &target : targets_) {
     if (target) {
       target->setColor(b2Color(0.5f * 0.95294f, 0.5f * 0.50588f,
@@ -266,6 +264,7 @@ void Sim::createTargets(Params... params) {
       std::cout << "Target is null" << std::endl;
     }
   }
+  get_logger()->info("Target creation complete");
 }
 
 void Sim::setTargetType(const std::string &type) { target_type_ = type; }

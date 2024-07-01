@@ -21,6 +21,9 @@ class RayCastCallback : public b2RayCastCallback {
     if (fixture->IsSensor()) {
       return -1;
     }
+    if (fixture->GetFilterData().categoryBits != 0x0001) {
+      return -1;
+    }
     b2Body *body = fixture->GetBody();
 
     // Check the body type to differentiate between drones and obstacles

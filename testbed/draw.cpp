@@ -587,6 +587,7 @@ struct GLRenderTargets {
   enum { e_maxVertices = 16 };  // Number of segments in the circle
   static const int NUM_CIRCLE_VERTICES = e_maxVertices + 2;
   float circleVertices[NUM_CIRCLE_VERTICES * 2];  // Each vertex has x and y
+  float targetRadius = 1.0f;
 
   std::vector<b2Vec2> treePositions;  // Dynamic array to hold tree positions
   std::vector<b2Color> treeColors;    // Dynamic array to hold tree colors
@@ -632,7 +633,7 @@ struct GLRenderTargets {
     circleVertices[0] = 0.0f;  // Center of circle
     circleVertices[1] = 0.0f;
     const float increment = 2.0f * M_PI / e_maxVertices;
-    const float radius = 5.0f;  // New radius for the circle
+    const float radius = targetRadius;  // New radius for the circle
     for (int i = 0; i <= e_maxVertices; ++i) {
       circleVertices[2 + i * 2] =
           cosf(i * increment) * radius;  // Scale x coordinate
@@ -673,6 +674,65 @@ struct GLRenderTargets {
     // glBindVertexArray(0);  // Unbind VAO
 
     // sCheckGLError();
+  }
+
+  void Update(float new_radius) {
+    const char *vs = R"(
+            #version 330 core
+            uniform mat4 projectionMatrix;
+            layout(location = 0) in vec2 v_position; // Base circle vertex position
+            layout(location = 1) in vec2 instancePosition; // Center position of each tree
+            layout(location = 2) in vec4 instanceColor; // Color of each tree
+
+            out vec4 f_color;
+
+            void main(void) {
+                f_color = instanceColor;
+                vec2 finalPosition = v_position + instancePosition; // Move base circle vertex by tree's center position
+                gl_Position = projectionMatrix * vec4(finalPosition, 0.0, 1.0);
+								gl_Position.z = gl_Position.w * 0.50;
+            }
+        )";
+
+    const char *fs = R"(
+            #version 330 core
+            in vec4 f_color;
+            out vec4 color;
+
+            void main(void) {
+                color = f_color;
+            }
+        )";
+    if (new_radius == targetRadius) return;
+    circleVertices[0] = 0.0f;  // Center of circle
+    circleVertices[1] = 0.0f;
+    const float increment = 2.0f * M_PI / e_maxVertices;
+    targetRadius = new_radius;
+    const float radius = targetRadius;  // New radius for the circle
+    for (int i = 0; i <= e_maxVertices; ++i) {
+      circleVertices[2 + i * 2] =
+          cosf(i * increment) * radius;  // Scale x coordinate
+      circleVertices[3 + i * 2] =
+          sinf(i * increment) * radius;  // Scale y coordinate
+    }
+    // Repeat first vertex at end to close circle
+    circleVertices[NUM_CIRCLE_VERTICES * 2 - 2] = circleVertices[2];
+    circleVertices[NUM_CIRCLE_VERTICES * 2 - 1] = circleVertices[3];
+
+    m_programId = sCreateShaderProgram(vs, fs);
+    m_projectionUniform = glGetUniformLocation(m_programId, "projectionMatrix");
+
+    glGenVertexArrays(1, &m_vaoId);
+    glGenBuffers(3, m_buffers);
+
+    glBindVertexArray(m_vaoId);
+
+    // Base circle vertices
+    glBindBuffer(GL_ARRAY_BUFFER, m_buffers[0]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(circleVertices), circleVertices,
+                 GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (void *)0);
   }
 
   void setBuffers(const std::vector<b2Vec2> &positions,
@@ -989,7 +1049,9 @@ void DebugDraw::DrawTargets(const std::vector<b2Vec2> &positions,
 }
 
 void DebugDraw::DrawAllTargets(const std::vector<b2Vec2> &positions,
-                               const std::vector<b2Color> &colors) {
+                               const std::vector<b2Color> &colors,
+                               const float radius) {
+  m_targets->Update(radius);
   m_targets->setBuffers(positions, colors);
   m_targets->UpdateTrees(positions, colors);
   glDepthMask(GL_FALSE);

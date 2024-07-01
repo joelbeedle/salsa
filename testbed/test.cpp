@@ -281,6 +281,11 @@ void Test::Step(Settings &settings) {
   // m_world->DebugDraw();
   g_debugDraw.Flush();
 
+  m_world->Step(timeStep, settings.m_velocityIterations,
+                settings.m_positionIterations);
+  if (timeStep > 0.0f) {
+    ++m_stepCount;
+  }
   if (settings.m_drawStats) {
     int32 bodyCount = m_world->GetBodyCount();
     int32 contactCount = m_world->GetContactCount();
