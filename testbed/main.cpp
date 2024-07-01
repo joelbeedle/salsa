@@ -16,7 +16,7 @@ int main(int argc, char** argv) {
   bool verbose = false;
 
   app.add_flag("--headless", headless, "Run in headless mode");
-  app.add_flag("-v,--verbose", verbose, "Verbose output");
+  app.add_flag("-v,--verbose", verbose, "Verbose output")->needs("--headless");
   CLI11_PARSE(app, argc, argv);
 
   auto testbed_console = spdlog::stdout_color_mt("testbed_console");
