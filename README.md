@@ -246,9 +246,9 @@ Now the type is fully registered and can be included in the simulation through T
 
 ### Adding a new Contact Listener
 After registering types as shown above, collisions between them can be controlled via the `swarm::BaseContactListener` class. (This class could also be extended, if the user wishes)
-To do this, in the main testbed entrypoint `main.cpp`, create a new shared instance of `swarm::BaseContactListener`:
+To do this, in the main testbed entrypoint `main.cpp`, create a new static shared pointer of `swarm::BaseContactListener` (it has to be static so it can be accessed from other scopes):
    ```cpp
-     auto contact_listener = std::make_shared<BaseContactListener>();
+     static auto contact_listener = std::make_shared<BaseContactListener>();
    ```
 Then, add collision handlers to it using the `addCollisionHandler` function. This function takes two types, which can be retrieved via `swarm::get_type<Class Name>`, and a user defined function. This function needs to be `void`, and takes two function parameters: `b2Fixture*` and `b2Fixture*`. These two fixtures represent the two fixtures that have been found to be colliding.
 
