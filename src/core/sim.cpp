@@ -76,7 +76,7 @@ Sim::Sim(TestConfig &config)
   }
 
   createDrones(*behaviour_, *drone_configuration_, SpawnType::CIRCULAR);
-  createTargets(config.target_parameters);
+  createTargets();
 }
 
 Sim::~Sim() {
@@ -129,6 +129,7 @@ void Sim::update() {
 void Sim::reset() {
   current_time_ = 0.0;
   drones_.clear();
+  targets_.clear();
   createDrones(*behaviour_, *drone_configuration_, SpawnType::CIRCULAR);
 }
 
@@ -253,12 +254,17 @@ void Sim::createTargets(Params... params) {
     float y = (rand() % static_cast<int>(border_height_));
     const b2Vec2 position(x, y);
     auto target = TargetFactory::createTarget(
-        target_type_, world_, std::ref(position), id++, params...);
+        target_type_, world_, std::ref(position), id++, std::any());
     targets_.push_back(target);
   }
+  std::cout << targets_.size() << std::endl;
   for (auto &target : targets_) {
-    target->setColor(b2Color(0.5f * 0.95294f, 0.5f * 0.50588f, 0.5f * 0.50588f,
-                             0.5f * 0.25f));
+    if (target) {
+      target->setColor(b2Color(0.5f * 0.95294f, 0.5f * 0.50588f,
+                               0.5f * 0.50588f, 0.5f * 0.25f));
+    } else {
+      std::cout << "Target is null" << std::endl;
+    }
   }
 }
 

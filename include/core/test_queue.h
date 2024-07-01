@@ -33,7 +33,6 @@ struct TestConfig {
   int num_targets;
   float time_limit;
   std::string target_type = "null";
-  std::any target_parameters;
   BaseContactListener *contact_listener;
   bool keep = true;
   // FUTURE: std::function<void()> drone_setup;

@@ -5,7 +5,8 @@ swarm::Entity::Entity(b2World *world, const b2Vec2 &position, bool is_static,
     : world_(world),
       radius_(radius),
       log_interval(log_interval),
-      type_name_(type_name) {
+      type_name_(type_name),
+      color_(b2Color(0.5, 0.5, 0.5)) {
   b2BodyDef bodyDef;
   if (is_static) {
     bodyDef.type = b2_staticBody;
