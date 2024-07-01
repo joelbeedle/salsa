@@ -3,11 +3,7 @@
 Swarm Algorithm Simulation library and Testbed, written in C++.
 
 ## Getting Started
-There is a virtual image with Ubuntu available [here](). 
-
-The `swarm-sim` files were installed on the disk image using the following instructions, and can be found at `~/swarm-sim`. You can use the CMake commands in the Installation section to re-configure and re-build this when modifying the code.
-
-There is also a Docker container available. It opens a noVNC web app on `localhost` with `swarm-sim` pre-installed.
+There is a Docker container available. It opens a noVNC web app on `localhost` with `swarm-sim` pre-installed.
 
 ### Using the Docker container
 
@@ -36,7 +32,7 @@ To use the virtual machine:
 - The testbed application can be found at `./build/testbed/`
 
 ### Installation
-`swarm-sim` was designed with to be cros-platform.
+`swarm-sim` was designed with to be cross-platform.
 
 #### Requirements
 - CMake **3.14+**
@@ -50,7 +46,7 @@ Requirements in bold are **essential**.
 
 `swarm-sim` uses the following packages directly:
 - [Box2D](https://github.com/erincatto/box2d)
-- [GLAD](https://github.com/Dav1dde/glad) and [GLFW]()
+- [GLAD](https://github.com/Dav1dde/glad) and [GLFW](https://www.glfw.org/)
 - [spdlog](https://github.com/gabime/spdlog)
 - [nlohmann_json](https://github.com/nlohmann/json)
 - [CLI11](https://github.com/CLIUtils/CLI11)
@@ -59,7 +55,7 @@ Requirements in bold are **essential**.
   
 These requirements are all either managed as git submodules, or are fetched and installed into `build/_deps` when configuring using CMake's [FetchContent](https://cmake.org/cmake/help/latest/module/FetchContent.html) module automatically, so you shouldn't have to do anything to set them up.
 
-It may also be neccessary to install some extra dependencies on Linux (or just do `sudo apt-get install -y build-essentials ubuntu-desktop`). If you get build errors, install the missing packages. 
+It may be neccessary to install some extra dependencies on Linux (or just do `sudo apt-get install -y build-essentials ubuntu-desktop`). If you get build errors, install the missing packages. 
 
 #### Steps
 - **Clone the repository and all submodules:**
@@ -250,9 +246,9 @@ Now the type is fully registered and can be included in the simulation through T
 
 ### Adding a new Contact Listener
 After registering types as shown above, collisions between them can be controlled via the `swarm::BaseContactListener` class. (This class could also be extended, if the user wishes)
-To do this, in the main testbed entrypoint `main.cpp`, create a new shared instance of `swarm::BaseContactListener`:
+To do this, in the main testbed entrypoint `main.cpp`, create a new static shared pointer of `swarm::BaseContactListener` (it has to be static so it can be accessed from other scopes):
    ```cpp
-     auto contact_listener = std::make_shared<BaseContactListener>();
+     static auto contact_listener = std::make_shared<BaseContactListener>();
    ```
 Then, add collision handlers to it using the `addCollisionHandler` function. This function takes two types, which can be retrieved via `swarm::get_type<Class Name>`, and a user defined function. This function needs to be `void`, and takes two function parameters: `b2Fixture*` and `b2Fixture*`. These two fixtures represent the two fixtures that have been found to be colliding.
 
@@ -307,42 +303,43 @@ Drone configurations are simple to add. We simply register them with the configu
 // user.cpp
 #include "testbed.h"
 
-// Create Parameters for CustomBehaviour
-auto behaviour_parameters = std::make_unique<CustomBehaviour>(250.0, 1.6, 1.0, 3.0, 3.0);
-
-// Create a drone configuration
-auto *drone_config = new swarm::DroneConfiguration(
-    25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f);
-
-// Set up the listener to listen for collisions.
-// Has to be static
-static auto listener = std::make_shared<swarm::BaseContactListener>();
-
-// Add a collision handler between Drone and Target types, when this collision is detected, userHandlingFunction is called to handle the collision.
-listener.addColisionHandler(typeid(swarm::Drone), typeid(swarm::Target), userHandlingFunction)
-
-// Set up test environment
-auto map = map::load("map.json");
-auto num_drones = 100;
-auto num_targets = 1000;
-auto time_limit = 1200.0;
-auto target_parameters = std::make_tuple(...);
-
-swarm::TestConfig test = {
-   "Custom Behaviour",
-   behaviour_parameters,
-   drone_config,
-   map,
-   num_drones,
-   num_targets,
-   target_parameters,
-   listener.get(),
-   time_limit,
-};
-
-// Create queue and add test to it
-swarm::TestQueue queue;
-queue.push(test);
+void user() {
+  // Create Parameters for CustomBehaviour
+  auto behaviour_parameters = std::make_unique<CustomBehaviour>(250.0, 1.6, 1.0, 3.0, 3.0);
+  
+  // Create a drone configuration
+  auto *drone_config = new swarm::DroneConfiguration(
+      25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f);
+  
+  // Set up the listener to listen for collisions.
+  // Has to be static
+  static auto listener = std::make_shared<swarm::BaseContactListener>();
+  
+  // Add a collision handler between Drone and Target types, when this collision is detected, userHandlingFunction is called to handle the collision.
+  listener.addColisionHandler(typeid(swarm::Drone), typeid(swarm::Target), userHandlingFunction)
+  
+  // Set up test environment
+  auto map = map::load("map.json");
+  auto num_drones = 100;
+  auto num_targets = 1000;
+  auto time_limit = 1200.0;
+  auto target_parameters = std::make_tuple(...);
+  
+  swarm::TestConfig test = {
+     "Custom Behaviour",
+     behaviour_parameters,
+     drone_config,
+     map,
+     num_drones,
+     num_targets,
+     target_parameters,
+     listener.get(),
+     time_limit,
+  };
+  
+  // Add test to the Simulator's TestQueue
+  swarm::TestQueue::push(test);
+}
 ```
 
 When the executable is ran, it will run this code first, intialising everything, before beginning the simulations.
