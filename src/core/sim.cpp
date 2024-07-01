@@ -85,7 +85,7 @@ Sim::~Sim() {
 }
 
 void Sim::update() {
-  if (current_time_ <= time_limit_) {
+  if (current_time_ <= time_limit_ && current_time_ > 0.0) {
     num_time_steps_++;
     targets_found_this_step_.clear();
     for (auto &drone : drones_) {
