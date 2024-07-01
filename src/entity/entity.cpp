@@ -24,19 +24,13 @@ struct fmt::formatter<swarm::Entity> : fmt::formatter<std::string> {
   }
 };
 
-void swarm::Entity::notifyAll(const nlohmann::json &message) {
-  auto now = std::chrono::steady_clock::now();
-  long duration =
-      std::chrono::duration_cast<std::chrono::milliseconds>(now - last_log_time)
-          .count();
-  if (duration > log_interval) {
-    nlohmann::json message_with_id;
-    message_with_id["message"] = message.dump();
-    message_with_id["id"] = id;
-    message_with_id["caller_type"] = fmt::format("{}", type_name_);
-    for (auto &observer : observers) {
-      observer->update(message_with_id);
-    }
-    last_log_time = now;
+void swarm::Entity::notifyAll(float time, const nlohmann::json &message) {
+  nlohmann::json message_with_id;
+  message_with_id["message"] = message.dump();
+  message_with_id["time"] = time;
+  message_with_id["id"] = id;
+  message_with_id["caller_type"] = fmt::format("{}", type_name_);
+  for (auto &observer : observers) {
+    observer->update(message_with_id);
   }
 }

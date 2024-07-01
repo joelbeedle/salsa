@@ -101,13 +101,12 @@ void user() {
   std::vector<std::string> loaded_parameter_names;
   // swarm::loadPermutations(loaded_permutations, loaded_parameter_names,
   //                         "permutations.json");
-  swarm::TestQueue queue;
   // queue.addPermutedTests(config, loaded_permutations,
   // loaded_parameter_names);
   config.num_targets = 500;
   config.num_drones = 100;
   config.time_limit = 100.0f;
-  queue.push(config);
+  swarm::TestQueue::push(config);
 }
 
 }  // namespace testbed

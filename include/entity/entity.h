@@ -51,7 +51,7 @@ class Entity {
     observers.push_back(observer);
   }
 
-  void notifyAll(const nlohmann::json &message);
+  void notifyAll(float time, const nlohmann::json &message);
 };
 
 }  // namespace swarm

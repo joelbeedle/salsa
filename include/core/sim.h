@@ -44,6 +44,7 @@ class Sim {
   float time_limit_ = -1.0f;
   float current_time_ = 0.0f;
   bool is_stack_test_ = false;
+  int num_time_steps_ = 0;
 
   // Drone management
   std::unordered_map<std::string, DroneParameters> all_drone_parameters_;
@@ -78,8 +79,8 @@ class Sim {
   // Logging
   Logger& logger_ = Logger::getInstance();
   std::chrono::steady_clock::time_point last_log_time;
-  std::vector<std::shared_ptr<Observer>> observers;
-  long log_interval = 100;  // milliseconds
+  std::vector<std::shared_ptr<Observer>> observers_;
+  int log_interval_ = 5;  // time steps
   // Private methods for internal use
   void createBounds();
   void applyCurrentBehaviour();
@@ -102,7 +103,7 @@ class Sim {
   void update();
   void reset();
   void addObserver(std::shared_ptr<Observer> observer) {
-    observers.push_back(observer);
+    observers_.push_back(observer);
   }
 
   // Behaviour functions

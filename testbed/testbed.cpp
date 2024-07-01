@@ -477,9 +477,8 @@ int run_headless() {
   s_testSelection = s_settings.m_testIndex;
   s_test = std::move(g_testEntries[s_settings.m_testIndex].instance());
 
-  swarm::TestQueue queue;
   while (true) {
-    auto test = queue.pop();
+    auto test = swarm::TestQueue::pop();
     swarm::Sim *sim = new swarm::Sim(test);
     std::cout << "Running test " << test.behaviour_name << std::endl;
 

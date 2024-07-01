@@ -176,11 +176,21 @@ class QueueSimulator : public Test {
   void Step(Settings &settings) override {
     // Run simulation steps here
     Test::Step(settings);
+    float timeStep =
+        settings.m_hertz > 0.0f ? 1.0f / settings.m_hertz : float(0.0f);
     pause = settings.m_pause;
     std::vector<int> foundIds;
     if (first_run_) {
     }
-    sim->update();
+    for (int i = 0; i < settings.m_simulationSpeed; i++) {
+      m_world->Step(timeStep, settings.m_velocityIterations,
+                    settings.m_positionIterations);
+      sim->update();
+      if (timeStep > 0.0f) {
+        ++m_stepCount;
+      }
+    }
+
     for (auto &target : sim->getTargetsFoundThisStep()) {
       target_colors_[target->getId()] = trueColour;
     }

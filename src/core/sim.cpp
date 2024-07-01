@@ -65,11 +65,12 @@ Sim::Sim(TestConfig &config)
   old_message["behaviour"] = current_behaviour_name_;
 
   nlohmann::json message;
+  message["time"] = current_time_;
   message["message"] = old_message.dump();
   message["id"] = 0;
   message["caller_type"] = "Sim";
 
-  for (auto &observer : observers) {
+  for (auto &observer : observers_) {
     observer->update(message);
   }
 
@@ -84,40 +85,44 @@ Sim::~Sim() {
 }
 
 void Sim::update() {
-  targets_found_this_step_.clear();
-  for (auto &drone : drones_) {
-    drone->update(drones_);
-    targets_found_this_step_.insert(targets_found_this_step_.end(),
-                                    drone->getTargetsFound().begin(),
-                                    drone->getTargetsFound().end());
-    drone->clearLists();
-    // Data logging
-    b2Vec2 position = drone->getPosition();
-    b2Vec2 velocity = drone->getVelocity();
-    drone->notifyAll({{"position", {position.x, position.y}},
-                      {"velocity", {velocity.x, velocity.y}}});
-  }
-  int i = 0;
-  for (auto &target : targets_) {
-    if (target->isFound()) {
-      i++;
+  if (current_time_ <= time_limit_) {
+    num_time_steps_++;
+    targets_found_this_step_.clear();
+    for (auto &drone : drones_) {
+      drone->update(drones_);
+      targets_found_this_step_.insert(targets_found_this_step_.end(),
+                                      drone->getTargetsFound().begin(),
+                                      drone->getTargetsFound().end());
+      drone->clearLists();
+      // Data logging
+      b2Vec2 position = drone->getPosition();
+      b2Vec2 velocity = drone->getVelocity();
+      if (num_time_steps_ >= log_interval_) {
+        drone->notifyAll(current_time_,
+                         {{"position", {position.x, position.y}},
+                          {"velocity", {velocity.x, velocity.y}}});
+      }
     }
-  }
-  const nlohmann::json &old_message = {{"targets_found", i}};
-  auto now = std::chrono::steady_clock::now();
-  long duration =
-      std::chrono::duration_cast<std::chrono::milliseconds>(now - last_log_time)
-          .count();
-  if (duration > log_interval) {
-    nlohmann::json message;
-    message["message"] = old_message.dump();
-    message["id"] = 0;
-    message["caller_type"] = "Sim";
+    int i = 0;
+    for (auto &target : targets_) {
+      if (target->isFound()) {
+        i++;
+      }
+    }
+    nlohmann::json old_message = {{"targets_found", i}};
+    if (num_time_steps_ >= log_interval_) {
+      nlohmann::json message;
+      message["time"] = current_time_;
+      message["message"] = old_message.dump();
+      message["id"] = 0;
+      message["caller_type"] = "Sim";
 
-    for (auto &observer : observers) {
-      observer->update(message);
+      for (auto &observer : observers_) {
+        observer->update(message);
+      }
+      num_time_steps_ = 0;
     }
-  }  // Simulation data logging
+  }
 }
 
 void Sim::reset() {

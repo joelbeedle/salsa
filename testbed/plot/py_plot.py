@@ -14,8 +14,8 @@ def create_dataframe(file_path: str) -> pd.DataFrame:
         data = file.read()
 
     pattern = re.compile(
-        r'\[(.*?)\] \[swarm::Drone (\d+)\] {"position":\[(.*?),(.*?)\],"velocity":\[(.*?),(.*?)\]}'
-        r'|\[(.*?)\] \[Sim 0\] {"targets_found":(\d+)}'
+        r'\[(\d+\.\d+)\] \[swarm::Drone (\d+)\] {"position":\[(.*?),(.*?)\],"velocity":\[(.*?),(.*?)\]}'
+        r'|\[(\d+\.\d+)\] \[Sim 0\] {"targets_found":(\d+)}'
     )
 
     matches = pattern.findall(data)
@@ -23,17 +23,17 @@ def create_dataframe(file_path: str) -> pd.DataFrame:
     for match in matches:
         if match[0]:  # This is a drone entry
             record = {
-                "timestamp": pd.to_datetime(match[0], format="%m-%d %H:%M:%S.%f"),
+                "timestamp": float(match[0]),
                 "drone_id": int(match[1]),
                 "position_x": float(match[2]),
                 "position_y": float(match[3]),
                 "velocity_x": float(match[4]),
                 "velocity_y": float(match[5]),
-                "targets_found": None,  # Adding None for simulation data consistency
+                "targets_found": None,  # No targets data in drone entries
             }
         else:  # This is a simulation targets found entry
             record = {
-                "timestamp": pd.to_datetime(match[6], format="%m-%d %H:%M:%S.%f"),
+                "timestamp": float(match[6]),
                 "drone_id": None,
                 "position_x": None,
                 "position_y": None,
@@ -42,7 +42,6 @@ def create_dataframe(file_path: str) -> pd.DataFrame:
                 "targets_found": int(match[7]),
             }
         records.append(record)
-
     # Creating DataFrame from records
     data_frame = pd.DataFrame(records)
     return data_frame
@@ -80,9 +79,7 @@ def plot_targets_found(data_frame, ax):
     sim_data = sim_data.sort_values("timestamp")
 
     # Convert timestamp to seconds from the start of the log
-    sim_data["time_seconds"] = (
-        sim_data["timestamp"] - sim_data["timestamp"].iloc[0]
-    ).dt.total_seconds()
+    sim_data["time_seconds"] = sim_data["timestamp"] - sim_data["timestamp"].iloc[0]
     sim_data["targets_percentage"] = (sim_data["targets_found"] / 500) * 100
 
     # Plotting
@@ -108,10 +105,12 @@ def plot_speed(data_frame, ax):
     speed_points = data_frame[["drone_id", "velocity_x", "velocity_y", "timestamp"]]
     # Plot the movement traces
     speed_points["speed"] = np.sqrt(
-        speed_points["velocity_x"] ** 2 + speed_points["velocity_y"] ** 2
+        data_frame["velocity_x"] ** 2 + speed_points["velocity_y"] ** 2
     )
 
-    speed_points["timestamp"] = pd.to_datetime(speed_points["timestamp"])
+    speed_points["timestamp"] = pd.to_datetime(
+        data_frame["timestamp"], unit="s", origin="unix"
+    )
     speed_points.set_index("timestamp", inplace=True)
 
     speed_stats = (
@@ -154,7 +153,9 @@ def plot_speed_per_drone():
     )
 
     # Ensure timestamp is set as the index and is a datetime type if it's not already
-    speed_points["timestamp"] = pd.to_datetime(speed_points["timestamp"])
+    speed_points["timestamp"] = pd.to_datetime(
+        speed_points["timestamp"], unit="s", origin="unix"
+    )
     speed_points.set_index("timestamp", inplace=True)
 
     # Create a figure and axes
@@ -377,8 +378,8 @@ def plot_both(border_size: str, bin_size: str, colorbar_location: str) -> None:
 
 
 if __name__ == "__main__":
-    td = create_dataframe("targets.log")
-    od = create_dataframe("2024-06-26_11-21-37_Flocking.log")
+    td = create_dataframe("2024-07-01_01-13-20_Flocking.log")
+    od = create_dataframe("2024-07-01_01-13-20_Flocking.log")
 
     mosaic = """
         fad
