@@ -5,6 +5,6 @@
 
 namespace testbed {
 int run();
-int run_headless();
+int run_headless(bool verbose);
 };  // namespace testbed
 #endif
