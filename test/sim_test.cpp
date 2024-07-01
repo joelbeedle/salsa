@@ -24,6 +24,8 @@ class SimTest : public ::testing::Test {
 
   void SetUp() override {
     auto mockBehaviour = std::make_unique<MockBehaviour>();
+    swarm::CollisionManager::registerType<swarm::Drone>({});
+
     swarm::behaviour::Registry::getInstance().add(behaviour_name,
                                                   std::move(mockBehaviour));
 

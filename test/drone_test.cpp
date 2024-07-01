@@ -22,6 +22,7 @@ class DroneTest : public ::testing::Test {
     MockBehaviour behaviour;
     config = new swarm::DroneConfiguration("test", 5.0f, 3.0f, 2.0f, 1.0f, 0.5f,
                                            1.0f, 10.0f);
+    swarm::CollisionManager::registerType<swarm::Drone>({});
   }
 
   void TearDown() override { delete world; }
