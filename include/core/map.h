@@ -29,7 +29,11 @@ struct Map {
 };
 
 Map load(const char *new_map_name);
+void loadAll();
 void save(Map map);
+std::vector<std::string> getMapNames();
+Map getMap(const std::string &name);
+
 std::filesystem::path getExecutablePath();
 }  // namespace map
 }  // namespace swarm

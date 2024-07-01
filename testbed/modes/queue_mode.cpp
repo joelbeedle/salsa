@@ -259,7 +259,6 @@ class QueueSimulator : public Test {
       static float new_time_limit = 0.0f;
       static bool to_change = false;
       static b2World *new_world = nullptr;
-      static swarm::map::Map new_map;
       static std::string new_target_type = "";
       // Get behaviour name for test
       if (ImGui::BeginCombo("Behaviour", current_name.c_str())) {
@@ -299,18 +298,22 @@ class QueueSimulator : public Test {
                            parameter->min_value(), parameter->max_value());
       }
 
-      // Get world map for test
-      static char str1[128] = "";
-      ImGui::InputText("Map Name", str1, IM_ARRAYSIZE(str1));
-      if (ImGui::Button("Open", ImVec2(120, 0))) {
-        new_map = swarm::map::load(str1);
-        new_world = new_map.world;
+      auto mapNames = swarm::map::getMapNames();
+      static std::string current_map_name = mapNames[0];
+      if (ImGui::BeginCombo("Map", current_map_name.c_str())) {
+        for (auto &name : mapNames) {
+          bool isSelected = (current_map_name == name);
+          if (ImGui::Selectable(name.c_str(), isSelected)) {
+            current_map_name = name;
+          }
+          if (isSelected) {
+            ImGui::SetItemDefaultFocus();
+          }
+        }
+        ImGui::EndCombo();
       }
 
-      if (new_world != nullptr) {
-        ImGui::SameLine();
-        ImGui::Text("Map Loaded");
-      }
+      auto new_map = swarm::map::getMap(current_map_name);
 
       auto listenerNames = swarm::BaseContactListener::GetListenerNames();
       static std::string current_listener_name =
@@ -376,9 +379,7 @@ class QueueSimulator : public Test {
       ImGui::InputInt("Target Count", &new_target_count);
       // Set time limit
       ImGui::InputFloat("Time Limit", &new_time_limit);
-      if (new_world == nullptr) {
-        ImGui::BeginDisabled();
-      }
+
       // create new_config and add it to the queue
       if (ImGui::Button("Add Test", ImVec2(120, 0))) {
         swarm::TestConfig new_config = {
@@ -388,11 +389,6 @@ class QueueSimulator : public Test {
         queue_.push(new_config);
         added_new_test_ = true;
         ImGui::CloseCurrentPopup();
-      }
-      if (new_world == nullptr) {
-        ImGui::EndDisabled();
-        if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip))
-          ImGui::SetTooltip("Please select a map first");
       }
 
       ImGui::SameLine();

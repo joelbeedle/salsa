@@ -23,6 +23,8 @@ int main(int argc, char** argv) {
   testbed_console->set_level(spdlog::level::info);
   // spdlog::register_logger(testbed_console);
   testbed::plot();
+  swarm::map::loadAll();
+
   if (headless) {
     // Run in headless mode
     testbed::user();

@@ -33,6 +33,8 @@ fs::path getExecutablePath() {
 #endif
 }
 
+static std::vector<Map> registry;
+
 Map load(const char *new_map_name) {
   std::filesystem::path exec_path = getExecutablePath();
   get_logger()->info("Executable path: {}", exec_path.string());
@@ -106,7 +108,45 @@ Map load(const char *new_map_name) {
     }
   }
   new_map.world = world;
+  registry.push_back(new_map);
   return new_map;
+}
+
+void loadAll() {
+  fs::path exec_path = getExecutablePath();
+  fs::path directory = exec_path / ".." / ".." / "testbed" / "maps";
+  if (!fs::exists(directory)) {
+    throw std::runtime_error("Directory does not exist: " + directory.string());
+  }
+  for (const auto &entry : fs::directory_iterator(directory)) {
+    if (entry.path().extension() == ".json") {
+      std::string map_name = entry.path().stem().string();
+      get_logger()->info("Loading map: {}", map_name);
+      try {
+        load(map_name.c_str());
+      } catch (const std::exception &e) {
+        get_logger()->error("Failed to load map: {}", map_name);
+        get_logger()->error("Error: {}", e.what());
+      }
+    }
+  }
+}
+
+std::vector<std::string> getMapNames() {
+  std::vector<std::string> names;
+  for (const auto &map : registry) {
+    names.push_back(map.name);
+  }
+  return names;
+}
+
+Map getMap(const std::string &name) {
+  for (const auto &map : registry) {
+    if (map.name == name) {
+      return map;
+    }
+  }
+  throw std::runtime_error("Map not found: " + name);
 }
 
 void save(Map new_map) {
