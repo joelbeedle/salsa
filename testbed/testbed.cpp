@@ -480,6 +480,7 @@ int run_headless() {
   while (true) {
     auto test = swarm::TestQueue::pop();
     swarm::Sim *sim = new swarm::Sim(test);
+    sim->setCurrentBehaviour(sim->current_behaviour_name());
     std::cout << "Running test " << test.behaviour_name << std::endl;
 
     while (sim->current_time() < test.time_limit) {
