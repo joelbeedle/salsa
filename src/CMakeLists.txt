@@ -19,9 +19,8 @@ FetchContent_MakeAvailable(spdlog)
 add_library(swarm-sim ${SOURCE_LIST} ${HEADER_LIST})
 
 target_link_libraries(swarm-sim PRIVATE nlohmann_json::nlohmann_json spdlog::spdlog box2d)
-target_include_directories(swarm-sim PUBLIC ${spdlog_SOURCE_DIR}/include
-    ${nlohmann_json_SOURCE_DIR}/include
- ${FREETYPE_INCLUDE_DIRS} ../include)
+target_include_directories(swarm-sim PRIVATE ${spdlog_SOURCE_DIR}/include ${nlohmann_json_SOURCE_DIR}/include ${FREETYPE_INCLUDE_DIRS})
+target_include_directories(swarm-sim PUBLIC ../include)
 
 target_compile_features(swarm-sim PUBLIC cxx_std_17)
 
