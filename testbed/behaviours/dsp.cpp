@@ -37,6 +37,8 @@ class DSPPoint {
     float density_box2d = mass / area_m2;
 
     fixtureDef.density = density_box2d;
+    fixtureDef.filter.maskBits = 0;
+    fixtureDef.filter.groupIndex = -1;
 
     body->CreateFixture(&fixtureDef);
 
