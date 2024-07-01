@@ -303,41 +303,43 @@ Drone configurations are simple to add. We simply register them with the configu
 // user.cpp
 #include "testbed.h"
 
-// Create Parameters for CustomBehaviour
-auto behaviour_parameters = std::make_unique<CustomBehaviour>(250.0, 1.6, 1.0, 3.0, 3.0);
-
-// Create a drone configuration
-auto *drone_config = new swarm::DroneConfiguration(
-    25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f);
-
-// Set up the listener to listen for collisions.
-// Has to be static
-static auto listener = std::make_shared<swarm::BaseContactListener>();
-
-// Add a collision handler between Drone and Target types, when this collision is detected, userHandlingFunction is called to handle the collision.
-listener.addColisionHandler(typeid(swarm::Drone), typeid(swarm::Target), userHandlingFunction)
-
-// Set up test environment
-auto map = map::load("map.json");
-auto num_drones = 100;
-auto num_targets = 1000;
-auto time_limit = 1200.0;
-auto target_parameters = std::make_tuple(...);
-
-swarm::TestConfig test = {
-   "Custom Behaviour",
-   behaviour_parameters,
-   drone_config,
-   map,
-   num_drones,
-   num_targets,
-   target_parameters,
-   listener.get(),
-   time_limit,
-};
-
-// Add test to the Simulator's TestQueue
-swarm::TestQueue::push(test);
+void user() {
+  // Create Parameters for CustomBehaviour
+  auto behaviour_parameters = std::make_unique<CustomBehaviour>(250.0, 1.6, 1.0, 3.0, 3.0);
+  
+  // Create a drone configuration
+  auto *drone_config = new swarm::DroneConfiguration(
+      25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f);
+  
+  // Set up the listener to listen for collisions.
+  // Has to be static
+  static auto listener = std::make_shared<swarm::BaseContactListener>();
+  
+  // Add a collision handler between Drone and Target types, when this collision is detected, userHandlingFunction is called to handle the collision.
+  listener.addColisionHandler(typeid(swarm::Drone), typeid(swarm::Target), userHandlingFunction)
+  
+  // Set up test environment
+  auto map = map::load("map.json");
+  auto num_drones = 100;
+  auto num_targets = 1000;
+  auto time_limit = 1200.0;
+  auto target_parameters = std::make_tuple(...);
+  
+  swarm::TestConfig test = {
+     "Custom Behaviour",
+     behaviour_parameters,
+     drone_config,
+     map,
+     num_drones,
+     num_targets,
+     target_parameters,
+     listener.get(),
+     time_limit,
+  };
+  
+  // Add test to the Simulator's TestQueue
+  swarm::TestQueue::push(test);
+}
 ```
 
 When the executable is ran, it will run this code first, intialising everything, before beginning the simulations.
