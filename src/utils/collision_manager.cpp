@@ -14,7 +14,7 @@ std::unordered_map<std::string, std::vector<std::string>,
                    std::hash<std::string>, std::equal_to<>>
     CollisionManager::collision_partners_;
 
-uint16_t CollisionManager::next_category_bit_ = 0x0001;
+uint16_t CollisionManager::next_category_bit_ = 2;
 
 void CollisionManager::updateMaskBits() {
   for (auto& config : configurations_) {
