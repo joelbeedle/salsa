@@ -197,62 +197,70 @@ def plot_speed_per_drone():
 
 
 def plot_nearest_neighbor_distance(data_frame, ax):
-    ax.set_xlim(0, 100)
-    points = data_frame[["drone_id", "position_x", "position_y", "timestamp"]]
+    filtered_data = data_frame[data_frame["drone_id"].notna()]
 
-    points["timestamp"] = pd.to_datetime(points["timestamp"])
-    points.set_index("timestamp", inplace=True)
+    # Convert timestamps to datetime objects and set as index
+    filtered_data["timestamp"] = pd.to_datetime(
+        filtered_data["timestamp"], unit="s", origin="unix"
+    )
+    filtered_data.set_index("timestamp", inplace=True)
 
+    # Prepare to collect stats for each timestamp
     stats = []
-    for timestamp, grp in points.groupby(level=0):
-        if len(grp) > 1:  # Ensure there are at least two drones to compare
-
-            # Calculate a pairwise distance matrix, and then fill the diagonal with
-            # infinities, so that we ignore the distance to itself (which would be zero)
-
+    for timestamp, group in filtered_data.groupby(level=0):
+        if len(group) > 1:  # Need at least two drones to calculate distances
+            # Calculate the pairwise distance matrix and set diagonal to infinity
             distances = distance_matrix(
-                grp[["position_x", "position_y"]], grp[["position_x", "position_y"]]
+                group[["position_x", "position_y"]], group[["position_x", "position_y"]]
             )
             np.fill_diagonal(distances, np.inf)
 
-            # Find the distance to the nearest neighbour
+            # Calculate the minimum distances for nearest neighbor
             min_distances = np.min(distances, axis=1)
+            stats.append(
+                {
+                    "timestamp": timestamp,
+                    "min": np.min(min_distances),
+                    "mean": np.mean(min_distances),
+                    "max": np.max(min_distances),
+                    "std": np.std(min_distances),
+                }
+            )
+            if np.std(min_distances) is None:
+                print("Standard deviation is None")
 
-            # Calculate min, mean, and max of these distances
-            min_val = np.min(min_distances)
-            mean_val = np.mean(min_distances)
-            max_val = np.max(min_distances)
-            std_val = np.std(min_distances)
+    if stats:
+        stats_df = pd.DataFrame(stats)
 
-            stats.append((timestamp, mean_val, min_val, max_val, std_val))
+        # Resample the statistics to improve smoothness in the plot
+        resampled_stats = stats_df
 
-    stats_df = pd.DataFrame(stats, columns=["timestamp", "mean", "min", "max", "std"])
-    stats_df.set_index("timestamp", inplace=True)
+        # Plot the average distances and the standard deviation
+        ax.plot(
+            resampled_stats.index,
+            resampled_stats["mean"],
+            label="Average Distance",
+            color="red",
+        )
+        ax.fill_between(
+            resampled_stats.index,
+            resampled_stats["mean"] - resampled_stats["std"],
+            resampled_stats["mean"] + resampled_stats["std"],
+            color="red",
+            alpha=0.2,
+            label="Std. Dev of Distance",
+        )
 
-    resampled_stats = (
-        stats_df.resample("1000L")
-        .agg({"min": "min", "mean": "mean", "max": "max", "std": "std"})
-        .dropna()
-    )
+        ax.set_xlim(
+            resampled_stats.index[0],
+            100,
+        )
 
-    resampled_stats.reset_index(inplace=True)
-    ax.set_ylabel("Distance (m)")
-    ax.set_xlabel("Time (s)")
-    ax.plot(
-        resampled_stats.index,
-        resampled_stats["mean"],
-        label="avg. distance",
-        color="red",
-    )
-    ax.fill_between(
-        resampled_stats.index,
-        resampled_stats["mean"] - resampled_stats["std"],
-        resampled_stats["mean"] + resampled_stats["std"],
-        color="red",
-        alpha=0.2,
-        label="distance std. dev",
-    )
-    plt.savefig("nearest_neighbor_distance.pdf")
+        ax.set_xlabel("Time (s)")
+        ax.set_ylabel("Nearest Neighbor Distance (m)")
+    else:
+        print("Not enough data points for meaningful distance calculations.")
+
     return ax
     plt.show()
 
@@ -295,7 +303,6 @@ def plot_trace(data_frame, ax, border_size: str):
 def plot_heatmap(data_frame, ax, bin_size: str, border_size: str):
     bin_size = int(bin_size)
     min_boundary = 0
-    max_boundary = 500
     step_size, minor_size = get_axis_steps(border_size)
     border_size = int(border_size)
     ax.set_xlim(0, border_size)
@@ -305,8 +312,8 @@ def plot_heatmap(data_frame, ax, bin_size: str, border_size: str):
     ax.set_yticks(np.arange(0, border_size + minor_size, minor_size), minor=True)
     ax.set_xticks(np.arange(0, border_size + minor_size, minor_size), minor=True)
     # Define the grid for the heatmap
-    x_bins = np.linspace(min_boundary, max_boundary, bin_size)
-    y_bins = np.linspace(min_boundary, max_boundary, bin_size)
+    x_bins = np.linspace(min_boundary, border_size, bin_size)
+    y_bins = np.linspace(min_boundary, border_size, bin_size)
 
     heatmap, xedges, yedges = np.histogram2d(
         data_frame["position_x"], data_frame["position_y"], bins=[x_bins, y_bins]
@@ -378,8 +385,8 @@ def plot_both(border_size: str, bin_size: str, colorbar_location: str) -> None:
 
 
 if __name__ == "__main__":
-    td = create_dataframe("2024-07-01_01-13-20_Flocking.log")
-    od = create_dataframe("2024-07-01_01-13-20_Flocking.log")
+    td = create_dataframe("2024-07-01_01-39-17_Flocking.log")
+    od = create_dataframe("2024-07-01_01-39-17_Flocking.log")
 
     mosaic = """
         fad
@@ -404,8 +411,8 @@ if __name__ == "__main__":
     plot_nearest_neighbor_distance(od, ax_dict["e"])
     fig.legend(loc="outside lower center", ncols=4)
 
-    plot_trace(od, ax_dict["c"], "500")
-    im, _ = plot_heatmap(od, ax_dict["f"], "50", "500")
+    plot_trace(od, ax_dict["c"], "4000")
+    im, _ = plot_heatmap(od, ax_dict["f"], "100", "4000")
     axins = inset_axes(
         ax_dict["f"],
         width="5%",  # width: 5% of parent_bbox width
