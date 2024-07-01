@@ -1,3 +1,5 @@
+#ifndef SWARM_TESTS_MOCK_DRONE_H
+#define SWARM_TESTS_MOCK_DRONE_H
 #include "entity/drone.h"
 #include "gmock/gmock.h"
 class MockDrone : public swarm::Drone {
@@ -9,3 +11,5 @@ class MockDrone : public swarm::Drone {
   MOCK_METHOD(void, setObstacleViewRange, (float), ());
   MOCK_METHOD(void, updateSensorRange, (), ());
 };
+
+#endif  // SWARM_TESTS_MOCK_DRONE_H
