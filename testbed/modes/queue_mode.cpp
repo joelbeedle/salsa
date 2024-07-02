@@ -59,8 +59,8 @@ class QueueSimulator : public Test {
     m_world = new b2World(b2Vec2(0.0f, 0.0f));
     sim = new swarm::Sim(m_world, 0, 0, smallDrone, 0, 0, 0);
 
-    auto &registry = swarm::behaviour::Registry::getInstance();
-    auto behaviour_names = registry.getBehaviourNames();
+    auto &registry = swarm::behaviour::Registry::get();
+    auto behaviour_names = registry.behaviour_names();
     sim->setCurrentBehaviour(behaviour_names[0]);
   }
   static std::unique_ptr<Test> Create() {
@@ -104,10 +104,10 @@ class QueueSimulator : public Test {
     bool radius_set = false;
     for (auto &target : targets) {
       if (!radius_set) {
-        target_radius_ = target->getRadius();
+        target_radius_ = target->radius();
         radius_set = true;
       }
-      target_positions_.push_back(target->getPosition());
+      target_positions_.push_back(target->position());
       target_colors_.push_back(falseColour);
     }
 
@@ -123,7 +123,7 @@ class QueueSimulator : public Test {
   }
   void AddBehaviour(const std::string &name,
                     std::unique_ptr<swarm::Behaviour> behaviour) {
-    swarm::behaviour::Registry::getInstance().add(name, std::move(behaviour));
+    swarm::behaviour::Registry::get().add(name, std::move(behaviour));
   }
 
   void SetConfiguration(swarm::DroneConfiguration *configuration) {
@@ -190,7 +190,7 @@ class QueueSimulator : public Test {
     }
 
     for (auto &target : sim->getTargetsFoundThisStep()) {
-      target_colors_[target->getId()] = trueColour;
+      target_colors_[target->id()] = trueColour;
     }
     if (!pause)
       sim->current_time() +=
@@ -249,8 +249,7 @@ class QueueSimulator : public Test {
         ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
     if (ImGui::BeginPopupModal("Add Test", NULL,
                                ImGuiWindowFlags_AlwaysAutoResize)) {
-      auto behaviourNames =
-          swarm::behaviour::Registry::getInstance().getBehaviourNames();
+      auto behaviourNames = swarm::behaviour::Registry::get().behaviour_names();
       static std::string current_name = behaviourNames[0];
       static std::string new_map_name = "";
       static int new_drone_count = 0;
@@ -262,7 +261,7 @@ class QueueSimulator : public Test {
       // Get behaviour name for test
       if (ImGui::BeginCombo("Behaviour", current_name.c_str())) {
         auto behaviourNames =
-            swarm::behaviour::Registry::getInstance().getBehaviourNames();
+            swarm::behaviour::Registry::get().behaviour_names();
 
         for (auto &name : behaviourNames) {
           bool isSelected = (current_name == name);
@@ -279,7 +278,7 @@ class QueueSimulator : public Test {
 
       // Get parameters for test
       auto chosen_behaviour =
-          swarm::behaviour::Registry::getInstance().getBehaviour(current_name);
+          swarm::behaviour::Registry::get().behaviour(current_name);
       auto chosen_params = chosen_behaviour->getParameters();
       static std::unordered_map<std::string, swarm::behaviour::Parameter *>
           new_params;
@@ -314,7 +313,7 @@ class QueueSimulator : public Test {
 
       auto new_map = swarm::map::getMap(current_map_name);
 
-      auto listenerNames = swarm::BaseContactListener::GetListenerNames();
+      auto listenerNames = swarm::BaseContactListener::getListenerNames();
       static std::string current_listener_name =
           listenerNames.empty() ? "" : listenerNames[0];
 
@@ -332,7 +331,7 @@ class QueueSimulator : public Test {
       }
 
       static auto *listener =
-          swarm::BaseContactListener::GetListenerByName(current_listener_name);
+          swarm::BaseContactListener::getListenerByName(current_listener_name);
 
       // Get drone configuration for test
       auto droneConfigNames =
@@ -402,8 +401,7 @@ class QueueSimulator : public Test {
         ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
     if (ImGui::BeginPopupModal("Add Test Permutation", NULL,
                                ImGuiWindowFlags_AlwaysAutoResize)) {
-      auto behaviourNames =
-          swarm::behaviour::Registry::getInstance().getBehaviourNames();
+      auto behaviourNames = swarm::behaviour::Registry::get().behaviour_names();
       static std::string current_name = behaviourNames[0];
       static std::string new_map_name = "";
       static int new_drone_count = 0;
@@ -430,7 +428,7 @@ class QueueSimulator : public Test {
 
       // Get parameters for test
       auto chosen_behaviour =
-          swarm::behaviour::Registry::getInstance().getBehaviour(current_name);
+          swarm::behaviour::Registry::get().behaviour(current_name);
       auto chosen_params = chosen_behaviour->getParameters();
       static std::unordered_map<std::string, std::string> input_storage;
       static std::vector<std::string> parameter_names;
@@ -615,7 +613,7 @@ class QueueSimulator : public Test {
       if (ImGui::BeginCombo("Behaviours",
                             sim->current_behaviour_name().c_str())) {
         auto behaviourNames =
-            swarm::behaviour::Registry::getInstance().getBehaviourNames();
+            swarm::behaviour::Registry::get().behaviour_names();
 
         for (auto &name : behaviourNames) {
           bool isSelected = (sim->current_behaviour_name() == name);
@@ -632,7 +630,7 @@ class QueueSimulator : public Test {
 
       ImGui::SeparatorText("Behaviour Settings");
       bool changed = false;
-      auto behaviour = swarm::behaviour::Registry::getInstance().getBehaviour(
+      auto behaviour = swarm::behaviour::Registry::get().behaviour(
           sim->current_behaviour_name());
       for (auto [name, parameter] : behaviour->getParameters()) {
         changed |=
@@ -821,9 +819,8 @@ class QueueSimulator : public Test {
             swarm::Drone *drone = userData->as<swarm::Drone>();
             // Draw drone
             b2Vec2 position = body->GetPosition();
-            debugDraw->DrawSolidCircle(position, drone->getRadius(),
-                                       transform.q.GetXAxis(),
-                                       drone->getColor());
+            debugDraw->DrawSolidCircle(position, drone->radius(),
+                                       transform.q.GetXAxis(), drone->color());
           } else if (name.compare("b2_groundBody") && draw_targets_) {
             // swarm::Target *target = userData->as<swarm::Target>();
             // b2Vec2 position = body->GetPosition();

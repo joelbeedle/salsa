@@ -1,9 +1,9 @@
 #ifndef SWARM_SIM_CORE_SIMULATION_H
 #define SWARM_SIM_CORE_SIMULATION_H
+#include <box2d/box2d.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
-#include "box2d/box2d.h"
 #include "salsa/behaviours/behaviour.h"
 #include "salsa/behaviours/parameter.h"
 #include "salsa/behaviours/registry.h"

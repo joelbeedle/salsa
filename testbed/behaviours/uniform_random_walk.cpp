@@ -45,7 +45,7 @@ class UniformRandomWalkBehaviour : public Behaviour {
                Drone &currentDrone) override {
     if (droneTimers.find(&currentDrone) == droneTimers.end()) {
       droneTimers[&currentDrone] = DroneTimerInfo();
-      droneTimers[&currentDrone].desiredVelocity = currentDrone.getVelocity();
+      droneTimers[&currentDrone].desiredVelocity = currentDrone.velocity();
     }
     RayCastCallback callback;
     performRayCasting(currentDrone, callback);
@@ -66,19 +66,19 @@ class UniformRandomWalkBehaviour : public Behaviour {
 
       // New desired velocity based on random angle
       timerInfo.desiredVelocity =
-          b2Vec2(std::cos(angle) * currentDrone.getMaxSpeed(),
-                 std::sin(angle) * currentDrone.getMaxSpeed());
+          b2Vec2(std::cos(angle) * currentDrone.max_speed(),
+                 std::sin(angle) * currentDrone.max_speed());
 
       // Reset the timer and generate a new random time interval for this drone
       timerInfo.elapsedTimeSinceLastForce = 0.0f;
       timerInfo.randomTimeInterval = generateRandomTimeInterval();
     }
 
-    steer = timerInfo.desiredVelocity - currentDrone.getVelocity();
-    clampMagnitude(steer, currentDrone.getMaxForce());
+    steer = timerInfo.desiredVelocity - currentDrone.velocity();
+    clampMagnitude(steer, currentDrone.max_force());
 
-    b2Vec2 velocity = currentDrone.getVelocity();
-    b2Vec2 position = currentDrone.getPosition();
+    b2Vec2 velocity = currentDrone.velocity();
+    b2Vec2 position = currentDrone.position();
     b2Vec2 acceleration = (force_weight_ * steer) +
                           (obstacle_avoidance_weight_ * obstacleAvoidance) +
                           neighbourAvoidance;
@@ -88,14 +88,14 @@ class UniformRandomWalkBehaviour : public Behaviour {
     b2Vec2 dir(velocity.x / speed, velocity.y / speed);
 
     // Clamp speed
-    if (speed > currentDrone.getMaxSpeed()) {
-      speed = currentDrone.getMaxSpeed();
+    if (speed > currentDrone.max_speed()) {
+      speed = currentDrone.max_speed();
     } else if (speed < 0) {
       speed = 0.001f;
     }
     velocity = b2Vec2(dir.x * speed, dir.y * speed);
 
-    currentDrone.getBody()->SetLinearVelocity(velocity);
+    currentDrone.body()->SetLinearVelocity(velocity);
   }
 
  private:
@@ -107,6 +107,6 @@ class UniformRandomWalkBehaviour : public Behaviour {
 auto uniform_random_walk =
     std::make_unique<swarm::UniformRandomWalkBehaviour>(10.0f, 1.0f, 1.0f);
 
-auto uniform_random_walk_behaviour = behaviour::Registry::getInstance().add(
+auto uniform_random_walk_behaviour = behaviour::Registry::get().add(
     "Uniform Random Walk", std::move(uniform_random_walk));
 }  // namespace swarm

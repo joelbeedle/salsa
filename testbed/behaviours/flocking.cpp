@@ -49,7 +49,7 @@ class FlockingBehaviour : public Behaviour {
     // Using ray casting to find neighbours and obstacles
     // DroneQueryCallback queryCallback;
     // b2AABB aabb = currentDrone.getViewSensor()->GetAABB(0);
-    // currentDrone.getBody()->GetWorld()->QueryAABB(&queryCallback, aabb);
+    // currentDrone.body()->GetWorld()->QueryAABB(&queryCallback, aabb);
     RayCastCallback callback;
     performRayCasting(currentDrone, callback);
     std::vector<b2Vec2> obstaclePoints = callback.obstaclePoints;
@@ -61,23 +61,23 @@ class FlockingBehaviour : public Behaviour {
     int32 neighbours = 0;
     b2Vec2 centreOfMass(0, 0);
 
-    float currentMaxSpeed = currentDrone.getMaxSpeed();
-    float currentMaxForce = currentDrone.getMaxForce();
+    float currentMaxSpeed = currentDrone.max_speed();
+    float currentMaxForce = currentDrone.max_force();
 
     for (auto &drone : drones) {
-      b2Body *body = drone->getBody();
+      b2Body *body = drone->body();
       b2Vec2 bodyPos = body->GetPosition();
-      if (body == currentDrone.getBody()) {
+      if (body == currentDrone.body()) {
         continue;
       }
-      float distance = b2Distance(currentDrone.getPosition(), bodyPos);
-      if (distance > currentDrone.getDroneDetectionRange()) {
+      float distance = b2Distance(currentDrone.position(), bodyPos);
+      if (distance > currentDrone.drone_detection_range()) {
         continue;
       }
       alignAvgVec += body->GetLinearVelocity();
       centreOfMass += bodyPos;
       if (distance < separation_distance_ && distance > 0) {
-        b2Vec2 diff = currentDrone.getPosition() - bodyPos;
+        b2Vec2 diff = currentDrone.position() - bodyPos;
         diff.Normalize();
         diff.x /= distance;
         diff.y /= distance;
@@ -93,17 +93,17 @@ class FlockingBehaviour : public Behaviour {
       alignAvgVec.Normalize();
       alignAvgVec *= currentMaxSpeed;
 
-      alignSteering = alignAvgVec - currentDrone.getVelocity();
+      alignSteering = alignAvgVec - currentDrone.velocity();
       clampMagnitude(alignSteering, currentMaxForce);
 
       centreOfMass.x /= neighbours;
       centreOfMass.y /= neighbours;
-      b2Vec2 vecToCom = centreOfMass - currentDrone.getPosition();
+      b2Vec2 vecToCom = centreOfMass - currentDrone.position();
 
       vecToCom.Normalize();
       vecToCom *= currentMaxSpeed;
 
-      cohereSteering = vecToCom - currentDrone.getVelocity();
+      cohereSteering = vecToCom - currentDrone.velocity();
       clampMagnitude(cohereSteering, currentMaxForce);
       separateAvgVec.x /= neighbours;
       separateAvgVec.y /= neighbours;
@@ -112,7 +112,7 @@ class FlockingBehaviour : public Behaviour {
       separateAvgVec.Normalize();
       separateAvgVec *= currentMaxSpeed;
 
-      separateSteering = separateAvgVec - currentDrone.getVelocity();
+      separateSteering = separateAvgVec - currentDrone.velocity();
       clampMagnitude(separateSteering, currentMaxForce);
     }
 
@@ -125,8 +125,8 @@ class FlockingBehaviour : public Behaviour {
         (alignment_weight_ * alignment) + (separation_weight_ * separation) +
         (cohesion_weight_ * cohesion) +
         (obstacle_avoidance_weight_ * obstacleAvoidance) + 0.0 * toPoint;
-    b2Vec2 velocity = currentDrone.getVelocity();
-    b2Vec2 position = currentDrone.getPosition();
+    b2Vec2 velocity = currentDrone.velocity();
+    b2Vec2 position = currentDrone.position();
 
     velocity += acceleration;
     float speed = 0.001f + velocity.Length();
@@ -140,7 +140,7 @@ class FlockingBehaviour : public Behaviour {
     }
     velocity = b2Vec2(dir.x * speed, dir.y * speed);
 
-    currentDrone.getBody()->SetLinearVelocity(velocity);
+    currentDrone.body()->SetLinearVelocity(velocity);
     acceleration.SetZero();
   }
 
@@ -152,7 +152,7 @@ class FlockingBehaviour : public Behaviour {
     int32 neighbours = 0;
 
     for (auto &drone : drones) {
-      avgVec += drone->getBody()->GetLinearVelocity();
+      avgVec += drone->body()->GetLinearVelocity();
       neighbours++;
     }
 
@@ -160,10 +160,10 @@ class FlockingBehaviour : public Behaviour {
       avgVec.x /= neighbours;
       avgVec.y /= neighbours;
       avgVec.Normalize();
-      avgVec *= currentDrone.getMaxSpeed();
+      avgVec *= currentDrone.max_speed();
 
-      steering = avgVec - currentDrone.getVelocity();
-      clampMagnitude(steering, currentDrone.getMaxForce());
+      steering = avgVec - currentDrone.velocity();
+      clampMagnitude(steering, currentDrone.max_force());
     }
     return steering;
   }
@@ -174,11 +174,10 @@ class FlockingBehaviour : public Behaviour {
     int32 neighbours = 0;
 
     for (auto &drone : drones) {
-      float distance = b2Distance(currentDrone.getPosition(),
-                                  drone->getBody()->GetPosition());
+      float distance =
+          b2Distance(currentDrone.position(), drone->body()->GetPosition());
       if (distance < separation_distance_ && distance > 0) {
-        b2Vec2 diff =
-            currentDrone.getPosition() - drone->getBody()->GetPosition();
+        b2Vec2 diff = currentDrone.position() - drone->body()->GetPosition();
         diff.Normalize();
         diff.x /= distance;
         diff.y /= distance;
@@ -193,10 +192,10 @@ class FlockingBehaviour : public Behaviour {
     }
     if (avgVec.Length() > 0) {
       avgVec.Normalize();
-      avgVec *= currentDrone.getMaxSpeed();
+      avgVec *= currentDrone.max_speed();
 
-      steering = avgVec - currentDrone.getVelocity();
-      clampMagnitude(steering, currentDrone.getMaxForce());
+      steering = avgVec - currentDrone.velocity();
+      clampMagnitude(steering, currentDrone.max_force());
     }
 
     return steering;
@@ -208,26 +207,26 @@ class FlockingBehaviour : public Behaviour {
     int32 neighbours = 0;
 
     for (auto &drone : drones) {
-      centreOfMass += drone->getBody()->GetPosition();
+      centreOfMass += drone->body()->GetPosition();
       neighbours++;
     }
 
     if (neighbours > 0) {
       centreOfMass.x /= neighbours;
       centreOfMass.y /= neighbours;
-      b2Vec2 vecToCom = centreOfMass - currentDrone.getPosition();
+      b2Vec2 vecToCom = centreOfMass - currentDrone.position();
 
       vecToCom.Normalize();
-      vecToCom *= currentDrone.getMaxSpeed();
+      vecToCom *= currentDrone.max_speed();
 
-      steering = vecToCom - currentDrone.getVelocity();
-      clampMagnitude(steering, currentDrone.getMaxForce());
+      steering = vecToCom - currentDrone.velocity();
+      clampMagnitude(steering, currentDrone.max_force());
     }
     return steering;
   }
 };
 
-auto flocking = behaviour::Registry::getInstance().add(
+auto flocking = behaviour::Registry::get().add(
     "Flocking",
     std::make_unique<swarm::FlockingBehaviour>(250.0, 1.6, 1.0, 3.0, 4.0));
 }  // namespace swarm

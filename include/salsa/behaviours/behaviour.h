@@ -14,13 +14,12 @@
 #include "salsa/utils/raycastcallback.h"
 namespace swarm {
 
-// Forward declaration for `Drone` class
 class Drone;
-// namespace behaviours {
 
 /// @brief Abstract base class for all swarm behaviours to inherit from.
 class Behaviour {
  protected:
+  /// @brief Map of parameter names to their settings.
   std::unordered_map<std::string, behaviour::Parameter *> parameters_;
 
  public:
@@ -50,26 +49,11 @@ class Behaviour {
   /// context-specific cleanup.
   virtual void clean(const std::vector<std::unique_ptr<Drone>> &drones) {}
 
-  void setParameters(const std::unordered_map<std::string, float> &parameters) {
-    std::unordered_map<std::string, behaviour::Parameter *> parameters_ =
-        getParameters();
-    for (auto &[name, val] : parameters) {
-      if (parameters_.find(name) != parameters_.end()) {
-        parameters_[name]->value() = val;
-      }
-    }
-  }
+  void setParameters(const std::unordered_map<std::string, float> &parameters);
 
   void setParameters(
       const std::unordered_map<std::string, swarm::behaviour::Parameter *>
-          &parameters) {
-    auto parameters_ = getParameters();  // Update the existing parameters
-    for (const auto &[name, val] : parameters) {
-      if (parameters_.find(name) != parameters_.end()) {
-        parameters_[name] = val;
-      }
-    }
-  }
+          &parameters);
 
  protected:
   /// @brief Clamps the magnitude of a vector to a specified maximum.

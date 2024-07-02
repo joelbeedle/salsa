@@ -10,12 +10,11 @@ using swarm::behaviour::Registry;
 
 class RegistryTest : public ::testing::Test {
  protected:
-  Registry& registry =
-      Registry::getInstance();  // Singleton instance for all tests
+  Registry& registry = Registry::get();  // Singleton instance for all tests
 
   void SetUp() override {
     // Ensure the registry is clean before each test
-    auto names = registry.getBehaviourNames();
+    auto names = registry.behaviour_names();
     for (const auto& name : names) {
       registry.remove(name);
     }
@@ -23,8 +22,8 @@ class RegistryTest : public ::testing::Test {
 };
 
 TEST_F(RegistryTest, SingletonInstance) {
-  Registry& registry1 = Registry::getInstance();
-  Registry& registry2 = Registry::getInstance();
+  Registry& registry1 = Registry::get();
+  Registry& registry2 = Registry::get();
   EXPECT_EQ(&registry1, &registry2);  // Both instances should be the same
 }
 
@@ -33,12 +32,12 @@ TEST_F(RegistryTest, AddAndGetBehaviour) {
   auto* rawPointer = mockBehaviour.get();
   registry.add("TestBehaviour", std::move(mockBehaviour));
 
-  Behaviour* retrievedBehaviour = registry.getBehaviour("TestBehaviour");
+  Behaviour* retrievedBehaviour = registry.behaviour("TestBehaviour");
   EXPECT_EQ(retrievedBehaviour, rawPointer);
 }
 
 TEST_F(RegistryTest, RetrieveNonExistentBehaviour) {
-  Behaviour* retrievedBehaviour = registry.getBehaviour("NonExistent");
+  Behaviour* retrievedBehaviour = registry.behaviour("NonExistent");
   EXPECT_EQ(retrievedBehaviour, nullptr);
 }
 
@@ -49,7 +48,7 @@ TEST_F(RegistryTest, AddDuplicateBehaviour) {
   auto mockBehaviour2 = std::make_unique<MockBehaviour>();
   registry.add("TestBehaviour", std::move(mockBehaviour2));
 
-  Behaviour* retrievedBehaviour = registry.getBehaviour("TestBehaviour");
+  Behaviour* retrievedBehaviour = registry.behaviour("TestBehaviour");
   EXPECT_NE(retrievedBehaviour, nullptr);
 }
 
@@ -59,7 +58,7 @@ TEST_F(RegistryTest, RemoveBehaviour) {
 
   registry.remove("TestBehaviour");
 
-  Behaviour* retrievedBehaviour = registry.getBehaviour("TestBehaviour");
+  Behaviour* retrievedBehaviour = registry.behaviour("TestBehaviour");
   EXPECT_EQ(retrievedBehaviour, nullptr);
 }
 
@@ -73,7 +72,7 @@ TEST_F(RegistryTest, ListBehaviourNames) {
   registry.add("Behaviour2", std::make_unique<MockBehaviour>());
   registry.add("Behaviour3", std::make_unique<MockBehaviour>());
 
-  auto names = registry.getBehaviourNames();
+  auto names = registry.behaviour_names();
   EXPECT_EQ(names.size(), 3);
   EXPECT_NE(std::find(names.begin(), names.end(), "Behaviour1"), names.end());
   EXPECT_NE(std::find(names.begin(), names.end(), "Behaviour2"), names.end());

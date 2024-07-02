@@ -60,8 +60,7 @@ class SandboxSimulator : public Test {
     m_world = new b2World(b2Vec2(0.0f, 0.0f));
     sim = new swarm::Sim(m_world, 1, 0, smallDrone, 2000, 2000, 1000.0);
     new_count = 1;
-    auto &registry = swarm::behaviour::Registry::getInstance();
-    auto behaviour_names = registry.getBehaviourNames();
+    auto behaviour_names = swarm::behaviour::Registry::get().behaviour_names();
     sim->setCurrentBehaviour(behaviour_names[0]);
     // m_world->SetContactListener(contactListener_);
   }
@@ -103,7 +102,7 @@ class SandboxSimulator : public Test {
   }
   void AddBehaviour(const std::string &name,
                     std::unique_ptr<swarm::Behaviour> behaviour) {
-    swarm::behaviour::Registry::getInstance().add(name, std::move(behaviour));
+    swarm::behaviour::Registry::get().add(name, std::move(behaviour));
   }
 
   void SetConfiguration(swarm::DroneConfiguration *configuration) {
@@ -153,7 +152,7 @@ class SandboxSimulator : public Test {
       if (ImGui::BeginCombo("Behaviours",
                             sim->current_behaviour_name().c_str())) {
         auto behaviourNames =
-            swarm::behaviour::Registry::getInstance().getBehaviourNames();
+            swarm::behaviour::Registry::get().behaviour_names();
 
         for (auto &name : behaviourNames) {
           bool isSelected = (sim->current_behaviour_name() == name);
@@ -170,7 +169,7 @@ class SandboxSimulator : public Test {
 
       ImGui::SeparatorText("Behaviour Settings");
       bool changed = false;
-      auto behaviour = swarm::behaviour::Registry::getInstance().getBehaviour(
+      auto behaviour = swarm::behaviour::Registry::get().behaviour(
           sim->current_behaviour_name());
       for (auto [name, parameter] : behaviour->getParameters()) {
         changed |=
@@ -267,9 +266,8 @@ class SandboxSimulator : public Test {
             swarm::Drone *drone = userData->as<swarm::Drone>();
             // Draw drone
             b2Vec2 position = body->GetPosition();
-            debugDraw->DrawSolidCircle(position, drone->getRadius(),
-                                       transform.q.GetXAxis(),
-                                       drone->getColor());
+            debugDraw->DrawSolidCircle(position, drone->radius(),
+                                       transform.q.GetXAxis(), drone->color());
           } else if (name.compare("b2_groundBody") && draw_targets_) {
             // swarm::Target *target = userData->as<swarm::Target>();
             // b2Vec2 position = body->GetPosition();

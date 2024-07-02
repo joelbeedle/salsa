@@ -30,21 +30,21 @@ class DroneTest : public ::testing::Test {
 
 TEST_F(DroneTest, DroneInitialization) {
   swarm::Drone drone(world, b2Vec2(0, 0), behaviour, *config);
-  EXPECT_FLOAT_EQ(drone.getViewRange(), 5.0f);
-  EXPECT_FLOAT_EQ(drone.getMaxSpeed(), 2.0f);
+  EXPECT_FLOAT_EQ(drone.camera_view_range(), 5.0f);
+  EXPECT_FLOAT_EQ(drone.max_speed(), 2.0f);
   EXPECT_NE(world, nullptr);
   EXPECT_EQ(world->GetBodyCount(), 1);
-  EXPECT_NE(drone.getBody(), nullptr);
+  EXPECT_NE(drone.body(), nullptr);
 }
 
 TEST_F(DroneTest, DroneFactoryInitialisation) {
   auto drone =
       swarm::DroneFactory::createDrone(world, b2Vec2(0, 0), behaviour, *config);
-  EXPECT_FLOAT_EQ(drone->getViewRange(), 5.0f);
-  EXPECT_FLOAT_EQ(drone->getMaxSpeed(), 2.0f);
+  EXPECT_FLOAT_EQ(drone->camera_view_range(), 5.0f);
+  EXPECT_FLOAT_EQ(drone->max_speed(), 2.0f);
   EXPECT_NE(world, nullptr);
   EXPECT_EQ(world->GetBodyCount(), 1);
-  EXPECT_NE(drone->getBody(), nullptr);
+  EXPECT_NE(drone->body(), nullptr);
 }
 
 TEST_F(DroneTest, DroneBehaviourExecution) {
@@ -57,7 +57,7 @@ TEST_F(DroneTest, UpdateDroneBehaviour) {
   swarm::Drone drone(world, b2Vec2(0, 0), behaviour, *config);
   MockBehaviour newBehaviour;
   EXPECT_CALL(newBehaviour, execute(_, _)).Times(1);
-  drone.setBehaviour(newBehaviour);
+  drone.behaviour() = &newBehaviour;
   drone.update({});
 }
 
@@ -77,11 +77,11 @@ TEST_F(DroneTest, MultipleDroneBehaviourExecution) {
 TEST_F(DroneTest, UpdateSensorRange) {
   swarm::Drone drone(world, b2Vec2(0, 0), behaviour, *config);
   float newRange = 10.0f;
-  drone.setViewRange(newRange);
+  drone.camera_view_range(newRange);
   drone.updateSensorRange();
 
   // Check if sensor range updated correctly
-  auto fixture = drone.getBody()->GetFixtureList();
+  auto fixture = drone.body()->GetFixtureList();
   while (fixture) {
     if (fixture->IsSensor()) {
       auto shape = static_cast<b2CircleShape *>(fixture->GetShape());

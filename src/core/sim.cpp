@@ -56,7 +56,7 @@ Sim::Sim(TestConfig &config)
   addObserver(std::shared_ptr<Logger>(&logger_, [](auto *) {}));
 
   auto behaviour_pointer =
-      behaviour::Registry::getInstance().getBehaviour(current_behaviour_name_);
+      behaviour::Registry::get().behaviour(current_behaviour_name_);
   auto visitor = [&](auto &&arg) { behaviour_pointer->setParameters(arg); };
   std::visit(visitor, config.parameters);
   nlohmann::json old_message;
@@ -94,12 +94,12 @@ void Sim::update() {
     for (auto &drone : drones_) {
       drone->update(drones_);
       targets_found_this_step_.insert(targets_found_this_step_.end(),
-                                      drone->getTargetsFound().begin(),
-                                      drone->getTargetsFound().end());
+                                      drone->targets_found().begin(),
+                                      drone->targets_found().end());
       drone->clearLists();
       // Data logging
-      b2Vec2 position = drone->getPosition();
-      b2Vec2 velocity = drone->getVelocity();
+      b2Vec2 position = drone->position();
+      b2Vec2 velocity = drone->velocity();
       if (num_time_steps_ >= log_interval_) {
         drone->notifyAll(current_time_,
                          {{"position", {position.x, position.y}},
@@ -132,18 +132,18 @@ void Sim::reset() {
 
 void Sim::applyCurrentBehaviour() {
   for (auto &drone : drones_) {
-    drone->setBehaviour(*behaviour_);
+    drone->behaviour() = behaviour_;
   }
 }
 
 void Sim::addBehaviour(const std::string &name,
                        std::unique_ptr<swarm::Behaviour> behaviour) {
-  swarm::behaviour::Registry::getInstance().add(name, std::move(behaviour));
+  swarm::behaviour::Registry::get().add(name, std::move(behaviour));
 }
 
 void Sim::setCurrentBehaviour(const std::string &name) {
   current_behaviour_name_ = name;
-  behaviour_ = behaviour::Registry::getInstance().getBehaviour(name);
+  behaviour_ = behaviour::Registry::get().behaviour(name);
   applyCurrentBehaviour();
 }
 
@@ -155,7 +155,7 @@ void Sim::setCurrentBehaviour(Behaviour *behaviour) {
 
 void Sim::createDrones(Behaviour &behaviour, DroneConfiguration &configuration,
                        SpawnType mode) {
-  get_logger()->info("Creating {} drones", num_drones_);
+  logger::get()->info("Creating {} drones", num_drones_);
   switch (mode) {
     case SpawnType::CIRCULAR:
       createDronesCircular(behaviour, configuration);
@@ -165,7 +165,7 @@ void Sim::createDrones(Behaviour &behaviour, DroneConfiguration &configuration,
     default:
       createDronesRandom(behaviour, configuration);
   }
-  get_logger()->info("Created {} drones", drones_.size());
+  logger::get()->info("Created {} drones", drones_.size());
 }
 
 void Sim::createDronesRandom(Behaviour &behaviour, DroneConfiguration &config) {
@@ -211,8 +211,8 @@ void Sim::createDronesCircular(Behaviour &behaviour,
   }
   int current_id = 0;
   for (auto &drone : drones_) {
-    drone->setColor(b2Color(0.7f, 0.5f, 0.5f));
-    drone->setId(current_id++);
+    drone->color(b2Color(0.7f, 0.5f, 0.5f));
+    drone->id(current_id++);
     drone->addObserver(std::shared_ptr<Logger>(&logger_, [](auto *) {}));
   }
 }
@@ -230,11 +230,11 @@ void Sim::setDroneConfiguration(DroneConfiguration *configuration) {
 
 void Sim::updateDroneSettings() {
   for (auto &drone : drones_) {
-    drone->setMaxForce(drone_configuration_->maxForce);
-    drone->setMaxSpeed(drone_configuration_->maxSpeed);
-    drone->setViewRange(drone_configuration_->cameraViewRange);
-    drone->setObstacleViewRange(drone_configuration_->obstacleViewRange);
-    drone->setDroneDetectionRange(drone_configuration_->droneDetectionRange);
+    drone->max_force(drone_configuration_->maxForce);
+    drone->max_speed(drone_configuration_->maxSpeed);
+    drone->camera_view_range(drone_configuration_->cameraViewRange);
+    drone->obstacle_view_range(drone_configuration_->obstacleViewRange);
+    drone->drone_detection_range(drone_configuration_->droneDetectionRange);
     drone->updateSensorRange();
   }
 }
@@ -248,7 +248,7 @@ void Sim::setDrones(std::vector<std::unique_ptr<swarm::Drone>> drones) {
 template <typename... Params>
 void Sim::createTargets(Params... params) {
   int id = 0;
-  get_logger()->info("Creating {} targets", num_targets_);
+  logger::get()->info("Creating {} targets", num_targets_);
   for (int i = 0; i < num_targets_; i++) {
     float x = (rand() % static_cast<int>(border_width_));
     float y = (rand() % static_cast<int>(border_height_));
@@ -257,16 +257,16 @@ void Sim::createTargets(Params... params) {
         target_type_, world_, std::ref(position), id++, std::any());
     targets_.push_back(target);
   }
-  get_logger()->info("Created {} targets", targets_.size());
+  logger::get()->info("Created {} targets", targets_.size());
   for (auto &target : targets_) {
     if (target) {
-      target->setColor(b2Color(0.5f * 0.95294f, 0.5f * 0.50588f,
-                               0.5f * 0.50588f, 0.5f * 0.25f));
+      target->color(b2Color(0.5f * 0.95294f, 0.5f * 0.50588f, 0.5f * 0.50588f,
+                            0.5f * 0.25f));
     } else {
       std::cout << "Target is null" << std::endl;
     }
   }
-  get_logger()->info("Target creation complete");
+  logger::get()->info("Targets created");
 }
 
 void Sim::setTargetType(const std::string &type) { target_type_ = type; }

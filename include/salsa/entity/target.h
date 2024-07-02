@@ -7,17 +7,24 @@
 #include "salsa/utils/collision_manager.h"
 
 namespace swarm {
+
+/// @class Target
+/// @brief Represents a target object in the simulation environment.
+///
+/// Target is a specialized entity that can be found or not found. Each target
+/// has a type that is specific to its derived class.
 class Target : public Entity {
  protected:
   bool found_ = false;
 
  public:
+  /// @brief Constructor for the Target.
+  /// @param world Pointer to the b2World where the target exists.
+  /// @param position Initial position of the target.
+  /// @param radius Radius of the target.
   Target(b2World *world, const b2Vec2 &position, float radius);
 
   virtual std::string getType() const = 0;
-
-  b2Vec2 getPosition() const { return body_->GetPosition(); }
-  float getRadius() const { return radius_; }
 
   bool isFound() const { return found_; }
   void setFound(bool found) { found_ = found; }

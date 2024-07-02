@@ -31,8 +31,7 @@ void TestQueue::addPermutedTests(
     std::unordered_map<std::string, swarm::behaviour::Parameter*> new_params;
     TestConfig modifiedConfig = base;  // Copy base config
     auto chosen_behaviour =
-        swarm::behaviour::Registry::getInstance().getBehaviour(
-            base.behaviour_name);
+        swarm::behaviour::Registry::get().behaviour(base.behaviour_name);
     auto chosen_params = chosen_behaviour->getParameters();
     for (size_t j = 0; j < parameter_names.size(); ++j) {
       const auto& name = parameter_names[j];

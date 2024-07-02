@@ -1,4 +1,4 @@
-/// \file test_stack.h
+/// @file test_stack.h
 /// Contains the static `TestStack` class, which is used to manage the running
 /// of simulation tests.
 #ifndef SWARM_SIM_CORE_TEST_STACK_H
@@ -17,10 +17,7 @@
 #include "salsa/utils/base_contact_listener.h"
 namespace swarm {
 
-void loadPermutations(std::vector<std::vector<float>> &permutations,
-                      std::vector<std::string> &parameter_names,
-                      std::string filename);
-
+/// Represents the configuration for a single test within the simulation.
 struct TestConfig {
   typedef std::unordered_map<std::string, behaviour::Parameter *> Parameters;
   typedef std::unordered_map<std::string, float> FloatParameters;
@@ -39,22 +36,51 @@ struct TestConfig {
   // FUTURE: std::function<void()> target_setup;
 };
 
+/// Static class that manages a queue of test configurations.
 class TestQueue {
  private:
   static std::vector<TestConfig> tests_;
 
  public:
+  /// Adds a test configuration to the back of the test queue.
+  /// @param test The test configuration to add.
   static void push(TestConfig test);
+
+  /// Adds multiple permuted test configurations based on a base configuration.
+  /// @param base The base test configuration.
+  /// @param permutations The list of parameter value permutations.
+  /// @param parameter_names The names of parameters corresponding to the
+  /// permutations.
   static void addPermutedTests(
       const TestConfig &base,
       const std::vector<std::vector<float>> &permutations,
       const std::vector<std::string> &parameter_names);
+
+  /// Removes and returns the first test configuration from the test queue.
+  /// @return The first test configuration.
+  /// @exception std::underflow_error Thrown if the queue is empty.
   static TestConfig pop();
+
+  /// Returns the first test configuration from the test queue without removing
+  /// it.
+  /// @return The first test configuration.
+  /// @exception std::underflow_error Thrown if the queue is empty.
   static TestConfig peek();
+
   static int size() { return tests_.size(); }
+
   static std::vector<TestConfig> &getTests() { return tests_; }
+
   static bool isEmpty() { return tests_.empty(); }
 };
+
+/// Loads permutations and parameter names from a JSON file.
+/// @param permutations Vector to store the loaded permutations.
+/// @param parameter_names Vector to store the loaded parameter names.
+/// @param filename The name of the file to load from.
+void loadPermutations(std::vector<std::vector<float>> &permutations,
+                      std::vector<std::string> &parameter_names,
+                      std::string filename);
 
 }  // namespace swarm
 

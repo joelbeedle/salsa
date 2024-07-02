@@ -10,22 +10,26 @@
 namespace swarm {
 std::vector<BaseContactListener *> BaseContactListener::registry_;
 
+BaseContactListener::BaseContactListener(std::string name) : name_(name) {
+  registry_.push_back(this);
+}
+
+BaseContactListener::~BaseContactListener() {
+  // Remove this listener from the registry
+  registry_.erase(std::remove(registry_.begin(), registry_.end(), this),
+                  registry_.end());
+}
+
 void BaseContactListener::addCollisionHandler(
     std::string type1, std::string type2,
     std::function<void(b2Fixture *, b2Fixture *)> handler) {
-  get_logger()->info("Adding collision handler for types: {} and {}", type1,
-                     type2);
-  if (handler) {
-    get_logger()->info("Handler is not null");
-  }
-  if (collision_handlers_.size() == 0) {
-    get_logger()->info("Collision handlers map is empty");
-  }
+  logger::get()->info("Adding collision handler for types: {} and {}", type1,
+                      type2);
   collision_handlers_[{type1, type2}] = handler;
 
   for (auto &handler : collision_handlers_) {
-    get_logger()->info("Handler: {} and {}", handler.first.first,
-                       handler.first.second);
+    logger::get()->info("Handler: {} and {}", handler.first.first,
+                        handler.first.second);
   }
 
   // Ensure symmetric handling, no matter the order of contact
@@ -50,7 +54,7 @@ void BaseContactListener::BeginContact(b2Contact *contact) {
     return;
   }
   if (!userDataA->object || !userDataB->object) {
-    get_logger()->error("One of the UserData objects is null.");
+    logger::get()->error("One of the UserData objects is null.");
     return;
   }
   auto handlerIt =
@@ -60,9 +64,28 @@ void BaseContactListener::BeginContact(b2Contact *contact) {
   if (handlerIt != collision_handlers_.end()) {
     handlerIt->second(fixtureA, fixtureB);
   } else {
-    get_logger()->error("No collision handler for types {} and {}",
-                        demangle(typeid(*(userDataA->object)).name()),
-                        demangle(typeid(*(userDataB->object)).name()));
+    logger::get()->error("No collision handler for types {} and {}",
+                         demangle(typeid(*(userDataA->object)).name()),
+                         demangle(typeid(*(userDataB->object)).name()));
+    return;
   }
+}
+
+std::vector<std::string> BaseContactListener::getListenerNames() {
+  std::vector<std::string> names;
+  for (const auto *listener : registry_) {
+    names.push_back(listener->name());
+  }
+  return names;
+}
+
+BaseContactListener *BaseContactListener::getListenerByName(
+    const std::string &name) {
+  for (auto *listener : registry_) {
+    if (listener->name() == name) {
+      return listener;
+    }
+  }
+  return nullptr;
 }
 }  // namespace swarm

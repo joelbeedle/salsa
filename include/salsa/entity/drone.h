@@ -14,70 +14,96 @@
 #include "salsa/utils/collision_manager.h"
 #include "target.h"
 namespace swarm {
+
+/// @class Drone
+/// @brief Represents a drone entity in the simulation environment.
+///
+/// Inherits from Entity and includes additional properties and functionalities
+/// specific to drones, such as behaviors, sensor range, and physical
+/// properties.
 class Drone : public Entity {
  private:
-  std::vector<Target *> targets_found_;
-  b2Fixture *viewSensor;  ///< Sensor used for detecting targets
-  Behaviour *behaviour;   ///< Current swarm `Behaviour` of the drone
+ private:
+  std::vector<Target *>
+      targets_found_;       ///< List of targets detected by the drone
+  b2Fixture *view_sensor_;  ///< Sensor fixture for target detection
+  Behaviour *behaviour_;    ///< Current behavior governing the drone's actions
 
-  float cameraViewRange;
-  float obstacleViewRange;
-  float droneDetectionRange;
-  float maxSpeed;
-  float maxForce;
+  /// @name Phsyical and Sensor attributes
+  ///@{
+  float camera_view_range_;
+  float obstacle_view_range_;
+  float drone_detection_range_;
+  float max_speed_;
+  float max_force_;
   float radius_;
-  float mass;
+  float mass_;
+  ///@}
 
  public:
+  /// @brief Constructor to create a drone with specified parameters.
+  /// @param world Pointer to the b2World where the drone operates.
+  /// @param position Initial position of the drone.
+  /// @param behaviour Behaviour assigned to control the drone.
+  /// @param config Configuration settings of the drone.
   Drone(b2World *world, const b2Vec2 &position, Behaviour &behaviour,
         const DroneConfiguration &config);
+  /// @brief Destructor for Drone.
   virtual ~Drone();
-  Drone() = default;
 
   void create_fixture();
 
-  /// @brief Updates one step of the simulation for this drone, where the drone
-  /// runs its behaviours' `execute` function, which tells the drone what move
-  /// to make in this step.
-  ///
-  /// @param drones The list of all drones in the simulation
+  /// @brief Updates drone's state and behavior execution for a simulation step.
+  /// @param drones List of all drones in the simulation for interaction.
   void update(const std::vector<std::unique_ptr<Drone>> &drones);
+
+  /// @brief Clears the list of targets found by the drone.
+  void clearLists();
+
+  /// @brief Updates the view sensor of the drone.
   void updateSensorRange();
 
-  // Accessors and Mutators
-  void setBehaviour(Behaviour &newBehaviour) { behaviour = &newBehaviour; }
-  Behaviour *getBehaviour() { return behaviour; }
+  /// @name Identity-oriented getters and setters for reference types
+  ///@{
+  Behaviour *&behaviour() { return behaviour_; }
+  const Behaviour *behaviour() const { return behaviour_; }
 
-  b2Body *getBody() { return body_; }
-  b2Vec2 getVelocity() { return body_->GetLinearVelocity(); }
-  b2Vec2 getPosition() { return body_->GetPosition(); }
+  b2Body *body() const { return body_; }
 
-  float getViewRange() { return cameraViewRange; }
-  void setViewRange(float newRange) { cameraViewRange = newRange; }
+  b2Fixture *&view_sensor() { return view_sensor_; }
+  const b2Fixture *view_sensor() const { return view_sensor_; }
+  ///@}
 
-  float getDroneDetectionRange() { return droneDetectionRange; }
-  void setDroneDetectionRange(float newRange) {
-    droneDetectionRange = newRange;
+  /// @name Value-oriented getters and setters for fundamental types
+  ///@{
+  float camera_view_range() const { return camera_view_range_; }
+  void camera_view_range(float new_range) { camera_view_range_ = new_range; }
+
+  float drone_detection_range() const { return drone_detection_range_; }
+  void drone_detection_range(float new_range) {
+    drone_detection_range_ = new_range;
   }
 
-  float getObstacleViewRange() { return obstacleViewRange; }
-  void setObstacleViewRange(float newRange) { obstacleViewRange = newRange; }
+  float obstacle_view_range() const { return obstacle_view_range_; }
+  void obstacle_view_range(float new_range) {
+    obstacle_view_range_ = new_range;
+  }
 
-  float getMaxSpeed() { return maxSpeed; }
-  void setMaxSpeed(float newSpeed) { maxSpeed = newSpeed; }
+  float max_speed() const { return max_speed_; }
+  void max_speed(float new_speed) { max_speed_ = new_speed; }
 
-  float getMaxForce() { return maxForce; }
-  void setMaxForce(float newForce) { maxForce = newForce; }
+  float max_force() const { return max_force_; }
+  void max_force(float new_force) { max_force_ = new_force; }
 
-  b2Fixture *getViewSensor() { return viewSensor; }
-
-  float getRadius() { return radius_; }
-
+  const std::vector<Target *> &targets_found() const { return targets_found_; }
   void addTargetFound(Target *target) { targets_found_.push_back(target); }
+  ///@}
 
-  std::vector<Target *> &getTargetsFound() { return targets_found_; }
-
-  void clearLists();
+  /// @name Physics properties exposed directly
+  ///@{
+  b2Vec2 velocity() const { return body_->GetLinearVelocity(); }
+  void clear_lists() { targets_found_.clear(); }
+  ///@}
 };
 
 }  // namespace swarm

@@ -29,8 +29,7 @@ Tree::Tree(b2World *world, const b2Vec2 &position, int treeID, bool diseased,
 
   fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(userData);
   body_->CreateFixture(&fixtureDef);
-  id = treeID;
-  id_prefix = 'T';
+  id_ = treeID;
 }
 
 Tree::~Tree() {}

@@ -1,10 +1,15 @@
 #include "salsa/core/map.h"
 
 namespace fs = std::filesystem;
-namespace swarm {
-namespace map {
 
-fs::path getExecutablePath() {
+using namespace swarm;
+using namespace swarm::map;
+using swarm::map::Map;
+
+/// @brief Registry of all loaded maps
+static std::vector<Map> registry;
+
+fs::path swarm::map::getExecutablePath() {
 #if defined(_WIN32)
   char path[MAX_PATH] = {0};
   HMODULE hModule = GetModuleHandle(nullptr);
@@ -33,15 +38,13 @@ fs::path getExecutablePath() {
 #endif
 }
 
-static std::vector<Map> registry;
-
-Map load(const char *new_map_name) {
+Map map::load(const char *new_map_name) {
   std::filesystem::path exec_path = getExecutablePath();
-  get_logger()->info("Executable path: {}", exec_path.string());
+  swarm::logger::get()->info("Executable path: {}", exec_path.string());
   std::filesystem::path file_path = exec_path / ".." / ".." / "testbed" /
                                     "maps" /
                                     (std::string(new_map_name) + ".json");
-  get_logger()->info("Loading map from: {}", file_path.string());
+  swarm::logger::get()->info("Loading map from: {}", file_path.string());
 
   b2World *world = new b2World(b2Vec2(0.0f, 0.0f));
   Map new_map;
@@ -112,7 +115,7 @@ Map load(const char *new_map_name) {
   return new_map;
 }
 
-void loadAll() {
+void map::loadAll() {
   fs::path exec_path = getExecutablePath();
   fs::path directory = exec_path / ".." / ".." / "testbed" / "maps";
   if (!fs::exists(directory)) {
@@ -121,18 +124,18 @@ void loadAll() {
   for (const auto &entry : fs::directory_iterator(directory)) {
     if (entry.path().extension() == ".json") {
       std::string map_name = entry.path().stem().string();
-      get_logger()->info("Loading map: {}", map_name);
+      swarm::logger::get()->info("Loading map: {}", map_name);
       try {
-        load(map_name.c_str());
+        swarm::map::load(map_name.c_str());
       } catch (const std::exception &e) {
-        get_logger()->error("Failed to load map: {}", map_name);
-        get_logger()->error("Error: {}", e.what());
+        swarm::logger::get()->error("Failed to load map: {}", map_name);
+        swarm::logger::get()->error("Error: {}", e.what());
       }
     }
   }
 }
 
-std::vector<std::string> getMapNames() {
+std::vector<std::string> map::getMapNames() {
   std::vector<std::string> names;
   for (const auto &map : registry) {
     names.push_back(map.name);
@@ -140,7 +143,7 @@ std::vector<std::string> getMapNames() {
   return names;
 }
 
-Map getMap(const std::string &name) {
+Map map::getMap(const std::string &name) {
   for (const auto &map : registry) {
     if (map.name == name) {
       return map;
@@ -149,7 +152,7 @@ Map getMap(const std::string &name) {
   throw std::runtime_error("Map not found: " + name);
 }
 
-void save(Map new_map) {
+void map::save(Map new_map) {
   std::cout << "Saving Map: " << new_map.name << "\n";
   // PrintBodiesAndFixtures(m_world);
   // Save map
@@ -234,5 +237,3 @@ void save(Map new_map) {
   }
   file.close();
 }
-}  // namespace map
-}  // namespace swarm

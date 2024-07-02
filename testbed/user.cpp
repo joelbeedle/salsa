@@ -54,9 +54,8 @@ static void setupInteractions(swarm::BaseContactListener &listener) {
 }
 
 void user() {
-  auto flock_params = swarm::behaviour::Registry::getInstance()
-                          .getBehaviour("Flocking")
-                          ->getParameters();
+  auto flock_params =
+      swarm::behaviour::Registry::get().behaviour("Flocking")->getParameters();
 
   swarm::DroneConfiguration *smallDrone = new swarm::DroneConfiguration(
       "Small", 15.0f, 50.2f, 10.0f, 0.3f, 1.0f, 1.5f, 134.0f);

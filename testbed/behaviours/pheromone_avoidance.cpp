@@ -36,7 +36,7 @@ class PheromoneBehaviour : public Behaviour {
     std::vector<b2Vec2> obstaclePoints = callback.obstaclePoints;
     std::vector<b2Body *> neighbours = callback.detectedDrones;
 
-    layPheromone(currentDrone.getPosition());
+    layPheromone(currentDrone.position());
 
     updatePheromones();
     b2Vec2 steering = obstacle_avoidance_weight_ *
@@ -47,12 +47,10 @@ class PheromoneBehaviour : public Behaviour {
 
     for (auto &pair : pheromones) {
       Pheromone &Pheromone = pair.second;
-      float distance =
-          b2Distance(currentDrone.getPosition(), Pheromone.position);
+      float distance = b2Distance(currentDrone.position(), Pheromone.position);
 
-      if (distance < currentDrone.getObstacleViewRange() && distance > 0) {
-        b2Vec2 awayFromPheromone =
-            currentDrone.getPosition() - Pheromone.position;
+      if (distance < currentDrone.obstacle_view_range() && distance > 0) {
+        b2Vec2 awayFromPheromone = currentDrone.position() - Pheromone.position;
         awayFromPheromone.Normalize();
 
         awayFromPheromone *= (1.0f / (distance)) * Pheromone.intensity;
@@ -83,5 +81,5 @@ class PheromoneBehaviour : public Behaviour {
 auto p = std::make_unique<swarm::PheromoneBehaviour>(0.5f, 1.0f);
 
 auto pheromone =
-    behaviour::Registry::getInstance().add("Pheromone Avoidance", std::move(p));
+    behaviour::Registry::get().add("Pheromone Avoidance", std::move(p));
 }  // namespace swarm

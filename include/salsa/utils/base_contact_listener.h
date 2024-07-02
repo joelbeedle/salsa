@@ -18,10 +18,8 @@ namespace swarm {
 /// @brief Extends the Box2D contact listener to handle collision events between
 /// registered types.
 ///
-/// BaseContactListener provides a mechanism to dynamically register collision
-/// handlers for pairs of object types at runtime. It utilizes std::map to store
-/// function handlers for each unique pair of types, enabling custom responses
-/// to collisions.
+/// Provides a mechanism to dynamically register collision handlers for pairs of
+/// object types at runtime, enabling custom responses to collisions.
 class BaseContactListener : public b2ContactListener {
  protected:
   /// @brief Maps pairs of types to their respective collision handlers.
@@ -33,50 +31,40 @@ class BaseContactListener : public b2ContactListener {
   static std::vector<BaseContactListener *> registry_;
 
  public:
-  BaseContactListener(std::string name) : name_(name) {
-    registry_.push_back(this);
-  }
+  explicit BaseContactListener(std::string name);
 
-  /// @brief Adds a collision handler for a specific pair of object types.
-  ///
-  /// @param type_a The std::type_index of the first object type.
-  /// @param type_b The std::type_index of the second object type.
+  /// @brief Destructor to remove this listener from the registry.
+  virtual ~BaseContactListener();
+
+  /// @brief Registers a collision handler for a specific pair of object types.
+  /// @param type_a Name of the first object type.
+  /// @param type_b Name of the second object type.
   /// @param handler The function to call when objects of type_a and type_b
   /// collide.
   void addCollisionHandler(
       std::string type_a, std::string type_b,
       std::function<void(b2Fixture *, b2Fixture *)> handler);
 
-  /// @brief Override from b2ContactListener to handle the start of a contact
-  /// event.
-  ///
-  /// This method is called when two fixtures begin to touch. It will
-  /// check user data attached to fixtures and invoke the corresponding
-  /// collision handler if registered.
-  ///
+  /// @brief Called when two fixtures begin to touch.
   /// @param contact The contact point information about the collision.
   void BeginContact(b2Contact *contact) override;
-  static const std::vector<BaseContactListener *> &GetRegistry() {
+  static const std::vector<BaseContactListener *> &registry() {
     return registry_;
   }
 
-  const std::string &GetName() const { return name_; }
+  /// @brief Retrieves the names of all listeners in the registry.
+  /// @return A vector of names of all registered listeners.
+  static std::vector<std::string> getListenerNames();
 
-  static std::vector<std::string> GetListenerNames() {
-    std::vector<std::string> names;
-    for (const auto *listener : registry_) {
-      names.push_back(listener->GetName());
-    }
-    return names;
-  }
+  /// @brief Finds a listener by its name.
+  /// @param name The name of the listener to find.
+  /// @return Pointer to the listener, or nullptr if not found.
+  static BaseContactListener *getListenerByName(const std::string &name);
 
-  static BaseContactListener *GetListenerByName(const std::string &name) {
-    for (auto *listener : registry_) {
-      if (listener->GetName() == name) {
-        return listener;
-      }
-    }
-    return nullptr;  // No listener found with the specified name
+  /// @brief Accessor for the listener's name.
+  /// @return The name of the listener.
+  const std::string &name() const {
+    { return name_; }
   }
 };
 

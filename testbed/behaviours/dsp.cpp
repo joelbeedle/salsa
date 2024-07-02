@@ -97,8 +97,8 @@ class DSPBehaviour : public Behaviour {
                Drone &currentDrone) override {
     if (droneInformation.find(&currentDrone) == droneInformation.end()) {
       droneInformation[&currentDrone] = DroneInfo();
-      DSPPoint *dsp = new DSPPoint(currentDrone.getBody()->GetWorld(),
-                                   currentDrone.getPosition());
+      DSPPoint *dsp = new DSPPoint(currentDrone.body()->GetWorld(),
+                                   currentDrone.position());
       dsp->recalc(drones.size());
       droneInformation[&currentDrone].dsp = dsp;
       dspPoints.push_back(dsp);
@@ -110,7 +110,7 @@ class DSPBehaviour : public Behaviour {
     DroneInfo &droneInfo = droneInformation[&currentDrone];
 
     for (auto &drone : drones) {
-      bodies.push_back(drone.get()->getBody());
+      bodies.push_back(drone.get()->body());
     }
     std::vector<b2Body *> neighbours = bodies;
     std::vector<b2Vec2> obstaclePoints = callback.obstaclePoints;
@@ -142,8 +142,8 @@ class DSPBehaviour : public Behaviour {
     // Update DSP position for this drone
     droneInfo.dsp->body->SetLinearVelocity(force);
 
-    b2Vec2 velocity = currentDrone.getVelocity();
-    b2Vec2 position = currentDrone.getPosition();
+    b2Vec2 velocity = currentDrone.velocity();
+    b2Vec2 position = currentDrone.position();
     b2Vec2 acceleration(0, 0);
     b2Vec2 steer(0, 0);
 
@@ -168,8 +168,8 @@ class DSPBehaviour : public Behaviour {
           // Change direction at regular intervals
           float angle = static_cast<float>(std::rand()) / RAND_MAX * 2 * M_PI;
           droneInfo.desiredVelocity =
-              b2Vec2(std::cos(angle) * currentDrone.getMaxSpeed(),
-                     std::sin(angle) * currentDrone.getMaxSpeed());
+              b2Vec2(std::cos(angle) * currentDrone.max_speed(),
+                     std::sin(angle) * currentDrone.max_speed());
 
           droneInfo.elapsedTimeSinceLastForce =
               0.0f;  // Reset the timer for force update
@@ -181,16 +181,16 @@ class DSPBehaviour : public Behaviour {
         droneInfo.elapsedTime += (1.0 / 30.0f);
 
         // Apply random walk velocity as steering force
-        b2Vec2 steer = droneInfo.desiredVelocity - currentDrone.getVelocity();
-        clampMagnitude(steer, currentDrone.getMaxForce());
+        b2Vec2 steer = droneInfo.desiredVelocity - currentDrone.velocity();
+        clampMagnitude(steer, currentDrone.max_force());
         acceleration += steer;
       }
     } else {
       // If not walking, drone should head towards the DSP point
       b2Vec2 dir = directionTo(position, bspPos);
       dir.Normalize();
-      b2Vec2 steering = currentDrone.getMaxSpeed() * dir;
-      clampMagnitude(steering, currentDrone.getMaxForce());
+      b2Vec2 steering = currentDrone.max_speed() * dir;
+      clampMagnitude(steering, currentDrone.max_force());
       acceleration += steering;
     }
     acceleration += neighbourAvoidance + (3.0f * obstacleAvoidance);
@@ -199,14 +199,14 @@ class DSPBehaviour : public Behaviour {
     b2Vec2 dir(velocity.x / speed, velocity.y / speed);
 
     // Clamp speed
-    if (speed > currentDrone.getMaxSpeed()) {
-      speed = currentDrone.getMaxSpeed();
+    if (speed > currentDrone.max_speed()) {
+      speed = currentDrone.max_speed();
     } else if (speed < 0) {
       speed = 0.001f;
     }
     velocity = b2Vec2(dir.x * speed, dir.y * speed);
 
-    currentDrone.getBody()->SetLinearVelocity(velocity);
+    currentDrone.body()->SetLinearVelocity(velocity);
     acceleration.SetZero();
   }
 
@@ -232,5 +232,5 @@ class DSPBehaviour : public Behaviour {
 
 auto d = std::make_unique<DSPBehaviour>();
 auto dsp_behaviour =
-    behaviour::Registry::getInstance().add("DSPBehaviour", std::move(d));
+    behaviour::Registry::get().add("DSPBehaviour", std::move(d));
 }  // namespace swarm

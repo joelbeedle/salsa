@@ -26,8 +26,8 @@ class SimTest : public ::testing::Test {
     auto mockBehaviour = std::make_unique<MockBehaviour>();
     swarm::CollisionManager::registerType<swarm::Drone>({});
 
-    swarm::behaviour::Registry::getInstance().add(behaviour_name,
-                                                  std::move(mockBehaviour));
+    swarm::behaviour::Registry::get().add(behaviour_name,
+                                          std::move(mockBehaviour));
 
     config = new DroneConfiguration("test", 5.0f, 3.0f, 2.0f, 1.0f, 0.5f, 1.0f,
                                     10.0f);
@@ -38,7 +38,7 @@ class SimTest : public ::testing::Test {
 
   void TearDown() override {
     delete config;
-    swarm::behaviour::Registry::getInstance().remove(behaviour_name);
+    swarm::behaviour::Registry::get().remove(behaviour_name);
   }
 };
 
@@ -48,8 +48,8 @@ TEST_F(SimTest, CorrectBehaviourTest) {
   EXPECT_EQ(behaviour_name, sim->current_behaviour_name());
   auto& drones = sim->getDrones();
   for (const auto& drone : drones) {
-    auto behaviour = Registry::getInstance().getBehaviour(behaviour_name);
-    auto drone_behaviour = drone->getBehaviour();
+    auto behaviour = Registry::get().behaviour(behaviour_name);
+    auto drone_behaviour = drone->behaviour();
     EXPECT_EQ(behaviour, drone_behaviour);
   }
 }
