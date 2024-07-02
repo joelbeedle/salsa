@@ -1,6 +1,6 @@
-# swarm-sim
+# SALSA - Swarm Algorithm Simulator
 
-Swarm Algorithm Simulation library and Testbed, written in C++.
+**S**warm **Al**gorithm **S**imul**a**tior: library, and Testbed, written in C++.
 
 ## Getting Started
 There is a Docker container available. It opens a noVNC web app on `localhost` with `swarm-sim` pre-installed.
