@@ -3,18 +3,20 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.spatial import distance_matrix
-from mpl_toolkits.axes_grid1.inset_locator import inset_axes
-from matplotlib.transforms import ScaledTranslation
-import matplotlib.image as mpimg
+import os
+
+global df
 
 
 def create_dataframe(file_path: str) -> pd.DataFrame:
-    global data_frame
+    global df
+
+    print(os.path.abspath(__file__))
     with open(file_path, "r") as file:
         data = file.read()
 
     pattern = re.compile(
-        r'\[(\d+\.\d+)\] \[swarm::Drone (\d+)\] {"position":\[(.*?),(.*?)\],"velocity":\[(.*?),(.*?)\]}'
+        r'\[(\d+\.\d+)\] \[salsa::Drone (\d+)\] {"position":\[(.*?),(.*?)\],"velocity":\[(.*?),(.*?)\]}'
         r'|\[(\d+\.\d+)\] \[Sim 0\] {"targets_found":(\d+)}'
     )
 
@@ -44,6 +46,7 @@ def create_dataframe(file_path: str) -> pd.DataFrame:
         records.append(record)
     # Creating DataFrame from records
     data_frame = pd.DataFrame(records)
+    df = data_frame
     return data_frame
 
 
@@ -101,6 +104,13 @@ def plot_targets_found(data_frame, ax):
     plt.show()
 
 
+def plot_targets_found_wrapper():
+    fig, ax = plt.subplots(figsize=(10, 6), layout="constrained")
+    ax = plot_targets_found(df, ax)
+    fig.savefig("targets_found.pdf")
+    plt.show()
+
+
 def plot_speed(data_frame, ax):
     speed_points = data_frame[["drone_id", "velocity_x", "velocity_y", "timestamp"]]
     # Plot the movement traces
@@ -144,7 +154,7 @@ def plot_speed(data_frame, ax):
     plt.show()
 
 
-def plot_speed_per_drone():
+def plot_speed_per_drone(data_frame):
     speed_points = data_frame[["drone_id", "velocity_x", "velocity_y", "timestamp"]]
 
     # Calculate the speed
@@ -335,112 +345,3 @@ def plot_heatmap(data_frame, ax, bin_size: str, border_size: str):
     ax.set_xlabel("Width (m)")
 
     return im, ax
-
-
-def plot_both(border_size: str, bin_size: str, colorbar_location: str) -> None:
-    trace_points = data_frame[["drone_id", "position_x", "position_y"]]
-    fig, axs = plt.subplots(1, 2, figsize=(10, 5))
-    step_size, minor_size = get_axis_steps(border_size)
-    border_size = int(border_size)
-    axs[0].set_xlim(0, border_size)
-    axs[0].set_ylim(0, border_size)
-    axs[0].set_yticks(np.arange(0, border_size + step_size, step_size))
-    axs[0].set_xticks(np.arange(0, border_size + step_size, step_size))
-    axs[0].set_yticks(np.arange(0, border_size + minor_size, minor_size), minor=True)
-    axs[0].set_xticks(np.arange(0, border_size + minor_size, minor_size), minor=True)
-
-    for drone_id in trace_points["drone_id"].unique():
-        drone_data = trace_points[trace_points["drone_id"] == drone_id]
-        axs[0].plot(
-            drone_data["position_x"],
-            drone_data["position_y"],
-            marker="",
-            label=f"Drone {drone_id}",
-            linewidth=1,
-        )
-    bin_size = int(bin_size)
-    min_boundary = 0
-    max_boundary = border_size
-    # Define the grid for the heatmap
-    x_bins = np.linspace(min_boundary, max_boundary, bin_size)
-    y_bins = np.linspace(min_boundary, max_boundary, bin_size)
-
-    heatmap, xedges, yedges = np.histogram2d(
-        data_frame["position_x"], data_frame["position_y"], bins=[x_bins, y_bins]
-    )
-    heatmap = np.clip(heatmap, 0, 100)
-
-    heatmap = np.flipud(heatmap.T)
-
-    axs[1].imshow(
-        heatmap,
-        aspect="equal",
-        cmap="plasma",
-        extent=[xedges[0], xedges[-1], yedges[0], yedges[-1]],
-    )
-    # fig.colorbar(im, ax=axs[1], pad=0.001, location=colorbar_location)
-    plt.savefig("heatmap_trace.pdf")
-
-    return axs[0], axs[1]
-
-
-if __name__ == "__main__":
-    td = create_dataframe("2024-07-01_01-39-17_Flocking.log")
-    od = create_dataframe("2024-07-01_01-39-17_Flocking.log")
-
-    mosaic = """
-        fad
-        bce
-    """
-    mosaic = """
-        abc
-        def
-    """
-    fig = plt.figure(figsize=(10, 6), layout="constrained")
-    ax_dict = fig.subplot_mosaic(
-        mosaic,
-    )
-
-    image_path = "testbed_screenshot.png"
-    ax_dict["a"].imshow(mpimg.imread(image_path))
-    ax_dict["a"].axis("off")
-
-    plot_targets_found(td, ax_dict["b"])
-    plot_speed(od, ax_dict["d"])
-
-    plot_nearest_neighbor_distance(od, ax_dict["e"])
-    fig.legend(loc="outside lower center", ncols=4)
-
-    plot_trace(od, ax_dict["c"], "4000")
-    im, _ = plot_heatmap(od, ax_dict["f"], "100", "4000")
-    axins = inset_axes(
-        ax_dict["f"],
-        width="5%",  # width: 5% of parent_bbox width
-        height="50%",  # height: 50%
-        loc="lower left",
-        bbox_to_anchor=(1.05, 0.0, 1, 1),
-        bbox_transform=ax_dict["f"].transAxes,
-        borderpad=0.0,
-    )
-    fig.colorbar(im, cax=axins)
-    for label, ax in ax_dict.items():
-        # Use ScaledTranslation to put the label
-        # - at the top left corner (axes fraction (0, 1)),
-        # - offset 20 pixels left and 7 pixels up (offset points (-20, +7)),
-        # i.e. just outside the axes.
-        new_label = f"({label})"
-        ax.text(
-            0.5,
-            0.0,
-            new_label,
-            transform=(
-                ax.transAxes + ScaledTranslation(-4 / 72, -50 / 72, fig.dpi_scale_trans)
-            ),
-            fontsize="medium",
-            va="bottom",
-            fontfamily="serif",
-        )
-    fig.get_layout_engine().set(w_pad=4 / 72, h_pad=4 / 72, hspace=0.0, wspace=0.0)
-    fig.savefig("testbed_results.svg", bbox_inches="tight")
-
-    plt.show()

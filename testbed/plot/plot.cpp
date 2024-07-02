@@ -55,30 +55,18 @@ bool call_function(const char *module_name, const char *function_name,
 void plot() {
   init_python();
 
-  // Set log file path
-  if (!call_function("py_plot", "set_file_path", "log.log")) {
+  // Create dataframe from log file
+  if (!call_function("py_plot", "create_dataframe",
+                     "/Users/joelbeedle/swarm-sim/testbed/plot/"
+                     "2024-07-02_19-00-16_Flocking.log")) {
     finalize_python();
     return;
   }
 
-  // Create dataframe from log
-  if (!call_function("py_plot", "create_dataframe")) {
+  if (!call_function("py_plot", "plot_targets_found_wrapper")) {
     finalize_python();
     return;
   }
-
-  // Plot heatmap
-  if (!call_function("py_plot", "plot_heatmap", "100")) {
-    finalize_python();
-    return;
-  }
-
-  // Plot traces
-  if (!call_function("py_plot", "plot_trace")) {
-    finalize_python();
-    return;
-  }
-
   // Finalize Python
   finalize_python();
   return;
