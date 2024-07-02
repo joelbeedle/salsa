@@ -186,7 +186,7 @@ class QueueSimulator : public Test {
     pause = settings.m_pause;
     std::vector<int> foundIds;
     for (int i = 0; i < settings.m_simulationSpeed; i++) {
-      sim->update();
+      if (!pause) sim->update();
     }
 
     for (auto &target : sim->getTargetsFoundThisStep()) {
