@@ -16,6 +16,8 @@ extern bool plot_drone_heatmap;
 extern bool plot_drone_distances;
 
 void plot(std::string log_file_path);
+void init_python();
+void finalize_python();
 }  // namespace testbed
 
 #endif  // TESTBED_PLOT_H

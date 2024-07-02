@@ -36,6 +36,8 @@ class QueueSimulator : public Test {
   bool using_queue_ = true;
   bool pause = false;
   bool next_frame = false;
+  bool queue_empty = true;
+  bool skipped_test = false;
   salsa::TestQueue queue_;
   std::vector<std::unique_ptr<salsa::Target>> targets;
   std::vector<b2Vec2> target_positions_;
@@ -89,7 +91,8 @@ class QueueSimulator : public Test {
     auto old_sim = sim;
     sim = temp_sim;
     std::string current_log_file = old_sim->getCurrentLogFile();
-    if (current_log_file != "") testbed::plot(current_log_file);
+    if (current_log_file != "" && !skipped_test)
+      testbed::plot(current_log_file);
     delete old_sim;
     sim->setCurrentBehaviour(sim->current_behaviour_name());
     m_world = sim->getWorld();
@@ -98,6 +101,7 @@ class QueueSimulator : public Test {
     g_camera.m_zoom = 10.0f;
     pause = false;
     first_run_ = true;
+    skipped_test = false;
     target_positions_.clear();
     target_colors_.clear();
     auto targets = sim->getTargets();
@@ -195,6 +199,10 @@ class QueueSimulator : public Test {
     for (auto &target : sim->getTargetsFoundThisStep()) {
       target_colors_[target->id()] = trueColour;
     }
+    if (queue_empty) {
+      pause = true;
+      queue_empty = queue_.isEmpty();
+    }
     if (!pause)
       sim->current_time() +=
           (1.0f / settings.m_hertz) * settings.m_simulationSpeed;
@@ -203,14 +211,16 @@ class QueueSimulator : public Test {
       pause = true;
       try {
         SetNextTestFromQueue();
+        queue_empty = false;
       } catch (const std::exception &e) {
         spdlog::error("Error: {}", e.what());
         std::cerr << e.what() << std::endl;
         pause = true;
+        queue_empty = true;
       }
       next_frame = false;
     }
-    if (sim->current_time() >= sim->time_limit()) {
+    if (!queue_empty && sim->current_time() >= sim->time_limit()) {
       // This sim is finished, get the next one from the stack pause = true;
       next_frame = true;
     }
@@ -774,6 +784,7 @@ class QueueSimulator : public Test {
       if (ImGui::Button("Next Test in Queue")) {
         pause = true;
         next_frame = true;
+        skipped_test = true;
       }
       if (sim->getDroneConfiguration() == nullptr) {
       }

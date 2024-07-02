@@ -62,69 +62,58 @@ bool call_function(const char *module_name, const char *function_name,
 }
 
 void plot(std::string log_file_path) {
-  init_python();
   std::filesystem::path results_dir =
       exec_path / ".." / ".." / "testbed" / "results";
   std::filesystem::path file_path = results_dir / (log_file_path);
 
   if (!call_function("py_plot", "set_file_name", log_file_path.c_str())) {
-    finalize_python();
     return;
   }
   if (!call_function("py_plot", "set_output_path",
                      results_dir.string().c_str())) {
-    finalize_python();
     return;
   }
 
   if (!call_function("py_plot", "get_sim_data", file_path.string().c_str())) {
-    finalize_python();
     return;
   }
 
   // Create dataframe from log file
   if (!call_function("py_plot", "create_dataframe",
                      file_path.string().c_str())) {
-    finalize_python();
     return;
   }
   if (testbed::plot_targets_found) {
     std::cout << "Plotting targets found" << std::endl;
     if (!call_function("py_plot", "plot_targets_found_wrapper")) {
-      finalize_python();
       return;
     }
   }
   if (testbed::plot_drone_speed) {
     std::cout << "Plotting drone speed" << std::endl;
     if (!call_function("py_plot", "plot_speed_wrapper")) {
-      finalize_python();
       return;
     }
   }
   if (testbed::plot_drone_distances) {
     std::cout << "Plotting drone distances" << std::endl;
     if (!call_function("py_plot", "plot_drone_distances_wrapper")) {
-      finalize_python();
       return;
     }
   }
   if (testbed::plot_drone_trace) {
     std::cout << "Plotting drone trace" << std::endl;
     if (!call_function("py_plot", "plot_trace_wrapper")) {
-      finalize_python();
       return;
     }
   }
   if (testbed::plot_drone_heatmap) {
     std::cout << "Plotting drone heatmap" << std::endl;
     if (!call_function("py_plot", "plot_heatmap_wrapper", "50")) {
-      finalize_python();
       return;
     }
   }
   // Finalize Python
-  finalize_python();
   return;
 }
 

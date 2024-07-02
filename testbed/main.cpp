@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
   testbed_console->set_level(spdlog::level::info);
   // spdlog::register_logger(testbed_console);
   salsa::map::loadAll();
-
+  testbed::init_python();
   if (headless) {
     // Run in headless mode
     testbed::user();
@@ -40,5 +40,6 @@ int main(int argc, char** argv) {
     testbed::user();
     testbed::run();
   }
+  testbed::finalize_python();
   return 0;
 }
