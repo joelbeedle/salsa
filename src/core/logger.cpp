@@ -2,7 +2,7 @@
 
 using namespace salsa;
 // Initialize and manage the static logger
-std::shared_ptr<spdlog::logger>& salsa::logger::get() {
+std::shared_ptr<spdlog::logger>& logger::get() {
   static std::shared_ptr<spdlog::logger> logger = spdlog::default_logger();
   return logger;
 }

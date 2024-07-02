@@ -60,6 +60,7 @@ class SandboxSimulator : public Test {
     m_world = new b2World(b2Vec2(0.0f, 0.0f));
     sim = new salsa::Sim(m_world, 1, 0, smallDrone, 2000, 2000, 1000.0);
     new_count = 1;
+
     auto behaviour_names = salsa::behaviour::Registry::get().behaviour_names();
     sim->setCurrentBehaviour(behaviour_names[0]);
     // m_world->SetContactListener(contactListener_);
@@ -235,6 +236,8 @@ class SandboxSimulator : public Test {
             current_map_name = name;
             sim->changeMap(name);
             m_world = sim->getWorld();
+            g_camera.m_center = sim->getDroneSpawnPosition();
+            g_camera.m_zoom = 10.0f;
           }
           if (isSelected) {
             ImGui::SetItemDefaultFocus();
@@ -307,7 +310,7 @@ class SandboxSimulator : public Test {
                 transform.p + b2Mul(transform.q, circleShape->m_p);
             debugDraw->DrawSolidCircle(position, circleShape->m_radius,
                                        transform.q.GetXAxis(),
-                                       b2Color(1.0f, 0.5f, 0.5f));
+                                       b2Color(0.5f, 0.5f, 0.5f));
             break;
           }
           case b2Shape::e_polygon: {

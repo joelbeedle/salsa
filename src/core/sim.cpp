@@ -281,6 +281,8 @@ void Sim::setContactListener(BaseContactListener &listener) {
   world_->SetContactListener(contact_listener_);
 }
 
+b2Vec2 &Sim::getDroneSpawnPosition() { return drone_spawn_position_; }
+
 void Sim::createBounds() {
   // Define the ground body.
   b2BodyDef groundBodyDef;

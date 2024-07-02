@@ -59,6 +59,13 @@ std::vector<std::string> getMapNames();
 /// @return The map with the given name.
 Map getMap(const std::string &name);
 
+/// @brief Clears all maps from the map registry.
+void clearMaps();
+
+/// @brief Refreshes the map registry by first clearing it and then reloading
+/// all maps.
+void refresh();
+
 }  // namespace map
 }  // namespace salsa
 #endif  // SWARM_TESTBED_MAP_H

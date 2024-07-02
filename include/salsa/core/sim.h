@@ -239,6 +239,7 @@ class Sim {
   void setContactListener(BaseContactListener& listener);
 
   // Getters and Setters for properties
+  b2Vec2& getDroneSpawnPosition();
   float& world_height();
   const float& world_height() const;
   float& world_width();

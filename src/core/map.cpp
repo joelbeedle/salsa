@@ -236,4 +236,12 @@ void map::save(Map new_map) {
     std::cout << "World saved successfully to " << file_path << std::endl;
   }
   file.close();
+  map::refresh();
+}
+
+void map::clearMaps() { registry.clear(); }
+
+void map::refresh() {
+  clearMaps();
+  loadAll();
 }
