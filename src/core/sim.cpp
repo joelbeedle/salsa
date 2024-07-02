@@ -149,7 +149,6 @@ void Sim::setCurrentBehaviour(const std::string &name) {
   applyCurrentBehaviour();
 }
 
-// Maybe unsafe
 void Sim::setCurrentBehaviour(Behaviour *behaviour) {
   behaviour_ = behaviour;
   applyCurrentBehaviour();
@@ -366,6 +365,7 @@ void Sim::changeMap(std::string name) {
   world_ = map.world;
   border_width_ = map.width;
   border_height_ = map.height;
+  drone_spawn_position_ = map.drone_spawn_point;
   reset();
 }
 }  // namespace salsa
