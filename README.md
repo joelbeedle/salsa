@@ -7,6 +7,14 @@ There is a Docker container available. It opens a noVNC web app on `localhost` w
 
 ### Using the Docker container
 
+- **Run the docker image:**
+```bash
+docker run --shm-size=256m -it -p 5901:5901 -e VNC_PASSWD=123456 ghcr.io/joelbeedle/swarm-sim:latest
+```
+***
+
+If you want to clone the repository and build it yourself:
+
 - **Clone the repository:**
 ```bash
 git clone --recursive https://github.com/joelbeedle/swarm-sim.git
