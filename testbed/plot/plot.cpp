@@ -7,11 +7,15 @@ bool plot_drone_speed = false;
 bool plot_drone_trace = false;
 bool plot_drone_heatmap = false;
 bool plot_drone_distances = false;
+
 void init_python() {
   Py_Initialize();
+  std::filesystem::path python_path =
+      exec_path / ".." / ".." / "testbed" / "plot";
+  std::string python_path_str = python_path.string();
+  std::string complete_string = "sys.path.append(\"" + python_path_str + "\")";
   PyRun_SimpleString("import sys");
-  PyRun_SimpleString(
-      "sys.path.append('/Users/joelbeedle/swarm-sim/testbed/plot')");
+  PyRun_SimpleString(complete_string.c_str());
 }
 
 void finalize_python() { Py_Finalize(); }
