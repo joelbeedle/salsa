@@ -67,18 +67,20 @@ void plot(std::string log_file_path) {
     finalize_python();
     return;
   }
-  if (!call_function("py_plot", "set_output_path", results_dir.c_str())) {
+  if (!call_function("py_plot", "set_output_path",
+                     results_dir.string().c_str())) {
     finalize_python();
     return;
   }
 
-  if (!call_function("py_plot", "get_sim_data", file_path.c_str())) {
+  if (!call_function("py_plot", "get_sim_data", file_path.string().c_str())) {
     finalize_python();
     return;
   }
 
   // Create dataframe from log file
-  if (!call_function("py_plot", "create_dataframe", file_path.c_str())) {
+  if (!call_function("py_plot", "create_dataframe",
+                     file_path.string().c_str())) {
     finalize_python();
     return;
   }
