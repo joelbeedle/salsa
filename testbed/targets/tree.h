@@ -2,8 +2,7 @@
 #ifndef TREE_H
 #define TREE_H
 #include <box2d/box2d.h>
-
-#include "core/simulation.h"
+#include <salsa/salsa.h>
 
 class Tree : public swarm::Target {
  private:

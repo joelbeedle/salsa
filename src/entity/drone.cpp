@@ -1,10 +1,10 @@
 // Drone.cpp
-#include "entity/drone.h"
+#include "salsa/entity/drone.h"
 
 #include <cmath>
 #include <valarray>
 
-#include "utils/object_types.h"
+#include "salsa/utils/object_types.h"
 
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600

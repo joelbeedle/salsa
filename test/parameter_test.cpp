@@ -1,4 +1,4 @@
-#include "behaviours/parameter.h"
+#include "salsa/behaviours/parameter.h"
 
 #include <iostream>
 #include <sstream>

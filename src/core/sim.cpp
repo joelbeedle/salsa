@@ -1,9 +1,9 @@
-#include "core/sim.h"
+#include "salsa/core/sim.h"
 
 #include <algorithm>
 #include <execution>
 
-#include "behaviours/registry.h"
+#include "salsa/behaviours/registry.h"
 namespace swarm {
 
 Sim::Sim(b2World *world, int drone_count, int target_count,

@@ -8,11 +8,11 @@
 
 #include <memory>
 
-#include "behaviours/behaviour.h"
-#include "entity/drone_configuration.h"
-#include "entity/entity.h"
-#include "entity/target.h"
-#include "utils/collision_manager.h"
+#include "drone_configuration.h"
+#include "entity.h"
+#include "salsa/behaviours/behaviour.h"
+#include "salsa/utils/collision_manager.h"
+#include "target.h"
 namespace swarm {
 class Drone : public Entity {
  private:

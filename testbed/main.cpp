@@ -1,11 +1,10 @@
 
+#include <salsa/salsa.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
 #include <CLI/CLI.hpp>
 
-#include "core/logger.h"
-#include "core/simulation.h"
 #include "plot/plot.h"
 #include "testbed.h"
 #include "user.h"

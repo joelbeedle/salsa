@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "behaviours/behaviour.h"
+#include "salsa/behaviours/behaviour.h"
 
 namespace swarm {
 namespace behaviour {

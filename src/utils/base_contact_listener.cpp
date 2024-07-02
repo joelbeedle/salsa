@@ -1,12 +1,12 @@
-#include "utils/base_contact_listener.h"
+#include "salsa/utils/base_contact_listener.h"
 
 #include <string>
 
 #include "box2d/b2_body.h"
-#include "core/logger.h"
-#include "core/simulation.h"
+#include "salsa/core/logger.h"
+#include "salsa/entity/entity.h"
+#include "salsa/utils/object_types.h"
 #include "spdlog/spdlog.h"
-#include "utils/object_types.h"
 namespace swarm {
 std::vector<BaseContactListener *> BaseContactListener::registry_;
 

@@ -1,7 +1,7 @@
+#include <salsa/salsa.h>
+
 #include <iostream>
 #include <valarray>
-
-#include "core/simulation.h"
 namespace swarm {
 
 class DroneQueryCallback : public b2QueryCallback {

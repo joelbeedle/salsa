@@ -1,4 +1,4 @@
-#include "entity/drone_configuration.h"
+#include "salsa/entity/drone_configuration.h"
 
 namespace swarm {
 std::vector<DroneConfiguration *> DroneConfiguration::config_registry_;

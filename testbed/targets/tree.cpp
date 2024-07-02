@@ -1,9 +1,10 @@
 #include "tree.h"
 
+#include <salsa/salsa.h>
+
 #include <cstdlib>
 
-#include "core/simulation.h"
-#include "entity/target_factory.h"
+#include "salsa/entity/target_factory.h"
 
 Tree::Tree(b2World *world, const b2Vec2 &position, int treeID, bool diseased,
            bool mapped, float radius)

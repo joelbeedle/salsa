@@ -1,8 +1,8 @@
 #ifndef SWARM_TESTS_MOCK_BEHAVIOUR_H
 #define SWARM_TESTS_MOCK_BEHAVIOUR_H
 
-#include "behaviours/behaviour.h"
 #include "gmock/gmock.h"
+#include "salsa/behaviours/behaviour.h"
 
 class MockBehaviour : public swarm::Behaviour {
  public:

@@ -6,15 +6,15 @@
 #include <sstream>
 #include <variant>
 
-#include "behaviours/behaviour.h"
-#include "behaviours/registry.h"
-#include "core/test_queue.h"
-#include "entity/drone.h"
-#include "entity/drone_configuration.h"
-#include "entity/drone_factory.h"
-#include "entity/target.h"
-#include "entity/target_factory.h"
-#include "utils/base_contact_listener.h"
+#include "salsa/behaviours/behaviour.h"
+#include "salsa/behaviours/registry.h"
+#include "salsa/entity/drone.h"
+#include "salsa/entity/drone_configuration.h"
+#include "salsa/entity/drone_factory.h"
+#include "salsa/entity/target.h"
+#include "salsa/entity/target_factory.h"
+#include "salsa/utils/base_contact_listener.h"
+#include "test_queue.h"
 namespace swarm {
 
 struct DroneParameters {

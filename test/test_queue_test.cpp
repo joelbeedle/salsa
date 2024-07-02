@@ -1,9 +1,9 @@
-#include "core/test_queue.h"
+#include "salsa/core/test_queue.h"
 
 #include <memory>
 
-#include "behaviours/parameter.h"
 #include "gtest/gtest.h"
+#include "salsa/behaviours/parameter.h"
 
 using swarm::TestConfig;
 using swarm::TestQueue;

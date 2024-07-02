@@ -2,8 +2,8 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "behaviours/registry.h"
 #include "mock_behaviour.h"
+#include "salsa/behaviours/registry.h"
 
 using swarm::Behaviour;
 using swarm::behaviour::Registry;

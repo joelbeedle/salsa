@@ -10,8 +10,8 @@
 #include <unordered_map>
 #include <vector>
 
-#include "behaviours/parameter.h"
-#include "utils/raycastcallback.h"
+#include "salsa/behaviours/parameter.h"
+#include "salsa/utils/raycastcallback.h"
 namespace swarm {
 
 // Forward declaration for `Drone` class

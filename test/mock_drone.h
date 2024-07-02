@@ -1,7 +1,7 @@
 #ifndef SWARM_TESTS_MOCK_DRONE_H
 #define SWARM_TESTS_MOCK_DRONE_H
-#include "entity/drone.h"
 #include "gmock/gmock.h"
+#include "salsa/entity/drone.h"
 class MockDrone : public swarm::Drone {
  public:
   MOCK_METHOD(void, update, (const std::vector<std::shared_ptr<Drone>>&), ());

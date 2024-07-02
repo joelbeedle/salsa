@@ -10,11 +10,11 @@
 #include <stdexcept>
 #include <variant>
 
-#include "behaviours/behaviour.h"
-#include "behaviours/parameter.h"
-#include "core/map.h"
-#include "entity/drone_configuration.h"
-#include "utils/base_contact_listener.h"
+#include "salsa/behaviours/behaviour.h"
+#include "salsa/behaviours/parameter.h"
+#include "salsa/core/map.h"
+#include "salsa/entity/drone_configuration.h"
+#include "salsa/utils/base_contact_listener.h"
 namespace swarm {
 
 void loadPermutations(std::vector<std::vector<float>> &permutations,

@@ -7,11 +7,11 @@
 #include <cstdio>
 #include <vector>
 
-#include "core/data.h"
+#include "salsa/core/data.h"
+#include "salsa/utils/object_types.h"
 #include "spdlog/cfg/env.h"  // support for loading levels from the environment variable
 #include "spdlog/fmt/ostr.h"  // support for user defined types
 #include "spdlog/spdlog.h"
-#include "utils/object_types.h"
 namespace swarm {
 class Entity {
  protected:

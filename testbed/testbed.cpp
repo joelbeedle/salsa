@@ -20,9 +20,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "core/test_queue.h"
 #define _CRT_SECURE_NO_WARNINGS
 #define IMGUI_DISABLE_OBSOLETE_FUNCTIONS 1
+
+#include "testbed.h"
 
 #include <stdio.h>
 
@@ -32,7 +33,6 @@
 
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
-#include "core/simulation.h"
 #include "draw.h"
 #include "imgui.h"
 #include "settings.h"

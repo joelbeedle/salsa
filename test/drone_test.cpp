@@ -1,13 +1,13 @@
-#include "entity/drone.h"
+#include "salsa/entity/drone.h"
 
 #include <box2d/box2d.h>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "behaviours/behaviour.h"
-#include "entity/drone_configuration.h"
-#include "entity/drone_factory.h"
 #include "mock_behaviour.h"
+#include "salsa/behaviours/behaviour.h"
+#include "salsa/entity/drone_configuration.h"
+#include "salsa/entity/drone_factory.h"
 
 using ::testing::_;
 // Test fixture for Drone tests

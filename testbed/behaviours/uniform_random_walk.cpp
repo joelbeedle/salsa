@@ -1,4 +1,5 @@
 #include <box2d/box2d.h>
+#include <salsa/salsa.h>
 
 #include <cmath>
 #include <cstdlib>
@@ -8,8 +9,6 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-
-#include "core/simulation.h"
 namespace swarm {
 class UniformRandomWalkBehaviour : public Behaviour {
  private:

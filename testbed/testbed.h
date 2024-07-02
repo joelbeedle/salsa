@@ -1,7 +1,7 @@
 #ifndef RUN_SIM_H
 #define RUN_SIM_H
 
-#include "core/simulation.h"
+#include <salsa/salsa.h>
 
 namespace testbed {
 int run();

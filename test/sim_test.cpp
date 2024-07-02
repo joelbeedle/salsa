@@ -1,14 +1,14 @@
-#include "core/sim.h"
+#include "salsa/core/sim.h"
 
 #include <memory>
 
-#include "behaviours/registry.h"
-#include "core/test_queue.h"
-#include "entity/drone_configuration.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "mock_behaviour.h"
 #include "mock_drone.h"
+#include "salsa/behaviours/registry.h"
+#include "salsa/core/test_queue.h"
+#include "salsa/entity/drone_configuration.h"
 
 using swarm::DroneConfiguration;
 using swarm::Sim;

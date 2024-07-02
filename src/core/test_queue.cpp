@@ -1,7 +1,7 @@
-#include "core/test_queue.h"
+#include "salsa/core/test_queue.h"
 
-#include "behaviours/registry.h"
 #include "nlohmann/json.hpp"
+#include "salsa/behaviours/registry.h"
 namespace swarm {
 
 std::vector<TestConfig> TestQueue::tests_;

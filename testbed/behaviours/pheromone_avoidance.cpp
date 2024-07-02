@@ -1,11 +1,10 @@
 #include <box2d/b2_math.h>
 #include <box2d/box2d.h>
+#include <salsa/salsa.h>
 
 #include <map>
 #include <memory>
 #include <unordered_map>
-
-#include "core/simulation.h"
 namespace swarm {
 class PheromoneBehaviour : public Behaviour {
  private:

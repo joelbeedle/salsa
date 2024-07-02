@@ -9,8 +9,8 @@
 #include <tuple>
 #include <typeinfo>
 
-#include "entity/target.h"
-#include "utils/object_types.h"
+#include "salsa/utils/object_types.h"
+#include "target.h"
 
 namespace swarm {
 

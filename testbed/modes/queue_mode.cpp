@@ -1,4 +1,5 @@
 #include <box2d/box2d.h>
+#include <salsa/salsa.h>
 #include <stdio.h>
 
 #include <chrono>
@@ -8,9 +9,7 @@
 #include <string>
 #include <vector>
 
-#include "core/simulation.h"
 #include "draw.h"
-#include "entity/drone_configuration.h"
 #include "imgui.h"
 #include "settings.h"
 #include "test.h"

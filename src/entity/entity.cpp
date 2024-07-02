@@ -1,4 +1,4 @@
-#include "entity/entity.h"
+#include "salsa/entity/entity.h"
 
 swarm::Entity::Entity(b2World *world, const b2Vec2 &position, bool is_static,
                       float radius, std::string type_name, long log_interval)
