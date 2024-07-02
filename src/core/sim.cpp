@@ -114,8 +114,8 @@ void Sim::update() {
                           {"velocity", {velocity.x, velocity.y}}});
       }
     }
-    int i = countFoundTargets();
-    nlohmann::json old_message = {{"targets_found", i}};
+    int targets_found = countFoundTargets();
+    nlohmann::json old_message = {{"targets_found", targets_found}};
     if (num_time_steps_ >= log_interval_) {
       nlohmann::json message;
       message["time"] = current_time_;

@@ -104,7 +104,7 @@ class Sim {
   Logger& logger_ = Logger::getInstance();
   std::chrono::steady_clock::time_point last_log_time;
   std::vector<std::shared_ptr<Observer>> observers_;
-  int log_interval_ = 5;  // time steps
+  int log_interval_ = 50;  // time steps between logs
   // Private methods for internal use
   void createBounds();
   void applyCurrentBehaviour();
