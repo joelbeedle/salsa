@@ -35,7 +35,7 @@ Drone::Drone(b2World *world, const b2Vec2 &position, Behaviour &behaviour,
   userData->object = this;
   CollisionConfig c = CollisionManager::getCollisionConfig<Drone>();
   fixtureDef.filter.categoryBits = 0x0002;
-  fixtureDef.filter.maskBits = 0x0001;
+  fixtureDef.filter.maskBits = 0x0001 | 0x0002;
   fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(userData);
   // fixtureDef.filter.groupIndex = -1;
   body_->CreateFixture(&fixtureDef);

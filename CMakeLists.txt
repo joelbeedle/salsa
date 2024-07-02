@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14...3.51)
 
-project(SwarmSim
+project(SALSA
  VERSION 1.0
  DESCRIPTION "Drone Swarm Simulation System"
  LANGUAGES CXX C)

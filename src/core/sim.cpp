@@ -125,6 +125,8 @@ void Sim::update() {
 
 void Sim::reset() {
   current_time_ = 0.0;
+  b2Vec2 gravity(0.0f, 0.0f);
+  world_->SetGravity(gravity);
   drones_.clear();
   targets_.clear();
   createDrones(*behaviour_, *drone_configuration_, SpawnType::CIRCULAR);
@@ -357,4 +359,13 @@ void Sim::setCurrentDroneConfiguration(DroneConfiguration &configuration) {
   updateDroneSettings();
 }
 
+void Sim::changeMap(std::string name) {
+  logger::get()->info("Changing map to {}", name);
+  map::Map map = map::getMap(name);
+  map_ = map;
+  world_ = map.world;
+  border_width_ = map.width;
+  border_height_ = map.height;
+  reset();
+}
 }  // namespace salsa

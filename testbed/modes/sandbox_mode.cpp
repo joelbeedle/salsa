@@ -224,6 +224,26 @@ class SandboxSimulator : public Test {
         pause = true;
         update_drone_count_ = true;
       }
+
+      auto mapNames = salsa::map::getMapNames();
+      static std::string current_map_name = mapNames[0];
+      if (ImGui::BeginCombo("Map", current_map_name.c_str())) {
+        for (auto &name : mapNames) {
+          bool isSelected = (current_map_name == name);
+          if (ImGui::Selectable(name.c_str(), isSelected)) {
+            // set current map in sim and reset
+            current_map_name = name;
+            sim->changeMap(name);
+            m_world = sim->getWorld();
+          }
+          if (isSelected) {
+            ImGui::SetItemDefaultFocus();
+          }
+        }
+        ImGui::EndCombo();
+      }
+
+      auto new_map = salsa::map::getMap(current_map_name);
     }
     ImGui::End();
   }

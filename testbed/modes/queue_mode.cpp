@@ -409,7 +409,6 @@ class QueueSimulator : public Test {
       static float new_time_limit = 0.0f;
       static bool to_change = false;
       static b2World *new_world = nullptr;
-      static salsa::map::Map new_map;
 
       // Get behaviour name for test
       if (ImGui::BeginCombo("Behaviour", current_name.c_str())) {
@@ -496,17 +495,42 @@ class QueueSimulator : public Test {
       }
 
       // Get world map for test
-      static char str1[128] = "";
-      ImGui::InputText("Map Name", str1, IM_ARRAYSIZE(str1));
-      if (ImGui::Button("Open", ImVec2(120, 0))) {
-        new_map = salsa::map::load(str1);
-        new_world = new_map.world;
+      auto mapNames = salsa::map::getMapNames();
+      static std::string current_map_name = mapNames[0];
+      if (ImGui::BeginCombo("Map", current_map_name.c_str())) {
+        for (auto &name : mapNames) {
+          bool isSelected = (current_map_name == name);
+          if (ImGui::Selectable(name.c_str(), isSelected)) {
+            current_map_name = name;
+          }
+          if (isSelected) {
+            ImGui::SetItemDefaultFocus();
+          }
+        }
+        ImGui::EndCombo();
       }
 
-      if (new_world != nullptr) {
-        ImGui::SameLine();
-        ImGui::Text("Map Loaded");
+      auto new_map = salsa::map::getMap(current_map_name);
+
+      auto listenerNames = salsa::BaseContactListener::getListenerNames();
+      static std::string current_listener_name =
+          listenerNames.empty() ? "" : listenerNames[0];
+
+      if (ImGui::BeginCombo("Listener Type", current_listener_name.c_str())) {
+        for (auto &name : listenerNames) {
+          bool isSelected = (current_listener_name == name);
+          if (ImGui::Selectable(name.c_str(), isSelected)) {
+            current_listener_name = name;
+          }
+          if (isSelected) {
+            ImGui::SetItemDefaultFocus();
+          }
+        }
+        ImGui::EndCombo();
       }
+
+      static auto *listener =
+          salsa::BaseContactListener::getListenerByName(current_listener_name);
 
       // Get drone configuration for test
       auto droneConfigNames =
@@ -529,13 +553,25 @@ class QueueSimulator : public Test {
       static auto *drone_config =
           salsa::DroneConfiguration::getDroneConfigurationByName(
               current_drone_config_name);
+
+      auto targetNames = salsa::TargetFactory::getTargetNames();
+      std::string current_target_name = targetNames[0];
+      // Get target type from TargetFactory Registry
+      if (ImGui::BeginCombo("Target Type", current_target_name.c_str())) {
+        for (auto &name : targetNames) {
+          bool isSelected = (current_target_name == name);
+          if (ImGui::Selectable(name.c_str(), isSelected)) {
+            current_target_name = name;
+          }
+          if (isSelected) {
+            ImGui::SetItemDefaultFocus();
+          }
+        }
+        ImGui::EndCombo();
+      }
       ImGui::InputInt("Drone Count", &new_drone_count);
       ImGui::InputInt("Target Count", &new_target_count);
       ImGui::InputFloat("Time Limit", &new_time_limit);
-
-      if (new_world == nullptr) {
-        ImGui::BeginDisabled();
-      }
 
       if (ImGui::Button("Generate Permutations")) {
         std::vector<std::vector<float>> lists;
@@ -580,22 +616,15 @@ class QueueSimulator : public Test {
             new_params[name] = chosen_params[name]->clone();
             *(new_params[name]) = static_cast<float>(combination[j]);
           }
-
           salsa::TestConfig new_config = {
-              current_name,    new_params,       drone_config,   new_map,
-              new_drone_count, new_target_count, new_time_limit,
-          };
+              current_name,   new_params,          drone_config,
+              new_map,        new_drone_count,     new_target_count,
+              new_time_limit, current_target_name, listener};
 
           queue_.push(new_config);
           added_test_permutation_ = true;
           ImGui::CloseCurrentPopup();
         }
-      }
-
-      if (new_world == nullptr) {
-        ImGui::EndDisabled();
-        if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip))
-          ImGui::SetTooltip("Please select a map first");
       }
 
       ImGui::SameLine();

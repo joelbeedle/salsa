@@ -255,6 +255,7 @@ class Sim {
   DroneConfiguration* getDroneConfiguration();
   const DroneConfiguration* drone_configuration() const;
   void setCurrentDroneConfiguration(DroneConfiguration& configuration);
+  void changeMap(std::string name);
 };
 
 /// @brief Builder class for the Sim class.

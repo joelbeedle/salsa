@@ -1,6 +1,6 @@
 
 add_executable(
-  swarm_test
+  salsa_test
   drone_test.cpp
   behaviour_registry_test.cpp
   parameter_test.cpp
@@ -9,7 +9,7 @@ add_executable(
   mock_behaviour.h
   mock_drone.h
 )
-target_link_libraries(swarm_test PRIVATE GTest::gtest_main GTest::gmock_main spdlog::spdlog nlohmann_json::nlohmann_json box2d swarm-sim)
+target_link_libraries(salsa_test PRIVATE GTest::gtest_main GTest::gmock_main spdlog::spdlog nlohmann_json::nlohmann_json box2d salsa)
 
 include(GoogleTest)
-gtest_discover_tests(swarm_test)
+gtest_discover_tests(salsa_test)

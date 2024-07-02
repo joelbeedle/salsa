@@ -16,13 +16,13 @@ FetchContent_MakeAvailable(nlohmann_json)
 # Make spdlog available
 FetchContent_MakeAvailable(spdlog)
 
-add_library(swarm-sim ${SOURCE_LIST} ${HEADER_LIST})
+add_library(salsa ${SOURCE_LIST} ${HEADER_LIST})
 
-target_link_libraries(swarm-sim PRIVATE nlohmann_json::nlohmann_json spdlog::spdlog box2d)
-target_include_directories(swarm-sim PRIVATE ${spdlog_SOURCE_DIR}/include ${nlohmann_json_SOURCE_DIR}/include ${FREETYPE_INCLUDE_DIRS})
-target_include_directories(swarm-sim PUBLIC ../include)
+target_link_libraries(salsa PRIVATE nlohmann_json::nlohmann_json spdlog::spdlog box2d)
+target_include_directories(salsa PRIVATE ${spdlog_SOURCE_DIR}/include ${nlohmann_json_SOURCE_DIR}/include ${FREETYPE_INCLUDE_DIRS})
+target_include_directories(salsa PUBLIC ../include)
 
-target_compile_features(swarm-sim PUBLIC cxx_std_17)
+target_compile_features(salsa PUBLIC cxx_std_17)
 
 source_group(
     TREE "${PROJECT_SOURCE_DIR}/include"
