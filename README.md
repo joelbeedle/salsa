@@ -3,7 +3,7 @@
 **S**warm **Al**gorithm **S**imul**a**tior: library, and Testbed, written in C++.
 
 ## Getting Started
-There is a Docker container available. It opens a noVNC web app on `localhost` with `salsa-sim` pre-installed.
+There is a Docker container available. It opens a noVNC web app on `localhost` with `salsa` pre-installed.
 
 ### Using the Docker container
 This docker container **only** contains what is in the repository. If you want to extend the program, you need to clone the repository and build the docker container / the code.
