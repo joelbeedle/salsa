@@ -6,7 +6,7 @@
 
 #include <algorithm>
 #include <chrono>
-#include <filesystem>  // C++17 header for directory operations
+#include <filesystem>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -81,12 +81,9 @@ void user() {
   static auto contactListener =
       std::make_shared<swarm::BaseContactListener>("Default");
   setupInteractions(*contactListener);
-  swarm::map::Map map = swarm::map::load("poly");
-  swarm::map::Map map1 = {"Map1", BORDER_WIDTH, BORDER_HEIGHT, b2Vec2(0, 0),
-                          new b2World(b2Vec2(0.0f, 0.0f))};
-  swarm::TestConfig config = {"Flocking", flock_params, smallDrone,
-                              map,        100,          100,
-                              1200.0f,    "Tree",       contactListener.get()};
+  swarm::TestConfig config = {
+      "Flocking", flock_params, smallDrone, swarm::map::getMap("poly"), 100,
+      100,        1200.0f,      "Tree",     contactListener.get()};
   std::vector<std::vector<float>> loaded_permutations;
   std::vector<std::string> loaded_parameter_names;
   // swarm::loadPermutations(loaded_permutations, loaded_parameter_names,
