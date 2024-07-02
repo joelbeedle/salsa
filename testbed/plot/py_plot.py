@@ -1,11 +1,26 @@
 import re
 import pandas as pd
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.spatial import distance_matrix
 import os
 
+matplotlib.use("Agg")
+
 global df
+global output_path
+global file_name
+
+
+def set_file_name(name: str):
+    global file_name
+    file_name = name[:-10]
+
+
+def set_output_path(path: str):
+    global output_path
+    output_path = path
 
 
 def create_dataframe(file_path: str) -> pd.DataFrame:
@@ -98,7 +113,6 @@ def plot_targets_found(data_frame, ax):
     ax.set_ylabel("Targets Found (%)")
     ax.set_xlabel("Time (s)")
 
-    plt.savefig("targets_found.pdf")
     return ax
 
     plt.show()
@@ -107,8 +121,9 @@ def plot_targets_found(data_frame, ax):
 def plot_targets_found_wrapper():
     fig, ax = plt.subplots(figsize=(10, 6), layout="constrained")
     ax = plot_targets_found(df, ax)
-    fig.savefig("targets_found.pdf")
-    plt.show()
+    print(f"{file_name}")
+    fig.savefig(f"{output_path}/{file_name}targets_found.pdf")
+    plt.close(fig)
 
 
 def plot_speed(data_frame, ax):
@@ -152,6 +167,14 @@ def plot_speed(data_frame, ax):
     plt.grid(True)
     plt.savefig("drone_speed.pdf")
     plt.show()
+
+
+def plot_speed_wrapper():
+    fig, ax = plt.subplots(figsize=(10, 6), layout="constrained")
+    ax = plot_speed(df, ax)
+    print(f"{file_name}")
+    fig.savefig(f"{output_path}/{file_name}/drone_speed.pdf")
+    plt.close(fig)
 
 
 def plot_speed_per_drone(data_frame):
@@ -275,6 +298,14 @@ def plot_nearest_neighbor_distance(data_frame, ax):
     plt.show()
 
 
+def plot_drone_distances_wrapper():
+    fig, ax = plt.subplots(figsize=(10, 6), layout="constrained")
+    ax = plot_nearest_neighbor_distance(df, ax)
+    print(f"{file_name}")
+    fig.savefig(f"{output_path}/{file_name}/nearest_neighbor_distance.pdf")
+    plt.close(fig)
+
+
 def plot_trace(data_frame, ax, border_size: str):
     trace_points = data_frame[["drone_id", "position_x", "position_y"]]
     step_size, minor_size = get_axis_steps(border_size)
@@ -308,6 +339,14 @@ def plot_trace(data_frame, ax, border_size: str):
     ax.set_ylabel("Height (m)")
     ax.set_xlabel("Width (m)")
     return ax
+
+
+def plot_trace_wrapper(border_size: str):
+    fig, ax = plt.subplots(figsize=(10, 6), layout="constrained")
+    ax = plot_trace(df, ax, border_size)
+    print(f"{file_name}")
+    fig.savefig(f"{output_path}/{file_name}/drone_trace.pdf")
+    plt.close(fig)
 
 
 def plot_heatmap(data_frame, ax, bin_size: str, border_size: str):
@@ -345,3 +384,10 @@ def plot_heatmap(data_frame, ax, bin_size: str, border_size: str):
     ax.set_xlabel("Width (m)")
 
     return im, ax
+
+
+def plot_heatmap_wrapper(bin_size: str, border_size: str):
+    fig, ax = plt.subplots(figsize=(10, 6), layout="constrained")
+    im, ax = plot_heatmap(df, ax, bin_size, border_size)
+    fig.savefig(f"{output_path}/{file_name}/drone_heatmap.pdf")
+    plt.close(fig)

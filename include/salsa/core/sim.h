@@ -53,6 +53,7 @@ class Sim {
   float current_time_ = 0.0f;
   bool is_stack_test_ = false;
   int num_time_steps_ = 0;
+  std::string current_log_file_;
   ///@}
 
   /// @name Drone properties
@@ -247,6 +248,7 @@ class Sim {
   float& current_time();
   const float& current_time() const;
   float& time_limit();
+  std::string& getCurrentLogFile();
   b2World* getWorld();
   void setWorld(b2World* world);
   map::Map getMap();

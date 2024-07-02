@@ -1,5 +1,6 @@
 #include "salsa/core/data.h"
 
+#include "salsa/core/map.h"
 using namespace salsa;
 
 std::shared_ptr<spdlog::logger> Logger::logger_ = nullptr;
@@ -14,11 +15,13 @@ Logger& Logger::getInstance() {
 }
 
 void Logger::init_logger(const std::string& log_file) {
+  std::filesystem::path log_path = salsa::map::getExecutablePath() / ".." /
+                                   ".." / "testbed" / "results" / log_file;
   spdlog::drop("async_logger");
   spdlog::init_thread_pool(8192,
                            1);  // Queue with 8192 slots and 1 background thread
-  logger_ =
-      spdlog::basic_logger_mt<spdlog::async_factory>("async_logger", log_file);
+  logger_ = spdlog::basic_logger_mt<spdlog::async_factory>("async_logger",
+                                                           log_path.string());
   logger_->set_pattern("%v");
   spdlog::set_default_logger(logger_);
   spdlog::set_level(spdlog::level::info);

@@ -45,6 +45,7 @@
 #if defined(_WIN32)
 #include <crtdbg.h>
 #endif
+#include "plot/plot.h"
 
 namespace testbed {
 
@@ -512,6 +513,7 @@ int run_headless(bool verbose) {
         }
         std::cout << std::endl;
         std::cout << "Finished test " << test.behaviour_name << std::endl;
+        testbed::plot(sim->getCurrentLogFile());
       } catch (const std::exception &e) {
         spdlog::error("Error: {}", e.what());
         std::cerr << e.what() << std::endl;
@@ -529,6 +531,7 @@ int run_headless(bool verbose) {
         sim->getWorld()->Step(1 / 60.0f, 8, 3);
         sim->current_time() += (1.0f / 60.0f) * 1.0f;
       }
+      testbed::plot(sim->getCurrentLogFile());
     }
   }
 

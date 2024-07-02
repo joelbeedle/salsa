@@ -49,7 +49,8 @@ Sim::Sim(TestConfig &config)
 
   std::ostringstream oss;
   oss << std::put_time(&tm, "%Y-%m-%d_%H-%M-%S") << "_"
-      << current_behaviour_name_.c_str() << ".log";
+      << current_behaviour_name_.c_str() << "/result.log";
+  current_log_file_ = oss.str();
   logger_.switch_log_file(oss.str());
 
   world_->SetContactListener(contact_listener_);
@@ -370,4 +371,6 @@ void Sim::changeMap(std::string name) {
   drone_spawn_position_ = map.drone_spawn_point;
   reset();
 }
+
+std::string &Sim::getCurrentLogFile() { return current_log_file_; }
 }  // namespace salsa

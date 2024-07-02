@@ -100,4 +100,5 @@ __pycache__
 testbed/plot/2024*
 testbed/plot/*.pdf
 testbed/plot/*.svg
+testbed/results/*
 *.log

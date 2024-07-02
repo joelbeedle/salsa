@@ -521,8 +521,8 @@ class MapCreator : public Test {
     bool changed = false;
     if (draw_boundary) {
       ImGui::Text("Boundary Length");
-      changed =
-          ImGui::SliderFloat("Length", &boundary_side_length, 0.0f, 4000.0f);
+      changed = ImGui::SliderFloat("Length", &boundary_side_length, 0.0f,
+                                   4000.0f, "%.1fm");
       if (changed) {
         DeleteBoundary();
         CreateBoundary();

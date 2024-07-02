@@ -1,4 +1,5 @@
 #include <box2d/box2d.h>
+#include <plot/plot.h>
 #include <salsa/salsa.h>
 #include <stdio.h>
 
@@ -87,6 +88,8 @@ class QueueSimulator : public Test {
     }
     auto old_sim = sim;
     sim = temp_sim;
+    std::string current_log_file = old_sim->getCurrentLogFile();
+    if (current_log_file != "") testbed::plot(current_log_file);
     delete old_sim;
     sim->setCurrentBehaviour(sim->current_behaviour_name());
     m_world = sim->getWorld();
@@ -774,7 +777,32 @@ class QueueSimulator : public Test {
       }
       if (sim->getDroneConfiguration() == nullptr) {
       }
+
+      ImGui::SeparatorText("Graph Plotting Settings");
+
+      static bool plot_graphs = true;
+      static bool plot_graph1 = false;
+      static bool plot_graph2 = false;
+      static bool plot_graph3 = false;
+      static bool plot_graph4 = false;
+      static bool plot_graph5 = false;
+
+      ImGui::Checkbox("Plot Graphs", &plot_graphs);
+      if (plot_graphs) {
+        ImGui::Checkbox("Plot Targets Found", &testbed::plot_targets_found);
+        ImGui::Checkbox("Plot Drone Distances", &testbed::plot_drone_distances);
+        ImGui::Checkbox("Plot Drone Heatmap", &testbed::plot_drone_heatmap);
+        ImGui::Checkbox("Plot Drone Trace", &testbed::plot_drone_trace);
+        ImGui::Checkbox("Plot Drone Speed", &testbed::plot_drone_speed);
+      } else if (!plot_graphs) {
+        plot_graph1 = false;
+        plot_graph2 = false;
+        plot_graph3 = false;
+        plot_graph4 = false;
+        plot_graph5 = false;
+      }
     }
+
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if (ImGui::CollapsingHeader("Drone Settings")) {
       // Drone settings window
