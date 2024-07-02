@@ -1,4 +1,4 @@
-# SALSA - salsa Algorithm Simulator
+# SALSA - Swarm Algorithm Simulator
 
 **S**warm **Al**gorithm **S**imul**a**tior: library, and Testbed, written in C++.
 
@@ -77,7 +77,7 @@ It may be neccessary to install some extra dependencies on Linux (or just do `su
    ```
 - **Configure the project with CMake:**
    ```bash
-   cd salsa-sim
+   cd salsa
    cmake -S . -B build
    ```
   > If you have Ninja installed, for a faster build time use:
@@ -109,19 +109,19 @@ The testbed, when opened, presents the main menu. From here, we can access the f
    - Sandbox Mode
 - **Map Creator**
 
-It comes prepackaged with a few salsa algorithms, a drone configuration, and `Tree`s as targets.
+It comes prepackaged with a few swarm algorithms, a drone configuration, and `Tree`s as targets.
 
 ## Extensibility
-Users can extend the functionality of the testbed. They can add custom salsa algorithms, targets for the drones to find, custom contact listeners and contact managers, as well as custom drone configurations. Users can create their own maps for the simulations and could set new custom data to log. It is also possible to add custom testbed modes, similar to the current `Queue` and `Sandbox` modes.
+Users can extend the functionality of the testbed. They can add custom swarm algorithms, targets for the drones to find, custom contact listeners and contact managers, as well as custom drone configurations. Users can create their own maps for the simulations and could set new custom data to log. It is also possible to add custom testbed modes, similar to the current `Queue` and `Sandbox` modes.
 
 For more information on extending the various aspects of the testbed, expand a section below.
 
 <details>
   
-<summary>Adding new salsa Algorithms</summary>
+<summary>Adding new swarm Algorithms</summary>
 
-### Add a Custom salsa Algorithm
-To add a custom salsa algorithm:
+### Add a Custom swarm Algorithm
+To add a custom swarm algorithm:
 Create a new `.cpp` file inside `testbed/behaviors`, and name it, etc `my_alg.cpp`.
 
 Inside this file, import `<salsa/salsa.h>` to import all library headers.
