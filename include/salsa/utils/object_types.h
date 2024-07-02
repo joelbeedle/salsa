@@ -3,7 +3,7 @@
 #ifndef SWARM_SIM_UTILS_OBJECT_TYPES_H
 #define SWARM_SIM_UTILS_OBJECT_TYPES_H
 #include <iostream>
-namespace swarm {
+namespace salsa {
 class Entity;
 
 /// @brief Enum class representing different types of objects in the simulation.
@@ -57,6 +57,6 @@ struct UserData {
   }
 };
 
-}  // namespace swarm
+}  // namespace salsa
 
 #endif  // SWARM_SIM_UTILS_OBJECT_TYPES_H

@@ -15,7 +15,7 @@
 #include "salsa/core/map.h"
 #include "salsa/entity/drone_configuration.h"
 #include "salsa/utils/base_contact_listener.h"
-namespace swarm {
+namespace salsa {
 
 /// Represents the configuration for a single test within the simulation.
 struct TestConfig {
@@ -82,6 +82,6 @@ void loadPermutations(std::vector<std::vector<float>> &permutations,
                       std::vector<std::string> &parameter_names,
                       std::string filename);
 
-}  // namespace swarm
+}  // namespace salsa
 
 #endif  // SWARM_SIM_CORE_TEST_STACK_H

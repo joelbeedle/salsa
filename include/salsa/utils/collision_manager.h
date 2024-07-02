@@ -18,7 +18,7 @@
 
 #include "spdlog/spdlog.h"
 
-namespace swarm {
+namespace salsa {
 
 /// @brief Collision configuration for a given entity type.
 ///
@@ -131,5 +131,5 @@ class CollisionManager {
     }
   }
 };
-}  // namespace swarm
+}  // namespace salsa
 #endif  // SWARM_UTILS_COLLISION_MANAGER_H

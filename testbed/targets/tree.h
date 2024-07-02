@@ -4,7 +4,7 @@
 #include <box2d/box2d.h>
 #include <salsa/salsa.h>
 
-class Tree : public swarm::Target {
+class Tree : public salsa::Target {
  private:
   bool diseased;
   bool mapped;

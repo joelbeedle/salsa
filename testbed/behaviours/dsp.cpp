@@ -1,5 +1,5 @@
 #include <salsa/salsa.h>
-namespace swarm {
+namespace salsa {
 class DSPPoint {
  public:
   float radius = 2.0f;
@@ -233,4 +233,4 @@ class DSPBehaviour : public Behaviour {
 auto d = std::make_unique<DSPBehaviour>();
 auto dsp_behaviour =
     behaviour::Registry::get().add("DSPBehaviour", std::move(d));
-}  // namespace swarm
+}  // namespace salsa

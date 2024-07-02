@@ -479,12 +479,12 @@ int run_headless(bool verbose) {
   if (verbose) {
     auto start = std::chrono::steady_clock::now();
     int count = 0;
-    int original_size = swarm::TestQueue::size();
-    while (swarm::TestQueue::size() > 0) {
+    int original_size = salsa::TestQueue::size();
+    while (salsa::TestQueue::size() > 0) {
       try {
-        auto test = swarm::TestQueue::pop();
+        auto test = salsa::TestQueue::pop();
         count++;
-        swarm::Sim *sim = new swarm::Sim(test);
+        salsa::Sim *sim = new salsa::Sim(test);
         sim->setCurrentBehaviour(sim->current_behaviour_name());
         std::cout << "(" << count << "/" << original_size << ")"
                   << " Running test: " << test.behaviour_name << std::endl;
@@ -519,8 +519,8 @@ int run_headless(bool verbose) {
     }
   } else {
     while (true) {
-      auto test = swarm::TestQueue::pop();
-      swarm::Sim *sim = new swarm::Sim(test);
+      auto test = salsa::TestQueue::pop();
+      salsa::Sim *sim = new salsa::Sim(test);
       sim->setCurrentBehaviour(sim->current_behaviour_name());
       std::cout << "Running test " << test.behaviour_name << std::endl;
 

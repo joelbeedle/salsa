@@ -11,7 +11,7 @@
 #include "nlohmann/json.hpp"
 #include "settings.h"
 #include "test.h"
-using namespace swarm;
+using namespace salsa;
 
 class myQueryCallback : public b2QueryCallback {
  public:

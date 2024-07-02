@@ -6,7 +6,7 @@
 #include <cstdlib>
 #include <memory>
 #include <string>
-namespace swarm {
+namespace salsa {
 std::string demangle(const char* name) {
   int status = -1;
   std::unique_ptr<char, void (*)(void*)> res{
@@ -14,9 +14,9 @@ std::string demangle(const char* name) {
 
   return (status == 0) ? std::string(res.get()) : std::string(name);
 }
-}  // namespace swarm
+}  // namespace salsa
 #else
-namespace swarm {
+namespace salsa {
 std::string demangle(const char* name) { return std::string(name); }
-}  // namespace swarm
+}  // namespace salsa
 #endif  // __GNUG__

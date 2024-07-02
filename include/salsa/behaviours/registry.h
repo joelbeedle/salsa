@@ -9,7 +9,7 @@
 
 #include "salsa/behaviours/behaviour.h"
 
-namespace swarm {
+namespace salsa {
 namespace behaviour {
 /// @brief Singleton class that manages and provides access to Behaviour
 /// instances.
@@ -82,6 +82,6 @@ class Registry {
 };
 
 }  // namespace behaviour
-}  // namespace swarm
+}  // namespace salsa
 
 #endif  // SWARM_SIM_UTILS_BEHAVIOUR_REGISTRY_H

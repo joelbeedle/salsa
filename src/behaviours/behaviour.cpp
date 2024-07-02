@@ -3,7 +3,7 @@
 #include "box2d/box2d.h"
 #include "salsa/entity/drone.h"
 
-using namespace swarm;
+using namespace salsa;
 
 void Behaviour::setParameters(
     const std::unordered_map<std::string, float> &parameters) {
@@ -17,7 +17,7 @@ void Behaviour::setParameters(
 }
 
 void Behaviour::setParameters(
-    const std::unordered_map<std::string, swarm::behaviour::Parameter *>
+    const std::unordered_map<std::string, salsa::behaviour::Parameter *>
         &parameters) {
   auto parameters_ = getParameters();  // Update the existing parameters
   for (const auto &[name, val] : parameters) {

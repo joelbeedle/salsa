@@ -6,7 +6,7 @@
 #include <iostream>
 #include <stdexcept>
 
-namespace swarm {
+namespace salsa {
 namespace behaviour {
 /// @brief Represents a bounded numerical parameter, to be used for behaviors.
 ///
@@ -102,6 +102,6 @@ class Parameter {
 };
 
 }  // namespace behaviour
-}  // namespace swarm
+}  // namespace salsa
 
 #endif  // SWARM_SIM_BEHAVIOURS_PARAMETER_H

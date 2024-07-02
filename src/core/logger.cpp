@@ -1,8 +1,8 @@
 #include "salsa/core/logger.h"
 
-using namespace swarm;
+using namespace salsa;
 // Initialize and manage the static logger
-std::shared_ptr<spdlog::logger>& swarm::logger::get() {
+std::shared_ptr<spdlog::logger>& salsa::logger::get() {
   static std::shared_ptr<spdlog::logger> logger = spdlog::default_logger();
   return logger;
 }

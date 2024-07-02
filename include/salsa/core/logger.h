@@ -8,7 +8,7 @@
 
 #include <memory>
 
-namespace swarm {
+namespace salsa {
 namespace logger {
 
 // Declaration of logger accessor and setter
@@ -19,5 +19,5 @@ void set(std::shared_ptr<spdlog::logger> custom_logger);
 void log_info(const std::string& message);
 void log_error(const std::string& message);
 }  // namespace logger
-}  // namespace swarm
+}  // namespace salsa
 #endif  // LOGGER_H

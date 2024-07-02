@@ -1,6 +1,6 @@
 #include "salsa/core/data.h"
 
-using namespace swarm;
+using namespace salsa;
 
 std::shared_ptr<spdlog::logger> Logger::logger_ = nullptr;
 

@@ -1,6 +1,6 @@
 #include "salsa/entity/entity.h"
 
-swarm::Entity::Entity(b2World *world, const b2Vec2 &position, bool is_static,
+salsa::Entity::Entity(b2World *world, const b2Vec2 &position, bool is_static,
                       float radius, std::string type_name, long log_interval)
     : world_(world),
       radius_(radius),
@@ -19,13 +19,13 @@ swarm::Entity::Entity(b2World *world, const b2Vec2 &position, bool is_static,
 }
 
 template <>
-struct fmt::formatter<swarm::Entity> : fmt::formatter<std::string> {
-  auto format(swarm::Entity my, format_context &ctx) -> decltype(ctx.out()) {
-    return fmt::format_to(ctx.out(), "[{} {}]", swarm::type(my), my.id());
+struct fmt::formatter<salsa::Entity> : fmt::formatter<std::string> {
+  auto format(salsa::Entity my, format_context &ctx) -> decltype(ctx.out()) {
+    return fmt::format_to(ctx.out(), "[{} {}]", salsa::type(my), my.id());
   }
 };
 
-void swarm::Entity::notifyAll(float time, const nlohmann::json &message) {
+void salsa::Entity::notifyAll(float time, const nlohmann::json &message) {
   nlohmann::json message_with_id;
   message_with_id["message"] = message.dump();
   message_with_id["time"] = time;

@@ -13,7 +13,7 @@
 #include "salsa/behaviours/behaviour.h"
 #include "salsa/utils/collision_manager.h"
 #include "target.h"
-namespace swarm {
+namespace salsa {
 
 /// @class Drone
 /// @brief Represents a drone entity in the simulation environment.
@@ -106,6 +106,6 @@ class Drone : public Entity {
   ///@}
 };
 
-}  // namespace swarm
+}  // namespace salsa
 
 #endif  // SWARM_SIM_DRONES_DRONE_H

@@ -9,7 +9,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-namespace swarm {
+namespace salsa {
 class UniformRandomWalkBehaviour : public Behaviour {
  private:
   std::unordered_map<std::string, behaviour::Parameter *> parameters_;
@@ -105,8 +105,8 @@ class UniformRandomWalkBehaviour : public Behaviour {
 };
 
 auto uniform_random_walk =
-    std::make_unique<swarm::UniformRandomWalkBehaviour>(10.0f, 1.0f, 1.0f);
+    std::make_unique<salsa::UniformRandomWalkBehaviour>(10.0f, 1.0f, 1.0f);
 
 auto uniform_random_walk_behaviour = behaviour::Registry::get().add(
     "Uniform Random Walk", std::move(uniform_random_walk));
-}  // namespace swarm
+}  // namespace salsa

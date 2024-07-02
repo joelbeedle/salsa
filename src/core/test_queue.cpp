@@ -2,7 +2,7 @@
 
 #include "nlohmann/json.hpp"
 #include "salsa/behaviours/registry.h"
-namespace swarm {
+namespace salsa {
 
 std::vector<TestConfig> TestQueue::tests_;
 
@@ -28,10 +28,10 @@ void TestQueue::addPermutedTests(
     const TestConfig& base, const std::vector<std::vector<float>>& permutations,
     const std::vector<std::string>& parameter_names) {
   for (const auto& combination : permutations) {
-    std::unordered_map<std::string, swarm::behaviour::Parameter*> new_params;
+    std::unordered_map<std::string, salsa::behaviour::Parameter*> new_params;
     TestConfig modifiedConfig = base;  // Copy base config
     auto chosen_behaviour =
-        swarm::behaviour::Registry::get().behaviour(base.behaviour_name);
+        salsa::behaviour::Registry::get().behaviour(base.behaviour_name);
     auto chosen_params = chosen_behaviour->getParameters();
     for (size_t j = 0; j < parameter_names.size(); ++j) {
       const auto& name = parameter_names[j];
@@ -59,4 +59,4 @@ void loadPermutations(std::vector<std::vector<float>>& permutations,
   }
 }
 
-}  // namespace swarm
+}  // namespace salsa

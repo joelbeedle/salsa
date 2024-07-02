@@ -1,5 +1,5 @@
 /// @file behaviour.h
-/// @brief Contains the abstract base class for all swarm behaviours to inherit.
+/// @brief Contains the abstract base class for all salsa behaviours to inherit.
 #ifndef SWARM_SIM_BEHAVIOURS_BEHAVIOUR_H
 #define SWARM_SIM_BEHAVIOURS_BEHAVIOUR_H
 
@@ -12,11 +12,11 @@
 
 #include "salsa/behaviours/parameter.h"
 #include "salsa/utils/raycastcallback.h"
-namespace swarm {
+namespace salsa {
 
 class Drone;
 
-/// @brief Abstract base class for all swarm behaviours to inherit from.
+/// @brief Abstract base class for all salsa behaviours to inherit from.
 class Behaviour {
  protected:
   /// @brief Map of parameter names to their settings.
@@ -52,7 +52,7 @@ class Behaviour {
   void setParameters(const std::unordered_map<std::string, float> &parameters);
 
   void setParameters(
-      const std::unordered_map<std::string, swarm::behaviour::Parameter *>
+      const std::unordered_map<std::string, salsa::behaviour::Parameter *>
           &parameters);
 
  protected:
@@ -92,6 +92,6 @@ class Behaviour {
 };
 
 // }  // namespace behaviours
-}  // namespace swarm
+}  // namespace salsa
 
 #endif  // SWARM_SIM_BEHAVIOURS_BEHAVIOUR_H

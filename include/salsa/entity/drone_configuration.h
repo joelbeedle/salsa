@@ -6,7 +6,7 @@
 
 #include <string>
 #include <vector>
-namespace swarm {
+namespace salsa {
 
 /// @brief Class representing the configuration parameters for a drone.
 class DroneConfiguration {
@@ -52,6 +52,6 @@ class DroneConfiguration {
   const std::string &name() const { return name_; }
 };
 
-}  // namespace swarm
+}  // namespace salsa
 
 #endif  // SWARM_SIM_UTILS_DRONE_CONFIGURATION_H

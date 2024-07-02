@@ -15,7 +15,7 @@
 #include "spdlog/cfg/env.h"  // support for loading levels from the environment variable
 #include "spdlog/fmt/ostr.h"  // support for user defined types
 #include "spdlog/spdlog.h"
-namespace swarm {
+namespace salsa {
 /// @class Entity
 /// @brief Represents a generic physical entity in a simulation environment.
 ///
@@ -86,6 +86,6 @@ class Entity {
   ///@}
 };
 
-}  // namespace swarm
+}  // namespace salsa
 
 #endif  // SWARM_ENTITY_H

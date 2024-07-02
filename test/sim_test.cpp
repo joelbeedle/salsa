@@ -10,9 +10,9 @@
 #include "salsa/core/test_queue.h"
 #include "salsa/entity/drone_configuration.h"
 
-using swarm::DroneConfiguration;
-using swarm::Sim;
-using swarm::behaviour::Registry;
+using salsa::DroneConfiguration;
+using salsa::Sim;
+using salsa::behaviour::Registry;
 
 class SimTest : public ::testing::Test {
  protected:
@@ -24,9 +24,9 @@ class SimTest : public ::testing::Test {
 
   void SetUp() override {
     auto mockBehaviour = std::make_unique<MockBehaviour>();
-    swarm::CollisionManager::registerType<swarm::Drone>({});
+    salsa::CollisionManager::registerType<salsa::Drone>({});
 
-    swarm::behaviour::Registry::get().add(behaviour_name,
+    salsa::behaviour::Registry::get().add(behaviour_name,
                                           std::move(mockBehaviour));
 
     config = new DroneConfiguration("test", 5.0f, 3.0f, 2.0f, 1.0f, 0.5f, 1.0f,
@@ -38,7 +38,7 @@ class SimTest : public ::testing::Test {
 
   void TearDown() override {
     delete config;
-    swarm::behaviour::Registry::get().remove(behaviour_name);
+    salsa::behaviour::Registry::get().remove(behaviour_name);
   }
 };
 

@@ -5,7 +5,7 @@
 
 #include "gtest/gtest.h"
 
-using swarm::behaviour::Parameter;
+using salsa::behaviour::Parameter;
 
 class ParameterTest : public ::testing::Test {
  protected:

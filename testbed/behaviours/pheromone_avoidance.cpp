@@ -5,7 +5,7 @@
 #include <map>
 #include <memory>
 #include <unordered_map>
-namespace swarm {
+namespace salsa {
 class PheromoneBehaviour : public Behaviour {
  private:
   struct Pheromone {
@@ -78,8 +78,8 @@ class PheromoneBehaviour : public Behaviour {
   }
 };
 
-auto p = std::make_unique<swarm::PheromoneBehaviour>(0.5f, 1.0f);
+auto p = std::make_unique<salsa::PheromoneBehaviour>(0.5f, 1.0f);
 
 auto pheromone =
     behaviour::Registry::get().add("Pheromone Avoidance", std::move(p));
-}  // namespace swarm
+}  // namespace salsa

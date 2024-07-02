@@ -13,7 +13,7 @@
 #include "spdlog/sinks/basic_file_sink.h"
 #include "spdlog/spdlog.h"
 
-namespace swarm {
+namespace salsa {
 
 /// @brief Abstract base class for an Observer in the Observer pattern.
 class Observer {
@@ -69,6 +69,6 @@ class Logger : public Observer {
   void update(const nlohmann::json& message) override;
 };
 
-}  // namespace swarm
+}  // namespace salsa
 
 #endif  // SWARM_CORE_DATA_H

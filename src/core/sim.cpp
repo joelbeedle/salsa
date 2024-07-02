@@ -4,7 +4,7 @@
 #include <execution>
 
 #include "salsa/behaviours/registry.h"
-namespace swarm {
+namespace salsa {
 
 Sim::Sim(b2World *world, int drone_count, int target_count,
          DroneConfiguration *configuration, float border_width,
@@ -137,8 +137,8 @@ void Sim::applyCurrentBehaviour() {
 }
 
 void Sim::addBehaviour(const std::string &name,
-                       std::unique_ptr<swarm::Behaviour> behaviour) {
-  swarm::behaviour::Registry::get().add(name, std::move(behaviour));
+                       std::unique_ptr<salsa::Behaviour> behaviour) {
+  salsa::behaviour::Registry::get().add(name, std::move(behaviour));
 }
 
 void Sim::setCurrentBehaviour(const std::string &name) {
@@ -239,9 +239,9 @@ void Sim::updateDroneSettings() {
   }
 }
 
-std::vector<std::unique_ptr<swarm::Drone>> &Sim::getDrones() { return drones_; }
+std::vector<std::unique_ptr<salsa::Drone>> &Sim::getDrones() { return drones_; }
 
-void Sim::setDrones(std::vector<std::unique_ptr<swarm::Drone>> drones) {
+void Sim::setDrones(std::vector<std::unique_ptr<salsa::Drone>> drones) {
   drones_ = std::move(drones);
 }
 
@@ -357,4 +357,4 @@ void Sim::setCurrentDroneConfiguration(DroneConfiguration &configuration) {
   updateDroneSettings();
 }
 
-}  // namespace swarm
+}  // namespace salsa

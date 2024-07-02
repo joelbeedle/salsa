@@ -11,7 +11,7 @@
 #include <string>
 #include <typeindex>
 
-namespace swarm {
+namespace salsa {
 
 /// @class BaseContactListener
 /// @brief Extends the Box2D contact listener to handle collision events between
@@ -67,6 +67,6 @@ class BaseContactListener : public b2ContactListener {
   }
 };
 
-}  // namespace swarm
+}  // namespace salsa
 
 #endif  // SWARM_UTILS_BASE_CONTACT_LISTENER_H

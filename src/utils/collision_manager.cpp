@@ -4,7 +4,7 @@
 
 #include "spdlog/spdlog.h"
 
-namespace swarm {
+namespace salsa {
 
 std::unordered_map<std::string, CollisionConfig, std::hash<std::string>,
                    std::equal_to<>>
@@ -28,4 +28,4 @@ void CollisionManager::updateMaskBits() {
   }
 }
 
-}  // namespace swarm
+}  // namespace salsa

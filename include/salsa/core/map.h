@@ -20,7 +20,7 @@
 #elif defined(__APPLE__)
 #include <mach-o/dyld.h>
 #endif
-namespace swarm {
+namespace salsa {
 namespace map {
 /// @brief Struct to hold map data
 struct Map {
@@ -60,5 +60,5 @@ std::vector<std::string> getMapNames();
 Map getMap(const std::string &name);
 
 }  // namespace map
-}  // namespace swarm
+}  // namespace salsa
 #endif  // SWARM_TESTBED_MAP_H

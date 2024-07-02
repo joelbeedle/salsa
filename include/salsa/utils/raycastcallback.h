@@ -9,7 +9,7 @@
 
 class Drone;  // Forward declaration
 
-namespace swarm {
+namespace salsa {
 
 /// @class RayCastCallback
 /// @brief Custom callback class for handling raycast results in the simulation.
@@ -59,6 +59,6 @@ class RayCastCallback : public b2RayCastCallback {
     return fraction;
   }
 };
-}  // namespace swarm
+}  // namespace salsa
 
 #endif  // SWARM_SIM_UTILS_RAYCASTCALLBACK_H

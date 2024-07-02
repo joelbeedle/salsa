@@ -15,7 +15,7 @@
 #include "salsa/utils/object_types.h"
 #include "target.h"
 
-namespace swarm {
+namespace salsa {
 
 /// @class TargetFactory
 /// @brief Factory class for creating Target objects dynamically.
@@ -100,6 +100,6 @@ class TargetFactory {
   static std::vector<std::string> getTargetNames();
 };
 
-}  // namespace swarm
+}  // namespace salsa
 
 #endif  // SWARM_ENTITY_TARGET_FACTORY_H

@@ -15,21 +15,21 @@ class DroneTest : public ::testing::Test {
  protected:
   b2World *world;
   MockBehaviour behaviour;
-  swarm::DroneConfiguration *config;
+  salsa::DroneConfiguration *config;
 
   void SetUp() override {
     world = new b2World(b2Vec2(0.0f, 0.0f));
     MockBehaviour behaviour;
-    config = new swarm::DroneConfiguration("test", 5.0f, 3.0f, 2.0f, 1.0f, 0.5f,
+    config = new salsa::DroneConfiguration("test", 5.0f, 3.0f, 2.0f, 1.0f, 0.5f,
                                            1.0f, 10.0f);
-    swarm::CollisionManager::registerType<swarm::Drone>({});
+    salsa::CollisionManager::registerType<salsa::Drone>({});
   }
 
   void TearDown() override { delete world; }
 };
 
 TEST_F(DroneTest, DroneInitialization) {
-  swarm::Drone drone(world, b2Vec2(0, 0), behaviour, *config);
+  salsa::Drone drone(world, b2Vec2(0, 0), behaviour, *config);
   EXPECT_FLOAT_EQ(drone.camera_view_range(), 5.0f);
   EXPECT_FLOAT_EQ(drone.max_speed(), 2.0f);
   EXPECT_NE(world, nullptr);
@@ -39,7 +39,7 @@ TEST_F(DroneTest, DroneInitialization) {
 
 TEST_F(DroneTest, DroneFactoryInitialisation) {
   auto drone =
-      swarm::DroneFactory::createDrone(world, b2Vec2(0, 0), behaviour, *config);
+      salsa::DroneFactory::createDrone(world, b2Vec2(0, 0), behaviour, *config);
   EXPECT_FLOAT_EQ(drone->camera_view_range(), 5.0f);
   EXPECT_FLOAT_EQ(drone->max_speed(), 2.0f);
   EXPECT_NE(world, nullptr);
@@ -48,13 +48,13 @@ TEST_F(DroneTest, DroneFactoryInitialisation) {
 }
 
 TEST_F(DroneTest, DroneBehaviourExecution) {
-  swarm::Drone drone(world, b2Vec2(0, 0), behaviour, *config);
+  salsa::Drone drone(world, b2Vec2(0, 0), behaviour, *config);
   EXPECT_CALL(behaviour, execute(_, _)).Times(1);
   drone.update({});
 }
 
 TEST_F(DroneTest, UpdateDroneBehaviour) {
-  swarm::Drone drone(world, b2Vec2(0, 0), behaviour, *config);
+  salsa::Drone drone(world, b2Vec2(0, 0), behaviour, *config);
   MockBehaviour newBehaviour;
   EXPECT_CALL(newBehaviour, execute(_, _)).Times(1);
   drone.behaviour() = &newBehaviour;
@@ -62,10 +62,10 @@ TEST_F(DroneTest, UpdateDroneBehaviour) {
 }
 
 TEST_F(DroneTest, MultipleDroneBehaviourExecution) {
-  std::vector<std::unique_ptr<swarm::Drone>> drones;
+  std::vector<std::unique_ptr<salsa::Drone>> drones;
   int n = 10;
   for (int i = 0; i < n; i++) {
-    drones.push_back(swarm::DroneFactory::createDrone(world, b2Vec2(i, i),
+    drones.push_back(salsa::DroneFactory::createDrone(world, b2Vec2(i, i),
                                                       behaviour, *config));
   }
   EXPECT_CALL(behaviour, execute(_, _)).Times(n);
@@ -75,7 +75,7 @@ TEST_F(DroneTest, MultipleDroneBehaviourExecution) {
 }
 
 TEST_F(DroneTest, UpdateSensorRange) {
-  swarm::Drone drone(world, b2Vec2(0, 0), behaviour, *config);
+  salsa::Drone drone(world, b2Vec2(0, 0), behaviour, *config);
   float newRange = 10.0f;
   drone.camera_view_range(newRange);
   drone.updateSensorRange();

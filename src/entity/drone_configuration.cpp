@@ -1,6 +1,6 @@
 #include "salsa/entity/drone_configuration.h"
 
-using namespace swarm;
+using namespace salsa;
 std::vector<DroneConfiguration *> DroneConfiguration::config_registry_;
 
 DroneConfiguration::DroneConfiguration(std::string name, float cameraView,

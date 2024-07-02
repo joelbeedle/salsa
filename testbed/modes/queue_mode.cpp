@@ -26,8 +26,8 @@ struct DroneParameters {
 };
 class QueueSimulator : public Test {
  private:
-  swarm::Sim *sim;
-  static swarm::SimBuilder *sim_builder;
+  salsa::Sim *sim;
+  static salsa::SimBuilder *sim_builder;
   bool draw_visual_range_ = true;
   bool draw_drone_sensor_range_ = true;
   bool draw_targets_ = true;
@@ -35,8 +35,8 @@ class QueueSimulator : public Test {
   bool using_queue_ = true;
   bool pause = false;
   bool next_frame = false;
-  swarm::TestQueue queue_;
-  std::vector<std::unique_ptr<swarm::Target>> targets;
+  salsa::TestQueue queue_;
+  std::vector<std::unique_ptr<salsa::Target>> targets;
   std::vector<b2Vec2> target_positions_;
   std::vector<b2Color> target_colors_;
   float target_radius_ = 10.0f;
@@ -52,14 +52,14 @@ class QueueSimulator : public Test {
  public:
   QueueSimulator() {
     pause = true;
-    swarm::DroneConfiguration *smallDrone = new swarm::DroneConfiguration(
+    salsa::DroneConfiguration *smallDrone = new salsa::DroneConfiguration(
         "hidden", 25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f);
 
     g_debugDraw.SetFlags(b2Draw::e_shapeBit | b2Draw::e_jointBit);
     m_world = new b2World(b2Vec2(0.0f, 0.0f));
-    sim = new swarm::Sim(m_world, 0, 0, smallDrone, 0, 0, 0);
+    sim = new salsa::Sim(m_world, 0, 0, smallDrone, 0, 0, 0);
 
-    auto &registry = swarm::behaviour::Registry::get();
+    auto &registry = salsa::behaviour::Registry::get();
     auto behaviour_names = registry.behaviour_names();
     sim->setCurrentBehaviour(behaviour_names[0]);
   }
@@ -69,19 +69,19 @@ class QueueSimulator : public Test {
 
   void Build() { sim_builder->build(); }
 
-  void SetBuilder(swarm::SimBuilder *builder) {
+  void SetBuilder(salsa::SimBuilder *builder) {
     sim_builder = builder;
     builder->setWorld(m_world);
   }
 
-  void UseQueue(swarm::TestQueue stack) {
+  void UseQueue(salsa::TestQueue stack) {
     using_queue_ = true;
     queue_ = stack;
   }
 
   bool SetNextTestFromQueue() {
     auto config = queue_.pop();
-    auto temp_sim = new swarm::Sim(config);
+    auto temp_sim = new salsa::Sim(config);
     if (temp_sim == nullptr) {
       return false;
     }
@@ -118,19 +118,19 @@ class QueueSimulator : public Test {
   void SetWidth(float width) { sim_builder->setWorldWidth(width); }
   float GetHeight() { return sim->world_height(); }
   float GetWidth() { return sim->world_width(); }
-  void SetContactListener(swarm::BaseContactListener &listener) {
+  void SetContactListener(salsa::BaseContactListener &listener) {
     sim_builder->setContactListener(listener);
   }
   void AddBehaviour(const std::string &name,
-                    std::unique_ptr<swarm::Behaviour> behaviour) {
-    swarm::behaviour::Registry::get().add(name, std::move(behaviour));
+                    std::unique_ptr<salsa::Behaviour> behaviour) {
+    salsa::behaviour::Registry::get().add(name, std::move(behaviour));
   }
 
-  void SetConfiguration(swarm::DroneConfiguration *configuration) {
+  void SetConfiguration(salsa::DroneConfiguration *configuration) {
     sim_builder->setDroneConfiguration(configuration);
   }
 
-  swarm::DroneConfiguration *GetConfiguration() {
+  salsa::DroneConfiguration *GetConfiguration() {
     return sim->getDroneConfiguration();
   }
 
@@ -249,7 +249,7 @@ class QueueSimulator : public Test {
         ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
     if (ImGui::BeginPopupModal("Add Test", NULL,
                                ImGuiWindowFlags_AlwaysAutoResize)) {
-      auto behaviourNames = swarm::behaviour::Registry::get().behaviour_names();
+      auto behaviourNames = salsa::behaviour::Registry::get().behaviour_names();
       static std::string current_name = behaviourNames[0];
       static std::string new_map_name = "";
       static int new_drone_count = 0;
@@ -261,7 +261,7 @@ class QueueSimulator : public Test {
       // Get behaviour name for test
       if (ImGui::BeginCombo("Behaviour", current_name.c_str())) {
         auto behaviourNames =
-            swarm::behaviour::Registry::get().behaviour_names();
+            salsa::behaviour::Registry::get().behaviour_names();
 
         for (auto &name : behaviourNames) {
           bool isSelected = (current_name == name);
@@ -278,9 +278,9 @@ class QueueSimulator : public Test {
 
       // Get parameters for test
       auto chosen_behaviour =
-          swarm::behaviour::Registry::get().behaviour(current_name);
+          salsa::behaviour::Registry::get().behaviour(current_name);
       auto chosen_params = chosen_behaviour->getParameters();
-      static std::unordered_map<std::string, swarm::behaviour::Parameter *>
+      static std::unordered_map<std::string, salsa::behaviour::Parameter *>
           new_params;
       if (new_params.empty() || to_change) {
         new_params.clear();
@@ -296,7 +296,7 @@ class QueueSimulator : public Test {
                            parameter->min_value(), parameter->max_value());
       }
 
-      auto mapNames = swarm::map::getMapNames();
+      auto mapNames = salsa::map::getMapNames();
       static std::string current_map_name = mapNames[0];
       if (ImGui::BeginCombo("Map", current_map_name.c_str())) {
         for (auto &name : mapNames) {
@@ -311,9 +311,9 @@ class QueueSimulator : public Test {
         ImGui::EndCombo();
       }
 
-      auto new_map = swarm::map::getMap(current_map_name);
+      auto new_map = salsa::map::getMap(current_map_name);
 
-      auto listenerNames = swarm::BaseContactListener::getListenerNames();
+      auto listenerNames = salsa::BaseContactListener::getListenerNames();
       static std::string current_listener_name =
           listenerNames.empty() ? "" : listenerNames[0];
 
@@ -331,11 +331,11 @@ class QueueSimulator : public Test {
       }
 
       static auto *listener =
-          swarm::BaseContactListener::getListenerByName(current_listener_name);
+          salsa::BaseContactListener::getListenerByName(current_listener_name);
 
       // Get drone configuration for test
       auto droneConfigNames =
-          swarm::DroneConfiguration::getDroneConfigurationNames();
+          salsa::DroneConfiguration::getDroneConfigurationNames();
       static std::string current_drone_config_name = droneConfigNames[0];
       if (ImGui::BeginCombo("Drone Configuration",
                             current_drone_config_name.c_str())) {
@@ -352,10 +352,10 @@ class QueueSimulator : public Test {
       }
 
       static auto *drone_config =
-          swarm::DroneConfiguration::getDroneConfigurationByName(
+          salsa::DroneConfiguration::getDroneConfigurationByName(
               current_drone_config_name);
 
-      auto targetNames = swarm::TargetFactory::getTargetNames();
+      auto targetNames = salsa::TargetFactory::getTargetNames();
       std::string current_target_name = targetNames[0];
       // Get target type from TargetFactory Registry
       if (ImGui::BeginCombo("Target Type", current_target_name.c_str())) {
@@ -380,7 +380,7 @@ class QueueSimulator : public Test {
 
       // create new_config and add it to the queue
       if (ImGui::Button("Add Test", ImVec2(120, 0))) {
-        swarm::TestConfig new_config = {
+        salsa::TestConfig new_config = {
             current_name,   new_params,          drone_config,
             new_map,        new_drone_count,     new_target_count,
             new_time_limit, current_target_name, listener};
@@ -401,7 +401,7 @@ class QueueSimulator : public Test {
         ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
     if (ImGui::BeginPopupModal("Add Test Permutation", NULL,
                                ImGuiWindowFlags_AlwaysAutoResize)) {
-      auto behaviourNames = swarm::behaviour::Registry::get().behaviour_names();
+      auto behaviourNames = salsa::behaviour::Registry::get().behaviour_names();
       static std::string current_name = behaviourNames[0];
       static std::string new_map_name = "";
       static int new_drone_count = 0;
@@ -409,7 +409,7 @@ class QueueSimulator : public Test {
       static float new_time_limit = 0.0f;
       static bool to_change = false;
       static b2World *new_world = nullptr;
-      static swarm::map::Map new_map;
+      static salsa::map::Map new_map;
 
       // Get behaviour name for test
       if (ImGui::BeginCombo("Behaviour", current_name.c_str())) {
@@ -428,7 +428,7 @@ class QueueSimulator : public Test {
 
       // Get parameters for test
       auto chosen_behaviour =
-          swarm::behaviour::Registry::get().behaviour(current_name);
+          salsa::behaviour::Registry::get().behaviour(current_name);
       auto chosen_params = chosen_behaviour->getParameters();
       static std::unordered_map<std::string, std::string> input_storage;
       static std::vector<std::string> parameter_names;
@@ -499,7 +499,7 @@ class QueueSimulator : public Test {
       static char str1[128] = "";
       ImGui::InputText("Map Name", str1, IM_ARRAYSIZE(str1));
       if (ImGui::Button("Open", ImVec2(120, 0))) {
-        new_map = swarm::map::load(str1);
+        new_map = salsa::map::load(str1);
         new_world = new_map.world;
       }
 
@@ -510,7 +510,7 @@ class QueueSimulator : public Test {
 
       // Get drone configuration for test
       auto droneConfigNames =
-          swarm::DroneConfiguration::getDroneConfigurationNames();
+          salsa::DroneConfiguration::getDroneConfigurationNames();
       static std::string current_drone_config_name = droneConfigNames[0];
       if (ImGui::BeginCombo("Drone Configuration",
                             current_drone_config_name.c_str())) {
@@ -527,7 +527,7 @@ class QueueSimulator : public Test {
       }
 
       static auto *drone_config =
-          swarm::DroneConfiguration::getDroneConfigurationByName(
+          salsa::DroneConfiguration::getDroneConfigurationByName(
               current_drone_config_name);
       ImGui::InputInt("Drone Count", &new_drone_count);
       ImGui::InputInt("Target Count", &new_target_count);
@@ -573,7 +573,7 @@ class QueueSimulator : public Test {
           std::cout << oss.str() << std::endl;
         }
         for (const auto &combination : permutations) {
-          std::unordered_map<std::string, swarm::behaviour::Parameter *>
+          std::unordered_map<std::string, salsa::behaviour::Parameter *>
               new_params;
           for (size_t j = 0; j < parameter_names.size(); ++j) {
             const auto &name = parameter_names[j];
@@ -581,7 +581,7 @@ class QueueSimulator : public Test {
             *(new_params[name]) = static_cast<float>(combination[j]);
           }
 
-          swarm::TestConfig new_config = {
+          salsa::TestConfig new_config = {
               current_name,    new_params,       drone_config,   new_map,
               new_drone_count, new_target_count, new_time_limit,
           };
@@ -613,7 +613,7 @@ class QueueSimulator : public Test {
       if (ImGui::BeginCombo("Behaviours",
                             sim->current_behaviour_name().c_str())) {
         auto behaviourNames =
-            swarm::behaviour::Registry::get().behaviour_names();
+            salsa::behaviour::Registry::get().behaviour_names();
 
         for (auto &name : behaviourNames) {
           bool isSelected = (sim->current_behaviour_name() == name);
@@ -630,7 +630,7 @@ class QueueSimulator : public Test {
 
       ImGui::SeparatorText("Behaviour Settings");
       bool changed = false;
-      auto behaviour = swarm::behaviour::Registry::get().behaviour(
+      auto behaviour = salsa::behaviour::Registry::get().behaviour(
           sim->current_behaviour_name());
       for (auto [name, parameter] : behaviour->getParameters()) {
         changed |=
@@ -656,7 +656,7 @@ class QueueSimulator : public Test {
       }
       ImGui::EndMenuBar();
 
-      swarm::TestConfig current_config = sim->test_config();
+      salsa::TestConfig current_config = sim->test_config();
       ImGui::Text("Behaviour: %s", current_config.behaviour_name.c_str());
       ImGui::Text("Drone Count: %d", current_config.num_drones);
       ImGui::Text("Target Count: %d", current_config.num_targets);
@@ -670,7 +670,7 @@ class QueueSimulator : public Test {
       if (ImGui::BeginMenuBar()) {
         ImGui::MenuItem("Next Test", NULL, false, false);
       }
-      swarm::TestConfig next_config;
+      salsa::TestConfig next_config;
       ImGui::EndMenuBar();
       try {
         next_config = queue_.peek();
@@ -685,7 +685,7 @@ class QueueSimulator : public Test {
 
       ImGui::EndChild();
       static int selectedTestIndex = -1;
-      static swarm::TestConfig *selectedTest = nullptr;
+      static salsa::TestConfig *selectedTest = nullptr;
 
       ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
       ImGui::BeginChild("Test Queue", ImVec2(0, 100), true,
@@ -790,7 +790,7 @@ class QueueSimulator : public Test {
         if (fixture->IsSensor()) {
           uint16 categoryBits = fixture->GetFilterData().categoryBits;
           if (categoryBits ==
-                  swarm::CollisionManager::getCollisionConfig<swarm::Drone>()
+                  salsa::CollisionManager::getCollisionConfig<salsa::Drone>()
                       .categoryBits &&
               draw_visual_range_) {
             // This is a drone sensor, draw if wanted
@@ -807,22 +807,22 @@ class QueueSimulator : public Test {
         }
 
         if (fixture->GetUserData().pointer != 0) {
-          swarm::UserData *userData = reinterpret_cast<swarm::UserData *>(
+          salsa::UserData *userData = reinterpret_cast<salsa::UserData *>(
               fixture->GetUserData().pointer);
           if (userData == nullptr) {
             std::cout << "User data is null" << std::endl;
             continue;
           }
           // Draw Drones
-          std::string name = swarm::type(*(userData->object));
-          if (name.compare("swarm::Drone") == 0) {
-            swarm::Drone *drone = userData->as<swarm::Drone>();
+          std::string name = salsa::type(*(userData->object));
+          if (name.compare("salsa::Drone") == 0) {
+            salsa::Drone *drone = userData->as<salsa::Drone>();
             // Draw drone
             b2Vec2 position = body->GetPosition();
             debugDraw->DrawSolidCircle(position, drone->radius(),
                                        transform.q.GetXAxis(), drone->color());
           } else if (name.compare("b2_groundBody") && draw_targets_) {
-            // swarm::Target *target = userData->as<swarm::Target>();
+            // salsa::Target *target = userData->as<salsa::Target>();
             // b2Vec2 position = body->GetPosition();
             // debugDraw->DrawSolidCircle(position, target->getRadius(),
             //                           transform.q.GetXAxis(),

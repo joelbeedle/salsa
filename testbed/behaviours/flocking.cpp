@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include <valarray>
-namespace swarm {
+namespace salsa {
 
 class DroneQueryCallback : public b2QueryCallback {
  public:
@@ -228,5 +228,5 @@ class FlockingBehaviour : public Behaviour {
 
 auto flocking = behaviour::Registry::get().add(
     "Flocking",
-    std::make_unique<swarm::FlockingBehaviour>(250.0, 1.6, 1.0, 3.0, 4.0));
-}  // namespace swarm
+    std::make_unique<salsa::FlockingBehaviour>(250.0, 1.6, 1.0, 3.0, 4.0));
+}  // namespace salsa

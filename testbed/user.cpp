@@ -32,14 +32,14 @@ namespace testbed {
 #define BORDER_HEIGHT 2000.0f
 #define MAX_TIME 1200.0f
 
-static void setupInteractions(swarm::BaseContactListener &listener) {
+static void setupInteractions(salsa::BaseContactListener &listener) {
   listener.addCollisionHandler(
-      "swarm::Drone", "Tree",
+      "salsa::Drone", "Tree",
       [](b2Fixture *droneFixture, b2Fixture *treeFixture) -> void {
-        swarm::Drone *drone = reinterpret_cast<swarm::UserData *>(
+        salsa::Drone *drone = reinterpret_cast<salsa::UserData *>(
                                   droneFixture->GetUserData().pointer)
-                                  ->as<swarm::Drone>();
-        Tree *tree = reinterpret_cast<swarm::UserData *>(
+                                  ->as<salsa::Drone>();
+        Tree *tree = reinterpret_cast<salsa::UserData *>(
                          treeFixture->GetUserData().pointer)
                          ->as<Tree>();
         tree->setFound(true);
@@ -47,7 +47,7 @@ static void setupInteractions(swarm::BaseContactListener &listener) {
         tree->addNumMapped();
       });
   listener.addCollisionHandler(
-      "swarm::Drone", "swarm::Drone",
+      "salsa::Drone", "salsa::Drone",
       [](b2Fixture *droneFixture1, b2Fixture *droneFixture2) -> void {
 
       });
@@ -55,13 +55,13 @@ static void setupInteractions(swarm::BaseContactListener &listener) {
 
 void user() {
   auto flock_params =
-      swarm::behaviour::Registry::get().behaviour("Flocking")->getParameters();
+      salsa::behaviour::Registry::get().behaviour("Flocking")->getParameters();
 
-  swarm::DroneConfiguration *smallDrone = new swarm::DroneConfiguration(
+  salsa::DroneConfiguration *smallDrone = new salsa::DroneConfiguration(
       "Small", 15.0f, 50.2f, 10.0f, 0.3f, 1.0f, 1.5f, 134.0f);
-  swarm::CollisionManager::registerType<swarm::Drone>({typeid(Tree).name()});
-  swarm::CollisionManager::registerType<Tree>({typeid(swarm::Drone).name()});
-  swarm::TargetFactory::registerTarget<Tree, bool, bool, float>("Tree", false,
+  salsa::CollisionManager::registerType<salsa::Drone>({typeid(Tree).name()});
+  salsa::CollisionManager::registerType<Tree>({typeid(salsa::Drone).name()});
+  salsa::TargetFactory::registerTarget<Tree, bool, bool, float>("Tree", false,
                                                                 false, 5.0f);
 
   auto new_flock_params = std::unordered_map<std::string, float>({
@@ -78,21 +78,21 @@ void user() {
   });
 
   static auto contactListener =
-      std::make_shared<swarm::BaseContactListener>("Default");
+      std::make_shared<salsa::BaseContactListener>("Default");
   setupInteractions(*contactListener);
-  swarm::TestConfig config = {
-      "Flocking", flock_params, smallDrone, swarm::map::getMap("poly"), 100,
+  salsa::TestConfig config = {
+      "Flocking", flock_params, smallDrone, salsa::map::getMap("poly"), 100,
       100,        1200.0f,      "Tree",     contactListener.get()};
   std::vector<std::vector<float>> loaded_permutations;
   std::vector<std::string> loaded_parameter_names;
-  // swarm::loadPermutations(loaded_permutations, loaded_parameter_names,
+  // salsa::loadPermutations(loaded_permutations, loaded_parameter_names,
   //                         "permutations.json");
   // queue.addPermutedTests(config, loaded_permutations,
   // loaded_parameter_names);
   config.num_targets = 1000;
   config.num_drones = 100;
   config.time_limit = 100.0f;
-  swarm::TestQueue::push(config);
+  salsa::TestQueue::push(config);
 }
 
 }  // namespace testbed

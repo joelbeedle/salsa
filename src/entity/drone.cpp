@@ -9,10 +9,10 @@
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
 
-namespace swarm {
+namespace salsa {
 Drone::Drone(b2World *world, const b2Vec2 &position, Behaviour &behaviour,
              const DroneConfiguration &config)
-    : Entity(world, position, false, config.radius, swarm::get_type<Drone>()),
+    : Entity(world, position, false, config.radius, salsa::get_type<Drone>()),
       behaviour_(&behaviour),
       camera_view_range_(config.cameraViewRange),
       obstacle_view_range_(config.obstacleViewRange),
@@ -91,4 +91,4 @@ void Drone::update(const std::vector<std::unique_ptr<Drone>> &drones) {
   body_->SetTransform(position, body_->GetAngle());
 }
 
-}  // namespace swarm
+}  // namespace salsa

@@ -2,14 +2,14 @@
 
 namespace fs = std::filesystem;
 
-using namespace swarm;
-using namespace swarm::map;
-using swarm::map::Map;
+using namespace salsa;
+using namespace salsa::map;
+using salsa::map::Map;
 
 /// @brief Registry of all loaded maps
 static std::vector<Map> registry;
 
-fs::path swarm::map::getExecutablePath() {
+fs::path salsa::map::getExecutablePath() {
 #if defined(_WIN32)
   char path[MAX_PATH] = {0};
   HMODULE hModule = GetModuleHandle(nullptr);
@@ -40,11 +40,11 @@ fs::path swarm::map::getExecutablePath() {
 
 Map map::load(const char *new_map_name) {
   std::filesystem::path exec_path = getExecutablePath();
-  swarm::logger::get()->info("Executable path: {}", exec_path.string());
+  salsa::logger::get()->info("Executable path: {}", exec_path.string());
   std::filesystem::path file_path = exec_path / ".." / ".." / "testbed" /
                                     "maps" /
                                     (std::string(new_map_name) + ".json");
-  swarm::logger::get()->info("Loading map from: {}", file_path.string());
+  salsa::logger::get()->info("Loading map from: {}", file_path.string());
 
   b2World *world = new b2World(b2Vec2(0.0f, 0.0f));
   Map new_map;
@@ -124,12 +124,12 @@ void map::loadAll() {
   for (const auto &entry : fs::directory_iterator(directory)) {
     if (entry.path().extension() == ".json") {
       std::string map_name = entry.path().stem().string();
-      swarm::logger::get()->info("Loading map: {}", map_name);
+      salsa::logger::get()->info("Loading map: {}", map_name);
       try {
-        swarm::map::load(map_name.c_str());
+        salsa::map::load(map_name.c_str());
       } catch (const std::exception &e) {
-        swarm::logger::get()->error("Failed to load map: {}", map_name);
-        swarm::logger::get()->error("Error: {}", e.what());
+        salsa::logger::get()->error("Failed to load map: {}", map_name);
+        salsa::logger::get()->error("Error: {}", e.what());
       }
     }
   }

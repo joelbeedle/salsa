@@ -10,7 +10,7 @@
 #include "drone.h"
 #include "drone_configuration.h"
 
-namespace swarm {
+namespace salsa {
 /// @brief Factory to create drones
 class DroneFactory {
  public:
@@ -28,6 +28,6 @@ class DroneFactory {
   }
 };
 
-}  // namespace swarm
+}  // namespace salsa
 
 #endif  // SWARM_SIM_DRONES_DRONE_FACTORY_H

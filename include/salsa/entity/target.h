@@ -9,7 +9,7 @@
 #include "entity.h"
 #include "salsa/utils/collision_manager.h"
 
-namespace swarm {
+namespace salsa {
 
 /// @class Target
 /// @brief Represents a target object in the simulation environment.
@@ -33,6 +33,6 @@ class Target : public Entity {
   void setFound(bool found) { found_ = found; }
 };
 
-}  // namespace swarm
+}  // namespace salsa
 
 #endif  // SWARM_TARGET_H

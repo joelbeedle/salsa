@@ -19,12 +19,12 @@ Tree::Tree(b2World *world, const b2Vec2 &position, int treeID, bool diseased,
   b2FixtureDef fixtureDef;
   fixtureDef.shape = &shape;
   fixtureDef.isSensor = true;
-  auto config = swarm::CollisionManager::getCollisionConfig<Tree>();
+  auto config = salsa::CollisionManager::getCollisionConfig<Tree>();
 
   fixtureDef.filter.categoryBits = config.categoryBits;
   fixtureDef.filter.maskBits = config.maskBits;
 
-  swarm::UserData *userData = new swarm::UserData();
+  salsa::UserData *userData = new salsa::UserData();
   userData->object = this;
 
   fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(userData);

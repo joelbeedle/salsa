@@ -5,8 +5,8 @@
 #include "mock_behaviour.h"
 #include "salsa/behaviours/registry.h"
 
-using swarm::Behaviour;
-using swarm::behaviour::Registry;
+using salsa::Behaviour;
+using salsa::behaviour::Registry;
 
 class RegistryTest : public ::testing::Test {
  protected:

@@ -7,7 +7,7 @@
 #include "salsa/entity/entity.h"
 #include "salsa/utils/object_types.h"
 #include "spdlog/spdlog.h"
-namespace swarm {
+namespace salsa {
 std::vector<BaseContactListener *> BaseContactListener::registry_;
 
 BaseContactListener::BaseContactListener(std::string name) : name_(name) {
@@ -88,4 +88,4 @@ BaseContactListener *BaseContactListener::getListenerByName(
   }
   return nullptr;
 }
-}  // namespace swarm
+}  // namespace salsa

@@ -26,8 +26,8 @@ struct DroneParameters {
 };
 class SandboxSimulator : public Test {
  private:
-  swarm::Sim *sim;
-  static swarm::SimBuilder *sim_builder;
+  salsa::Sim *sim;
+  static salsa::SimBuilder *sim_builder;
   bool draw_visual_range_ = true;
   bool draw_drone_sensor_range_ = true;
   bool draw_targets_ = false;
@@ -35,8 +35,8 @@ class SandboxSimulator : public Test {
   bool using_queue_ = true;
   bool pause = false;
   bool next_frame = false;
-  swarm::TestQueue queue_;
-  std::vector<swarm::Target *> targets;
+  salsa::TestQueue queue_;
+  std::vector<salsa::Target *> targets;
   std::vector<b2Vec2> treePositions;
   std::vector<b2Color> treeColors;
 
@@ -53,14 +53,14 @@ class SandboxSimulator : public Test {
 
  public:
   SandboxSimulator() {
-    swarm::DroneConfiguration *smallDrone = new swarm::DroneConfiguration(
+    salsa::DroneConfiguration *smallDrone = new salsa::DroneConfiguration(
         "sandbox_default", 25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f);
 
     g_debugDraw.SetFlags(b2Draw::e_shapeBit | b2Draw::e_jointBit);
     m_world = new b2World(b2Vec2(0.0f, 0.0f));
-    sim = new swarm::Sim(m_world, 1, 0, smallDrone, 2000, 2000, 1000.0);
+    sim = new salsa::Sim(m_world, 1, 0, smallDrone, 2000, 2000, 1000.0);
     new_count = 1;
-    auto behaviour_names = swarm::behaviour::Registry::get().behaviour_names();
+    auto behaviour_names = salsa::behaviour::Registry::get().behaviour_names();
     sim->setCurrentBehaviour(behaviour_names[0]);
     // m_world->SetContactListener(contactListener_);
   }
@@ -68,19 +68,19 @@ class SandboxSimulator : public Test {
     return std::make_unique<SandboxSimulator>();
   }
   void Build() { sim_builder->build(); }
-  void SetBuilder(swarm::SimBuilder *builder) {
+  void SetBuilder(salsa::SimBuilder *builder) {
     sim_builder = builder;
     builder->setWorld(m_world);
   }
 
-  void UseQueue(swarm::TestQueue stack) {
+  void UseQueue(salsa::TestQueue stack) {
     using_queue_ = true;
     queue_ = stack;
   }
 
   bool SetNextTestFromQueue() {
     auto config = queue_.pop();
-    auto temp_sim = new swarm::Sim(config);
+    auto temp_sim = new salsa::Sim(config);
     if (temp_sim == nullptr) {
       return false;
     }
@@ -97,19 +97,19 @@ class SandboxSimulator : public Test {
   void SetWidth(float width) { sim_builder->setWorldWidth(width); }
   float GetHeight() { return sim->world_height(); }
   float GetWidth() { return sim->world_width(); }
-  void SetContactListener(swarm::BaseContactListener &listener) {
+  void SetContactListener(salsa::BaseContactListener &listener) {
     sim_builder->setContactListener(listener);
   }
   void AddBehaviour(const std::string &name,
-                    std::unique_ptr<swarm::Behaviour> behaviour) {
-    swarm::behaviour::Registry::get().add(name, std::move(behaviour));
+                    std::unique_ptr<salsa::Behaviour> behaviour) {
+    salsa::behaviour::Registry::get().add(name, std::move(behaviour));
   }
 
-  void SetConfiguration(swarm::DroneConfiguration *configuration) {
+  void SetConfiguration(salsa::DroneConfiguration *configuration) {
     sim_builder->setDroneConfiguration(configuration);
   }
 
-  swarm::DroneConfiguration *GetConfiguration() {
+  salsa::DroneConfiguration *GetConfiguration() {
     return sim->getDroneConfiguration();
   }
 
@@ -152,7 +152,7 @@ class SandboxSimulator : public Test {
       if (ImGui::BeginCombo("Behaviours",
                             sim->current_behaviour_name().c_str())) {
         auto behaviourNames =
-            swarm::behaviour::Registry::get().behaviour_names();
+            salsa::behaviour::Registry::get().behaviour_names();
 
         for (auto &name : behaviourNames) {
           bool isSelected = (sim->current_behaviour_name() == name);
@@ -169,7 +169,7 @@ class SandboxSimulator : public Test {
 
       ImGui::SeparatorText("Behaviour Settings");
       bool changed = false;
-      auto behaviour = swarm::behaviour::Registry::get().behaviour(
+      auto behaviour = salsa::behaviour::Registry::get().behaviour(
           sim->current_behaviour_name());
       for (auto [name, parameter] : behaviour->getParameters()) {
         changed |=
@@ -237,7 +237,7 @@ class SandboxSimulator : public Test {
         if (fixture->IsSensor()) {
           uint16 categoryBits = fixture->GetFilterData().categoryBits;
           if (categoryBits ==
-                  swarm::CollisionManager::getCollisionConfig<swarm::Drone>()
+                  salsa::CollisionManager::getCollisionConfig<salsa::Drone>()
                       .categoryBits &&
               draw_visual_range_) {
             // This is a drone sensor, draw if wanted
@@ -254,22 +254,22 @@ class SandboxSimulator : public Test {
         }
 
         if (fixture->GetUserData().pointer != 0) {
-          swarm::UserData *userData = reinterpret_cast<swarm::UserData *>(
+          salsa::UserData *userData = reinterpret_cast<salsa::UserData *>(
               fixture->GetUserData().pointer);
           if (userData == nullptr) {
             std::cout << "User data is null" << std::endl;
             continue;
           }
           // Draw Drones
-          std::string name = swarm::type(*(userData->object));
-          if (name.compare("swarm::Drone") == 0) {
-            swarm::Drone *drone = userData->as<swarm::Drone>();
+          std::string name = salsa::type(*(userData->object));
+          if (name.compare("salsa::Drone") == 0) {
+            salsa::Drone *drone = userData->as<salsa::Drone>();
             // Draw drone
             b2Vec2 position = body->GetPosition();
             debugDraw->DrawSolidCircle(position, drone->radius(),
                                        transform.q.GetXAxis(), drone->color());
           } else if (name.compare("b2_groundBody") && draw_targets_) {
-            // swarm::Target *target = userData->as<swarm::Target>();
+            // salsa::Target *target = userData->as<salsa::Target>();
             // b2Vec2 position = body->GetPosition();
             // debugDraw->DrawSolidCircle(position, target->getRadius(),
             //                           transform.q.GetXAxis(),

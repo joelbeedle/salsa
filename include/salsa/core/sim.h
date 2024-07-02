@@ -19,7 +19,7 @@
 #include "salsa/entity/target_factory.h"
 #include "salsa/utils/base_contact_listener.h"
 #include "test_queue.h"
-namespace swarm {
+namespace salsa {
 
 /// @brief Defines the parameters for a drone in the simulation.
 struct DroneParameters {
@@ -37,14 +37,14 @@ class Sim {
  private:
   map::Map map_;    ///< The map of the simulation environment
   b2World* world_;  ///< The Box2D world for the simulation
-  swarm::BaseContactListener*
+  salsa::BaseContactListener*
       contact_listener_;  ///< The contact listener for the simulation
 
   /// @name Simulation properties
   /// These properties originate from the test configuration and are used to
   /// set up the simulation.
   ///@{
-  swarm::TestConfig
+  salsa::TestConfig
       test_config_;  ///< The test configuration for the simulation
   float border_height_;
   float border_width_;
@@ -61,12 +61,12 @@ class Sim {
   /// Map of all drone parameters by name.
   std::unordered_map<std::string, DroneParameters> all_drone_parameters_;
   /// Map of all drone configurations by name.
-  std::unordered_map<std::string, swarm::DroneConfiguration>
+  std::unordered_map<std::string, salsa::DroneConfiguration>
       all_drone_configurations_;
   /// The current drone configuration.
-  swarm::DroneConfiguration* drone_configuration_;
+  salsa::DroneConfiguration* drone_configuration_;
   /// The list of drones in the simulation.
-  std::vector<std::unique_ptr<swarm::Drone>> drones_;
+  std::vector<std::unique_ptr<salsa::Drone>> drones_;
   int num_drones_;   ///< The number of drones in the simulation
   float max_speed_;  ///< The maximum speed of the drones
   float max_force_;  ///< The maximum force of the drones
@@ -90,7 +90,7 @@ class Sim {
   float obstacle_view_range_;
 
   // Behaviour management
-  swarm::Behaviour* behaviour_;
+  salsa::Behaviour* behaviour_;
   std::string current_behaviour_name_;
   float camera_view_range_;
 
@@ -117,7 +117,7 @@ class Sim {
   Sim(b2World* world, int drone_count, int target_count,
       DroneConfiguration* config, float border_width, float border_height,
       float time_limit);
-  Sim(swarm::TestConfig& config);
+  Sim(salsa::TestConfig& config);
   ~Sim();
 
   enum class SpawnType { CIRCULAR, RANDOM };
@@ -143,7 +143,7 @@ class Sim {
   ///@{
   /// @brief Adds a behaviour to the simulation.
   void addBehaviour(const std::string& name,
-                    std::unique_ptr<swarm::Behaviour> behaviour);
+                    std::unique_ptr<salsa::Behaviour> behaviour);
 
   /// @brief Sets the current behaviour of the simulation.
   /// @param behaviour A pointer to the behaviour to set.
@@ -180,13 +180,13 @@ class Sim {
   /// max speed, view range, obstacle range, drone detection range, and sensor
   /// range, to be consistent with the current simulation drone configuration.
   void updateDroneSettings();
-  std::vector<std::unique_ptr<swarm::Drone>>& getDrones();
+  std::vector<std::unique_ptr<salsa::Drone>>& getDrones();
 
   /// @brief Sets the vector of drones to the simulation.
   /// Care must be taken to ensure that the drones inhabit the same `b2World` as
   /// the simulation.
   /// @param drones The vector of drones to set.
-  void setDrones(std::vector<std::unique_ptr<swarm::Drone>> drones);
+  void setDrones(std::vector<std::unique_ptr<salsa::Drone>> drones);
   ///@}
 
   /// @name Target Functions
@@ -249,7 +249,7 @@ class Sim {
   b2World* getWorld();
   void setWorld(b2World* world);
   map::Map getMap();
-  swarm::TestConfig& test_config();
+  salsa::TestConfig& test_config();
   std::string& current_behaviour_name();
   const std::string& current_behaviour_name() const;
   DroneConfiguration* getDroneConfiguration();
@@ -325,6 +325,6 @@ class SimBuilder {
   }
 };
 
-}  // namespace swarm
+}  // namespace salsa
 
 #endif  // SWARM_SIM_CORE_SIM_H

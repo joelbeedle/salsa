@@ -5,9 +5,9 @@
 #include "gtest/gtest.h"
 #include "salsa/behaviours/parameter.h"
 
-using swarm::TestConfig;
-using swarm::TestQueue;
-using swarm::behaviour::Parameter;
+using salsa::TestConfig;
+using salsa::TestQueue;
+using salsa::behaviour::Parameter;
 
 class TestQueueTest : public ::testing::Test {
  protected:
@@ -28,7 +28,7 @@ TEST_F(TestQueueTest, PushAndPopTest) {
       "Behaviour1",
       std::variant<TestConfig::Parameters, TestConfig::FloatParameters>(),
       nullptr,
-      swarm::map::Map(),
+      salsa::map::Map(),
       100,
       0,
       1200.0f,
@@ -50,7 +50,7 @@ TEST_F(TestQueueTest, MaintainOrder) {
       "Behaviour1",
       std::variant<TestConfig::Parameters, TestConfig::FloatParameters>(),
       nullptr,
-      swarm::map::Map(),
+      salsa::map::Map(),
       100,
       0,
       1200.0f,
@@ -59,7 +59,7 @@ TEST_F(TestQueueTest, MaintainOrder) {
       "Behaviour2",
       std::variant<TestConfig::Parameters, TestConfig::FloatParameters>(),
       nullptr,
-      swarm::map::Map(),
+      salsa::map::Map(),
       100,
       0,
       1200.0f,
