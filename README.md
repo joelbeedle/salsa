@@ -6,7 +6,7 @@ Swarm Algorithm Simulation library and Testbed, written in C++.
 There is a Docker container available. It opens a noVNC web app on `localhost` with `swarm-sim` pre-installed.
 
 ### Using the Docker container
-
+This docker container **only** contains what is in the repository. If you want to extend the program, you need to clone the repository and build the docker container / the code.
 - **Run the docker image:**
 ```bash
 docker run --shm-size=256m -it -p 5901:5901 -e VNC_PASSWD=123456 ghcr.io/joelbeedle/swarm-sim:latest
