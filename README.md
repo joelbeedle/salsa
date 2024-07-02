@@ -3,13 +3,13 @@
 **S**warm **Al**gorithm **S**imul**a**tior: library, and Testbed, written in C++.
 
 ## Getting Started
-There is a Docker container available. It opens a noVNC web app on `localhost` with `swarm-sim` pre-installed.
+There is a Docker container available. It opens a noVNC web app on `localhost` with `salsa` pre-installed.
 
 ### Using the Docker container
 This docker container **only** contains what is in the repository. If you want to extend the program, you need to clone the repository and build the docker container / the code.
 - **Run the docker image:**
 ```bash
-docker run --shm-size=256m -it -p 5901:5901 -e VNC_PASSWD=123456 ghcr.io/joelbeedle/swarm-sim:latest
+docker run --shm-size=256m -it -p 5901:5901 -e VNC_PASSWD=123456 ghcr.io/joelbeedle/salsa-sim:latest
 ```
 ***
 
@@ -17,18 +17,18 @@ If you want to clone the repository and build it yourself:
 
 - **Clone the repository:**
 ```bash
-git clone --recursive https://github.com/joelbeedle/swarm-sim.git
+git clone --recursive https://github.com/joelbeedle/salsa-sim.git
 git submodule update --init --recursive
 ```
 
 - **Build the docker image:**
 ```bash
-docker build -t swarm-test/testbed .
+docker build -t salsa-test/testbed .
 ```
 
 - **Run the container:**
 ```bash
-docker run --shm-size=256m -it -p 5901:5901 -e VNC_PASSWD=123456 swarm-test/testbed
+docker run --shm-size=256m -it -p 5901:5901 -e VNC_PASSWD=123456 salsa-test/testbed
 ```
 
 To use the virtual machine:
@@ -40,7 +40,7 @@ To use the virtual machine:
 - The testbed application can be found at `./build/testbed/`
 
 ### Installation
-`swarm-sim` was designed with to be cross-platform.
+`salsa` was designed with to be cross-platform.
 
 #### Requirements
 - CMake **3.14+**
@@ -52,7 +52,7 @@ To use the virtual machine:
 
 Requirements in bold are **essential**.
 
-`swarm-sim` uses the following packages directly:
+`salsa` uses the following packages directly:
 - [Box2D](https://github.com/erincatto/box2d)
 - [GLAD](https://github.com/Dav1dde/glad) and [GLFW](https://www.glfw.org/)
 - [spdlog](https://github.com/gabime/spdlog)
@@ -68,7 +68,7 @@ It may be neccessary to install some extra dependencies on Linux (or just do `su
 #### Steps
 - **Clone the repository and all submodules:**
    ```bash
-   git clone --recursive https://github.com/joelbeedle/swarm-sim.git
+   git clone --recursive https://github.com/joelbeedle/salsa.git
    ```
    > **Note**: the `--recursive` tag is important, as this also clones the submodules, which are needed.
 - **Initialise and update the submodules:**
@@ -77,7 +77,7 @@ It may be neccessary to install some extra dependencies on Linux (or just do `su
    ```
 - **Configure the project with CMake:**
    ```bash
-   cd swarm-sim
+   cd salsa
    cmake -S . -B build
    ```
   > If you have Ninja installed, for a faster build time use:
@@ -118,23 +118,23 @@ For more information on extending the various aspects of the testbed, expand a s
 
 <details>
   
-<summary>Adding new Swarm Algorithms</summary>
+<summary>Adding new swarm Algorithms</summary>
 
-### Add a Custom Swarm Algorithm
+### Add a Custom swarm Algorithm
 To add a custom swarm algorithm:
 Create a new `.cpp` file inside `testbed/behaviors`, and name it, etc `my_alg.cpp`.
 
-Inside this file, import `<core/simulation.h>` to import all library headers.
+Inside this file, import `<salsa/salsa.h>` to import all library headers.
 
 Create a class that extends the `Behaviour` class:
   ```cpp
-  #include <core/simulation.h>
+  #include <salsa/salsa.h>
 
   class MyAlg : public Behaviour {};
   ```
 Define any parameters as a behaviour::Parameter
    ```cpp
-   class MyAlg : public swarm::Behaviour {
+   class MyAlg : public salsa::Behaviour {
      private:
       behaviour::Parameter param_1_;
       behaviour::Parameter param_2_;
@@ -145,7 +145,7 @@ Implement a constructor that takes as arguments the behaviour parameters, and pa
 
 Then, create a key value pair in `parameters_`, a map of names to parameters, using as a key the display name, and as value a reference to the internal `behaviour::Parameter`. 
   ```cpp
-   class MyAlg : public swarm::Behaviour {
+   class MyAlg : public salsa::Behaviour {
      private:
       behaviour::Parameter param_1_;
       behaviour::Parameter param_2_;
@@ -186,7 +186,7 @@ This behaviour will now appear in the testbed, and can be set in a TestConfig us
 ### Add a custom Target
 Create a `.cpp` and `.h` file in `testbed/targets`, and name it, etc. `my_target.h`.
 
-In the header file, include `<core/simulation.h>` and create a class that extends `swarm::Target`
+In the header file, include `<core/simulation.h>` and create a class that extends `salsa::Target`
    ```cpp
    class MyTarget : public Target {};
    ```
@@ -211,11 +211,11 @@ A target must follow this pattern for its body definitions:
      fixtureDef.filter.categoryBits = config.categoryBits;
      fixtureDef.filter.maskBits = config.maskBits;
 
-     // We then create a swarm::UserData object. This is metadata and how collision callbacks are managed.
+     // We then create a salsa::UserData object. This is metadata and how collision callbacks are managed.
      UserData *my_data = new UserData();
      // Set the userData's object argument to point to this instance
      my_data->object = this;
-     // Set the userData of the fixtureDef as a pointer to our swarm::UserData object and create fixture
+     // Set the userData of the fixtureDef as a pointer to our salsa::UserData object and create fixture
      fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(my_data);
      body_->CreateFixture(&fixtureDef);
    ```
@@ -229,12 +229,12 @@ Once the target is fully defined, we register it with the `TargetFactory` and th
    CollisionManager::registerType<Tree>({typeid(Drone).name()});
 
    // Register our custom type with the TargetFactory. We supply it with template parameters corresponding to the **unique** parameters in our target class (AKA not the three that need to be there)
-   // It takes function parameters equal to the name of the type, through swarm::get_type<T>
+   // It takes function parameters equal to the name of the type, through salsa::get_type<T>
    TargetFactory::registerTargetType<MyTarget, bool, bool, float>(get_type<MyTarget>);
    ```
 Now the type is fully registered and can be included in the simulation through TestConfigs like as follows:
    ```cpp
-     swarm::TestConfig config = {"My Alg",
+     salsa::TestConfig config = {"My Alg",
                               behaviour_parameters,
                               drone_config,
                               map,
@@ -253,12 +253,12 @@ Now the type is fully registered and can be included in the simulation through T
 <summary>Adding custom Contact Listeners</summary>
 
 ### Adding a new Contact Listener
-After registering types as shown above, collisions between them can be controlled via the `swarm::BaseContactListener` class. (This class could also be extended, if the user wishes)
-To do this, in the main testbed entrypoint `main.cpp`, create a new static shared pointer of `swarm::BaseContactListener` (it has to be static so it can be accessed from other scopes):
+After registering types as shown above, collisions between them can be controlled via the `salsa::BaseContactListener` class. (This class could also be extended, if the user wishes)
+To do this, in the main testbed entrypoint `main.cpp`, create a new static shared pointer of `salsa::BaseContactListener` (it has to be static so it can be accessed from other scopes):
    ```cpp
      static auto contact_listener = std::make_shared<BaseContactListener>();
    ```
-Then, add collision handlers to it using the `addCollisionHandler` function. This function takes two types, which can be retrieved via `swarm::get_type<Class Name>`, and a user defined function. This function needs to be `void`, and takes two function parameters: `b2Fixture*` and `b2Fixture*`. These two fixtures represent the two fixtures that have been found to be colliding.
+Then, add collision handlers to it using the `addCollisionHandler` function. This function takes two types, which can be retrieved via `salsa::get_type<Class Name>`, and a user defined function. This function needs to be `void`, and takes two function parameters: `b2Fixture*` and `b2Fixture*`. These two fixtures represent the two fixtures that have been found to be colliding.
 
 Here's an example of adding a collision handler between a `Drone` and a `MyTarget`, using a lambda function:
    ```cpp
@@ -313,35 +313,35 @@ Drone configurations are simple to add. We simply register them with the configu
 
 void user() {
   // Get the default parameters for CustomBehaviour
-  auto behaviour_parameters = swarm::behaviour::Registry::getInstance().getBehaviour("Custom Behaviour")->getParameters();
+  auto behaviour_parameters = salsa::behaviour::Registry::getInstance().getBehaviour("Custom Behaviour")->getParameters();
 
   // Create a drone configuration
-  auto *drone_config = new swarm::DroneConfiguration("My Config",
+  auto *drone_config = new salsa::DroneConfiguration("My Config",
       25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f);
   
   // Set up the listener to listen for collisions.
   // Has to be static, and named
-  static auto listener = std::make_shared<swarm::BaseContactListener>("Default");
+  static auto listener = std::make_shared<salsa::BaseContactListener>("Default");
 
   // Register the drones and targets with the collision manager
-  swarm::CollisionManager::registerType<swarm::Drone>({typeid(CustomTarget).name()});
-  swarm::CollisionManager::registerType<CustomTarget>({typeid(swarm::Drone).name()});
+  salsa::CollisionManager::registerType<salsa::Drone>({typeid(CustomTarget).name()});
+  salsa::CollisionManager::registerType<CustomTarget>({typeid(salsa::Drone).name()});
 
   // Add the target to the TargetFactory, supplying any custom parameters and their types
   // This can be done multiple times for the same Target class, with a different name.
-   swarm::TargetFactory::registerTarget<CustomTarget, bool, bool, float>("Custom_1", false,
+   salsa::TargetFactory::registerTarget<CustomTarget, bool, bool, float>("Custom_1", false,
                                                                 false, 5.0f);
 
   // Add a collision handler between Drone and Target types, when this collision is detected, userHandlingFunction is called to handle the collision.
-  listener.addColisionHandler(typeid(swarm::Drone), typeid(CustomTarget), userHandlingFunction)
+  listener.addColisionHandler(typeid(salsa::Drone), typeid(CustomTarget), userHandlingFunction)
 
   // Set up test environment
-  auto map = swarm::map::get("test"); // "test.json" here is a map that has already been created and is in testbed/maps
+  auto map = salsa::map::get("test"); // "test.json" here is a map that has already been created and is in testbed/maps
   auto num_drones = 100;
   auto num_targets = 1000;
   auto time_limit = 1200.0;
   
-  swarm::TestConfig test = {
+  salsa::TestConfig test = {
      "Custom Behaviour",
      behaviour_parameters,
      drone_config,
@@ -353,11 +353,8 @@ void user() {
   };
   
   // Add test to the Simulator's TestQueue
-  swarm::TestQueue::push(test);
+  salsa::TestQueue::push(test);
 }
 ```
 
 When the executable is ran, it will run this code first, intialising everything, before beginning the simulations.
-
-## Architecture
-TODO: is this necessary? If so, I will complete it
