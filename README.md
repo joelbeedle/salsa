@@ -170,7 +170,7 @@ b2Vec2 execute(const std::vector<std::unique_ptr<Drone>> &drones,
 ```
 After the class definition, create an instance and register it with the behaviour registry with its initial parameters.
 ```cpp
-auto alg = behaviour::Registry::getInstance().add(
+auto alg = behaviour::Registry::get().add(
     "My Alg",
     std::make_unique<MyAlg>(1.0, 3421.3));
 ```
