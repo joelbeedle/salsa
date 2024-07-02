@@ -9,7 +9,7 @@ There is a Docker container available. It opens a noVNC web app on `localhost` w
 This docker container **only** contains what is in the repository. If you want to extend the program, you need to clone the repository and build the docker container / the code.
 - **Run the docker image:**
 ```bash
-docker run --shm-size=256m -it -p 5901:5901 -e VNC_PASSWD=123456 ghcr.io/joelbeedle/salsa-sim:latest
+docker run --shm-size=256m -it -p 5901:5901 -e VNC_PASSWD=123456 ghcr.io/joelbeedle/salsa:latest
 ```
 ***
 
@@ -17,7 +17,7 @@ If you want to clone the repository and build it yourself:
 
 - **Clone the repository:**
 ```bash
-git clone --recursive https://github.com/joelbeedle/salsa-sim.git
+git clone --recursive https://github.com/joelbeedle/salsa.git
 git submodule update --init --recursive
 ```
 
