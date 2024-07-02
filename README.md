@@ -126,7 +126,45 @@ The testbed, when opened, presents the main menu. From here, we can access the f
   - Sandbox Mode
 - **Map Creator**
 
-It comes prepackaged with a few swarm algorithms, a drone configuration, and `Tree`s as targets.
+## Testbed Details
+
+Both Simulation modes allow the user to dynamically change the simulation as it is occuring. Queue mode is intended to collect data, whereas Sandbox mode is intended for algorithm development. Modes can be switched between seamlessly.
+
+> If in Queue mode, and a simulation is running, it will be cut short if the mode is switched.
+
+### Queue Mode
+
+- In Queue mode, you can specify a number of simulations in a queue. Data is logged to the `testbed/results` folder.
+- After the time limit for each runs out, plots that can be selected in the GUI are created from the data automatically.
+  > In headless mode, all plots are generated unless specified otherwise.
+- Then, the next simulation in the queue begins.
+- The Test Queue can be set beforehand in `user.cpp`, or generated in the GUI. Head to the Test Queue section on the left, click the `+` button, and choose whether to add a single test or add a group of tests, permuting behavior parameters.
+
+### Sandbox Mode
+
+- Sandbox mode gives the user the ability to dynamically change parameters, maps, drone configurations, etc., without setting a Test Queue beforehand.
+
+  > You still need to set the other definitions in `user.cpp`.
+
+### Map Creator
+
+- The Map Creator allows the user to create their own maps. Simply use the menu on the left.
+
+- **Drawing Tips:**
+
+  - Drawing lines is done by clicking and holding, then dragging and releasing to end the line
+  - Drawing shapes (hollow polygon, polygon) is done by clicking once, releasing, then clicking again to set the next vertex. Connect the last vertex to the first to draw the shape.
+  - Drawing circles is done by clicking where the center of the circle should be, holding, and then dragging outwards to increase the size of the radius.
+  - The drone spawn point should be set for where you want drones to spawn.
+
+    > Drones wont spawn inside solid objects, but they will spawn inside hollow polygons.
+
+  - A square world boundary can be set by checking Draw Boundary and adjusting the size of the sides.
+
+- To save a map, click `File > Save As` and then enter a name when prompted. This will refresh the map registry, so if you want to use the map in a simulation straight away, you can.
+- To load a map, click `File > Load`, and select a map to load.
+
+- The testbed comes prepackaged with a few swarm algorithms, a drone configuration, and `Tree`s as targets.
 
 ## Extensibility
 
