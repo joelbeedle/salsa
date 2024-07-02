@@ -67,6 +67,13 @@ Sim::Sim(TestConfig &config)
     old_message[key] = value->value();
   }
   old_message["behaviour"] = current_behaviour_name_;
+  old_message["drone_spawn_position"] = {drone_spawn_position_.x,
+                                         drone_spawn_position_.y};
+  old_message["num_drones"] = num_drones_;
+  old_message["num_targets"] = num_targets_;
+  old_message["time_limit"] = time_limit_;
+  old_message["target_type"] = target_type_;
+  old_message["border_dimensions"] = {border_width_, border_height_};
 
   nlohmann::json message;
   message["time"] = current_time_;

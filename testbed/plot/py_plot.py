@@ -5,12 +5,65 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.spatial import distance_matrix
 import os
+import json
 
 matplotlib.use("Agg")
 
 global df
 global output_path
 global file_name
+global parsed_first_line
+
+global border_dimensions
+global drone_spawn_x
+global drone_spawn_y
+global max_time
+
+
+def parse_log_line(line):
+    # Use regex to extract the JSON part from the line
+    match = re.search(r"\{.*\}", line)
+    if match:
+        json_str = match.group(0)
+        try:
+            # Parse the JSON string into a dictionary
+            data = json.loads(json_str)
+            return data
+        except json.JSONDecodeError as e:
+            print(f"Error parsing JSON: {e}")
+            return None
+    else:
+        print("No JSON found in the line")
+        return None
+
+
+def read_first_line(file_path):
+    try:
+        with open(file_path, "r") as file:
+            first_line = file.readline().strip()
+            return first_line
+    except Exception as e:
+        print(f"Error reading file: {e}")
+        return None
+
+
+def get_sim_data(file_path):
+    global parsed_first_line
+    global border_dimensions
+    global drone_spawn_x
+    global drone_spawn_y
+    global max_time
+    first_line = read_first_line(file_path)
+    if first_line:
+        parsed_first_line = parse_log_line(first_line)
+        if parsed_first_line:
+            border_dimensions = parsed_first_line.get("border_dimensions", None)
+            drone_spawn = parsed_first_line.get("drone_spawn_position", None)
+            drone_spawn_x = drone_spawn[0]
+            drone_spawn_y = drone_spawn[1]
+            max_time = parsed_first_line.get("time_limit", None)
+    else:
+        return None
 
 
 def set_file_name(name: str):
@@ -66,8 +119,8 @@ def create_dataframe(file_path: str) -> pd.DataFrame:
 
 
 def get_axis_steps(border_size: str) -> tuple:
-    first_number = int(border_size[0])
-    border_size = int(border_size)
+    first_number = float(border_size[0])
+    border_size = float(border_size)
 
     if border_size >= 1000:
         step_round_base = 1000
@@ -101,7 +154,7 @@ def plot_targets_found(data_frame, ax):
     sim_data["targets_percentage"] = (sim_data["targets_found"] / 500) * 100
 
     # Plotting
-    ax.set_xlim(0, 100)
+    ax.set_xlim(0, max_time)
     ax.set_ylim(0, 100)
     ax.plot(
         sim_data["time_seconds"],
@@ -139,16 +192,13 @@ def plot_speed(data_frame, ax):
     speed_points.set_index("timestamp", inplace=True)
 
     speed_stats = (
-        speed_points["speed"]
-        .resample("100L")
-        .agg(["min", "mean", "max", "std"])
-        .dropna()
+        speed_points["speed"].resample("1S").agg(["min", "mean", "max", "std"]).dropna()
     )
 
     # Reset index if you want 'timestamp' as a column for plotting
     speed_stats.reset_index(inplace=True)
 
-    ax.set_xlim(0, 100)
+    ax.set_xlim(0, max_time)
     ax.set_ylim(0, speed_stats["mean"].max() + speed_stats["std"].max())
     ax.set_ylabel("Speed (m/s)")
     ax.set_xlabel("Time (s)")
@@ -237,7 +287,6 @@ def plot_nearest_neighbor_distance(data_frame, ax):
         filtered_data["timestamp"], unit="s", origin="unix"
     )
     filtered_data.set_index("timestamp", inplace=True)
-
     # Prepare to collect stats for each timestamp
     stats = []
     for timestamp, group in filtered_data.groupby(level=0):
@@ -266,8 +315,12 @@ def plot_nearest_neighbor_distance(data_frame, ax):
         stats_df = pd.DataFrame(stats)
 
         # Resample the statistics to improve smoothness in the plot
-        resampled_stats = stats_df
-
+        resampled_stats = (
+            stats_df.resample("1S", on="timestamp")
+            .agg({"min": "min", "mean": "mean", "max": "max", "std": "mean"})
+            .dropna()
+        )
+        resampled_stats.reset_index(inplace=True)
         # Plot the average distances and the standard deviation
         ax.plot(
             resampled_stats.index,
@@ -286,7 +339,7 @@ def plot_nearest_neighbor_distance(data_frame, ax):
 
         ax.set_xlim(
             resampled_stats.index[0],
-            100,
+            max_time,
         )
 
         ax.set_xlabel("Time (s)")
@@ -309,7 +362,7 @@ def plot_drone_distances_wrapper():
 def plot_trace(data_frame, ax, border_size: str):
     trace_points = data_frame[["drone_id", "position_x", "position_y"]]
     step_size, minor_size = get_axis_steps(border_size)
-    border_size = int(border_size)
+    border_size = float(border_size)
     ax.set_xlim(0, border_size)
     ax.set_ylim(0, border_size)
     ax.set_yticks(np.arange(0, border_size + step_size, step_size))
@@ -327,8 +380,8 @@ def plot_trace(data_frame, ax, border_size: str):
             linewidth=1,
         )
     ax.plot(
-        396.24749755859375,
-        299.29345703125,
+        drone_spawn_x,
+        drone_spawn_y,
         marker="x",
         color="black",
         markersize=10,
@@ -341,9 +394,9 @@ def plot_trace(data_frame, ax, border_size: str):
     return ax
 
 
-def plot_trace_wrapper(border_size: str):
+def plot_trace_wrapper():
     fig, ax = plt.subplots(figsize=(10, 6), layout="constrained")
-    ax = plot_trace(df, ax, border_size)
+    ax = plot_trace(df, ax, str(border_dimensions[0]))
     print(f"{file_name}")
     fig.savefig(f"{output_path}/{file_name}/drone_trace.pdf")
     plt.close(fig)
@@ -353,7 +406,7 @@ def plot_heatmap(data_frame, ax, bin_size: str, border_size: str):
     bin_size = int(bin_size)
     min_boundary = 0
     step_size, minor_size = get_axis_steps(border_size)
-    border_size = int(border_size)
+    border_size = float(border_size)
     ax.set_xlim(0, border_size)
     ax.set_ylim(0, border_size)
     ax.set_yticks(np.arange(0, border_size + step_size, step_size))
@@ -386,8 +439,8 @@ def plot_heatmap(data_frame, ax, bin_size: str, border_size: str):
     return im, ax
 
 
-def plot_heatmap_wrapper(bin_size: str, border_size: str):
+def plot_heatmap_wrapper(bin_size: str):
     fig, ax = plt.subplots(figsize=(10, 6), layout="constrained")
-    im, ax = plot_heatmap(df, ax, bin_size, border_size)
+    im, ax = plot_heatmap(df, ax, bin_size, str(border_dimensions[0]))
     fig.savefig(f"{output_path}/{file_name}/drone_heatmap.pdf")
     plt.close(fig)

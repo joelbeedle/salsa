@@ -72,6 +72,11 @@ void plot(std::string log_file_path) {
     return;
   }
 
+  if (!call_function("py_plot", "get_sim_data", file_path.c_str())) {
+    finalize_python();
+    return;
+  }
+
   // Create dataframe from log file
   if (!call_function("py_plot", "create_dataframe", file_path.c_str())) {
     finalize_python();
@@ -100,14 +105,14 @@ void plot(std::string log_file_path) {
   }
   if (testbed::plot_drone_trace) {
     std::cout << "Plotting drone trace" << std::endl;
-    if (!call_function("py_plot", "plot_drone_trace_wrapper", "4000")) {
+    if (!call_function("py_plot", "plot_trace_wrapper")) {
       finalize_python();
       return;
     }
   }
   if (testbed::plot_drone_heatmap) {
     std::cout << "Plotting drone heatmap" << std::endl;
-    if (!call_function("py_plot", "plot_drone_heatmap_wrapper", "4000")) {
+    if (!call_function("py_plot", "plot_heatmap_wrapper", "50")) {
       finalize_python();
       return;
     }
