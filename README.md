@@ -300,7 +300,12 @@ We then pass this listener into the TestConfig for it to be used by a simulation
 <summary>Adding custom Drone Configurations</summary>
   
 ### Adding a new Drone Configuration
-Drone configurations are simple to add. We simply register them with the configuration register.
+Drone configurations are simple to add. We simpy create one in `user.cpp`, give it a name, and it will appear in the testbed.
+
+```cpp
+  salsa::DroneConfiguration *smallDrone = new salsa::DroneConfiguration(
+      "Default", 15.0f, 50.2f, 10.0f, 0.3f, 1.0f, 1.5f, 134.0f);
+```
 
 </details>
 
