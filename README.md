@@ -312,26 +312,34 @@ Drone configurations are simple to add. We simply register them with the configu
 #include "testbed.h"
 
 void user() {
-  // Create Parameters for CustomBehaviour
-  auto behaviour_parameters = std::make_unique<CustomBehaviour>(250.0, 1.6, 1.0, 3.0, 3.0);
-  
+  // Get the default parameters for CustomBehaviour
+  auto behaviour_parameters = swarm::behaviour::Registry::getInstance().getBehaviour("Custom Behaviour")->getParameters();
+
   // Create a drone configuration
-  auto *drone_config = new swarm::DroneConfiguration(
+  auto *drone_config = new swarm::DroneConfiguration("My Config",
       25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f);
   
   // Set up the listener to listen for collisions.
-  // Has to be static
-  static auto listener = std::make_shared<swarm::BaseContactListener>();
-  
+  // Has to be static, and named
+  static auto listener = std::make_shared<swarm::BaseContactListener>("Default");
+
+  // Register the drones and targets with the collision manager
+  swarm::CollisionManager::registerType<swarm::Drone>({typeid(CustomTarget).name()});
+  swarm::CollisionManager::registerType<CustomTarget>({typeid(swarm::Drone).name()});
+
+  // Add the target to the TargetFactory, supplying any custom parameters and their types
+  // This can be done multiple times for the same Target class, with a different name.
+   swarm::TargetFactory::registerTarget<CustomTarget, bool, bool, float>("Custom_1", false,
+                                                                false, 5.0f);
+
   // Add a collision handler between Drone and Target types, when this collision is detected, userHandlingFunction is called to handle the collision.
-  listener.addColisionHandler(typeid(swarm::Drone), typeid(swarm::Target), userHandlingFunction)
-  
+  listener.addColisionHandler(typeid(swarm::Drone), typeid(CustomTarget), userHandlingFunction)
+
   // Set up test environment
-  auto map = map::load("map.json");
+  auto map = swarm::map::get("test"); // "test.json" here is a map that has already been created and is in testbed/maps
   auto num_drones = 100;
   auto num_targets = 1000;
   auto time_limit = 1200.0;
-  auto target_parameters = std::make_tuple(...);
   
   swarm::TestConfig test = {
      "Custom Behaviour",
@@ -340,7 +348,6 @@ void user() {
      map,
      num_drones,
      num_targets,
-     target_parameters,
      listener.get(),
      time_limit,
   };
