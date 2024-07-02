@@ -1,3 +1,6 @@
+/// @file entity.h
+/// @brief Contains the `Entity` class, which is the base class for all physical
+/// entities.
 #ifndef SWARM_ENTITY_H
 #define SWARM_ENTITY_H
 

@@ -1,3 +1,6 @@
+/// @file target.h
+/// @brief Defines the Target class for representing target objects in the
+/// simulation.
 #ifndef SWARM_TARGET_H
 #define SWARM_TARGET_H
 

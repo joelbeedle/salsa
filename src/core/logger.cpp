@@ -7,10 +7,14 @@ std::shared_ptr<spdlog::logger>& swarm::logger::get() {
   return logger;
 }
 
-void set(std::shared_ptr<spdlog::logger> custom_logger) {
+void logger::set(std::shared_ptr<spdlog::logger> custom_logger) {
   logger::get() = custom_logger;
 }
 
-void log_info(const std::string& message) { logger::get()->info(message); }
+void logger::log_info(const std::string& message) {
+  logger::get()->info(message);
+}
 
-void log_error(const std::string& message) { logger::get()->error(message); }
+void logger::log_error(const std::string& message) {
+  logger::get()->error(message);
+}

@@ -1,6 +1,5 @@
 /// @file base_contact_listener.h
-/// @brief Declares the BaseContactListener class for handling collision events
-
+/// @brief Defines the BaseContactListener class for handling collision events
 #ifndef SWARM_UTILS_BASE_CONTACT_LISTENER_H
 #define SWARM_UTILS_BASE_CONTACT_LISTENER_H
 

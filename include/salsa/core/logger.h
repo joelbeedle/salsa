@@ -1,3 +1,5 @@
+/// @file logger.h
+/// @brief Defines the logger utility functions for SALSA.
 #ifndef LOGGER_H
 #define LOGGER_H
 

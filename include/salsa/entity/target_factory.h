@@ -1,5 +1,5 @@
 /// @file target_factory.h
-/// Contains the `TargetFactory` class, which is used to create `Target`
+/// @brief Contains the `TargetFactory` class, which is used to create `Target`
 /// objects.
 #ifndef SWARM_ENTITY_TARGET_FACTORY_H
 #define SWARM_ENTITY_TARGET_FACTORY_H

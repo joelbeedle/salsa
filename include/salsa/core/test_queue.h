@@ -1,6 +1,6 @@
-/// @file test_stack.h
-/// Contains the static `TestStack` class, which is used to manage the running
-/// of simulation tests.
+/// @file test_queue.h
+/// @brief Contains the static `TestQueue` class, which is used to manage the
+/// running of simulation tests.
 #ifndef SWARM_SIM_CORE_TEST_STACK_H
 #define SWARM_SIM_CORE_TEST_STACK_H
 

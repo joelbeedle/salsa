@@ -34,7 +34,7 @@ struct CollisionConfig {
 
 /// @brief Manages collision configurations for different object types.
 ///
-/// CollisionManager uses singleton pattern to maintain a consistent
+/// Uses singleton pattern to maintain a consistent
 /// state across the system. It offers functionality to register new types with
 /// collision partners and update collision masks dynamically based on
 /// registered types and their partners.
@@ -58,7 +58,7 @@ class CollisionManager {
   /// @brief Updates the mask bits for all registered types based on their
   /// collision partners.
   ///
-  /// This method iterates through each registered type, computes the mask bits
+  /// Iterates through each registered type, computes the mask bits
   /// by combining the category bits of its collision partners, and updates the
   /// mask bits accordingly.
   static void updateMaskBits();
@@ -98,8 +98,8 @@ class CollisionManager {
 
   /// @brief Registers a new type and its collision partners in the system.
   ///
-  /// This method registers a new type with its collision category bit and
-  /// partners. It prints details about the registration process and ensures
+  /// Registers a new type with its collision category bit and
+  /// partners. Logs details about the registration process and ensures
   /// that the type is added with a unique category bit, which is then left
   /// shifted for the next registration.
   ///

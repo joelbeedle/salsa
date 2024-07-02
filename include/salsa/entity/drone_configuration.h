@@ -1,5 +1,6 @@
 /// @file drone_configuration.h
-/// Contains the `DroneConfiguration` class, which represents a configuration
+/// @brief Contains the `DroneConfiguration` class, which represents a
+/// configuration
 #ifndef SWARM_SIM_UTILS_DRONE_CONFIGURATION_H
 #define SWARM_SIM_UTILS_DRONE_CONFIGURATION_H
 
