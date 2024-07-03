@@ -424,7 +424,7 @@ void user() {
   listener.addColisionHandler(typeid(salsa::Drone), typeid(CustomTarget), userHandlingFunction)
 
   // Set up test environment
-  auto map = salsa::map::get("test"); // "test.json" here is a map that has already been created and is in testbed/maps
+  auto map_name = "test" // "test.json" here is a map that has already been created and is in testbed/maps
   auto num_drones = 100;
   auto num_targets = 1000;
   auto time_limit = 1200.0;
@@ -433,15 +433,19 @@ void user() {
      "Custom Behaviour",
      behaviour_parameters,
      drone_config,
-     map,
+     map_name,
      num_drones,
-     num_targets,
-     listener.get(),
-     time_limit,
+     num_targets, 
+     target_type,   // "Custom_1"
+     listener_name, // "Default"
+     time_limit,    // 100.0
   };
 
   // Add test to the Simulator's TestQueue
   salsa::TestQueue::push(test);
+
+  // Or... load a queue that you've saved before:
+  salsa::TestQueue::load("my_queue");
 }
 ```
 
