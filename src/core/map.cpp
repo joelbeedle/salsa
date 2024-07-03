@@ -101,10 +101,10 @@ Map map::load(const char *new_map_name) {
         fixture_def.shape = &shape;
       } else if (fixture_json.find("edge") != fixture_json.end()) {
         b2EdgeShape shape;
-        shape.m_vertex1.Set(fixture_json["edge"]["start"][0],
-                            fixture_json["edge"]["start"][1]);
-        shape.m_vertex2.Set(fixture_json["edge"]["end"][0],
-                            fixture_json["edge"]["end"][1]);
+        shape.SetTwoSided(b2Vec2(fixture_json["edge"]["start"][0],
+                                 fixture_json["edge"]["start"][1]),
+                          b2Vec2(fixture_json["edge"]["end"][0],
+                                 fixture_json["edge"]["end"][1]));
         fixture_def.shape = &shape;
       }
       body->CreateFixture(&fixture_def);
