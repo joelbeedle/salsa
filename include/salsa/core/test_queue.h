@@ -25,7 +25,7 @@ struct TestConfig {
   std::string behaviour_name;
   std::variant<Parameters, FloatParameters> parameters;
   DroneConfiguration *drone_config;
-  map::Map map;
+  std::string map_name;
   int num_drones;
   int num_targets;
   float time_limit;

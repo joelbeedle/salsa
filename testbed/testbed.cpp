@@ -20,10 +20,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#include "salsa/entity/drone_configuration.h"
 #define _CRT_SECURE_NO_WARNINGS
 #define IMGUI_DISABLE_OBSOLETE_FUNCTIONS 1
-
-#include "testbed.h"
 
 #include <stdio.h>
 
@@ -37,6 +36,7 @@
 #include "imgui.h"
 #include "settings.h"
 #include "test.h"
+#include "testbed.h"
 
 #ifdef __APPLE__
 #define GL_SILENCE_DEPRECATION
@@ -481,7 +481,8 @@ int run_headless(bool verbose) {
   salsa::TestConfig test = salsa::TestQueue::pop();
   salsa::TestQueue::push(test);
 
-  salsa::Sim *sim = new salsa::Sim(test);
+  bool init_testbed = true;
+  salsa::Sim *sim;
   int count = 0;
   int original_size = salsa::TestQueue::size();
   while (salsa::TestQueue::size() > 0) {
@@ -491,11 +492,18 @@ int run_headless(bool verbose) {
       if (temp_sim == nullptr) {
         return false;
       }
-      auto old_sim = sim;
-      sim = temp_sim;
-      delete old_sim;
-      sim->setCurrentBehaviour(sim->current_behaviour_name());
-      world = sim->getWorld();
+      if (init_testbed) {
+        init_testbed = false;
+        sim = temp_sim;
+        sim->setCurrentBehaviour(sim->current_behaviour_name());
+        world = sim->getWorld();
+      } else {
+        auto old_sim = sim;
+        sim = temp_sim;
+        delete old_sim;
+        sim->setCurrentBehaviour(sim->current_behaviour_name());
+        world = sim->getWorld();
+      }
       std::cout << "(" << count << "/" << original_size << ")"
                 << " Running test: " << test.behaviour_name << std::endl;
       std::cout << "Drones: " << test.num_drones

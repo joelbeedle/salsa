@@ -324,8 +324,6 @@ class QueueSimulator : public Test {
         ImGui::EndCombo();
       }
 
-      auto new_map = salsa::map::getMap(current_map_name);
-
       auto listenerNames = salsa::BaseContactListener::getListenerNames();
       static std::string current_listener_name =
           listenerNames.empty() ? "" : listenerNames[0];
@@ -394,9 +392,9 @@ class QueueSimulator : public Test {
       // create new_config and add it to the queue
       if (ImGui::Button("Add Test", ImVec2(120, 0))) {
         salsa::TestConfig new_config = {
-            current_name,   new_params,          drone_config,
-            new_map,        new_drone_count,     new_target_count,
-            new_time_limit, current_target_name, listener};
+            current_name,     new_params,          drone_config,
+            current_map_name, new_drone_count,     new_target_count,
+            new_time_limit,   current_target_name, listener};
         queue_.push(new_config);
         added_new_test_ = true;
         ImGui::CloseCurrentPopup();
@@ -630,9 +628,9 @@ class QueueSimulator : public Test {
             *(new_params[name]) = static_cast<float>(combination[j]);
           }
           salsa::TestConfig new_config = {
-              current_name,   new_params,          drone_config,
-              new_map,        new_drone_count,     new_target_count,
-              new_time_limit, current_target_name, listener};
+              current_name,     new_params,          drone_config,
+              current_map_name, new_drone_count,     new_target_count,
+              new_time_limit,   current_target_name, listener};
 
           queue_.push(new_config);
           added_test_permutation_ = true;

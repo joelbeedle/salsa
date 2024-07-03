@@ -46,6 +46,7 @@ class Sim {
   ///@{
   salsa::TestConfig
       test_config_;  ///< The test configuration for the simulation
+  std::string map_name_;
   float border_height_;
   float border_width_;
   b2Vec2 drone_spawn_position_;

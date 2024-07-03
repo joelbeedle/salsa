@@ -28,6 +28,7 @@ int main(int argc, char** argv) {
   if (headless) {
     // Run in headless mode
     testbed::user();
+    testbed_console->set_level(spdlog::level::warn);
     if (!no_plots) {
       testbed::plot_drone_distances = true;
       testbed::plot_drone_heatmap = true;

@@ -27,12 +27,8 @@ Sim::Sim(b2World *world, int drone_count, int target_count,
 }
 
 Sim::Sim(TestConfig &config)
-    : world_(config.map.world),
-      border_width_(config.map.width),
-      border_height_(config.map.height),
-      map_(config.map),
+    : map_name_(config.map_name),
       num_drones_(config.num_drones),
-      drone_spawn_position_(config.map.drone_spawn_point),
       num_targets_(config.num_targets),
       drone_configuration_(config.drone_config),
       time_limit_(config.time_limit),
@@ -40,18 +36,30 @@ Sim::Sim(TestConfig &config)
       contact_listener_(config.contact_listener),
       test_config_(config) {
   is_stack_test_ = true;
+
+  // Load map
+  map_ = salsa::map::load(map_name_.c_str());
+  world_ = map_.world;
+  border_width_ = map_.width;
+  border_height_ = map_.height;
+  drone_spawn_position_ = map_.drone_spawn_point;
+
   b2Vec2 gravity(0.0f, 0.0f);
   world_->SetGravity(gravity);
   current_behaviour_name_ = config.behaviour_name;
   auto now = std::chrono::system_clock::now();
   auto time_t = std::chrono::system_clock::to_time_t(now);
   auto tm = *std::localtime(&time_t);
+  auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(
+                          now.time_since_epoch()) %
+                      1000;
 
   std::ostringstream oss;
-  oss << std::put_time(&tm, "%Y-%m-%d_%H-%M-%S") << "_"
-      << current_behaviour_name_.c_str() << "/result.log";
+  oss << std::put_time(&tm, "%Y-%m-%d_%H-%M-%S") << "." << std::setw(3)
+      << milliseconds.count() << "_" << current_behaviour_name_.c_str()
+      << "/result.log";
   current_log_file_ = oss.str();
-  logger_.switch_log_file(oss.str());
+  logger_.switch_log_file(current_log_file_);
 
   world_->SetContactListener(contact_listener_);
   addObserver(std::shared_ptr<Logger>(&logger_, [](auto *) {}));
@@ -370,7 +378,7 @@ void Sim::setCurrentDroneConfiguration(DroneConfiguration &configuration) {
 
 void Sim::changeMap(std::string name) {
   logger::get()->info("Changing map to {}", name);
-  map::Map map = map::getMap(name);
+  map::Map map = map::load(name.c_str());
   map_ = map;
   world_ = map.world;
   border_width_ = map.width;

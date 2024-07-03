@@ -15,6 +15,8 @@
 
 namespace salsa {
 
+std::string generateRandomString(int length);
+
 /// @brief Abstract base class for an Observer in the Observer pattern.
 class Observer {
  public:
