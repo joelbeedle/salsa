@@ -102,3 +102,4 @@ testbed/plot/*.pdf
 testbed/plot/*.svg
 testbed/results/*
 *.log
+settings.ini
