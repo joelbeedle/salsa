@@ -27,12 +27,14 @@ TEST_F(TestQueueTest, PushAndPopTest) {
   TestConfig testConfig1 = {
       "Behaviour1",
       std::variant<TestConfig::Parameters, TestConfig::FloatParameters>(),
-      nullptr,
+      "",
       "",
       100,
       0,
       1200.0f,
-  };
+      "",
+      ""};
+
   TestQueue::push(testConfig1);
   EXPECT_EQ(1, TestQueue::size());
 
@@ -49,21 +51,24 @@ TEST_F(TestQueueTest, MaintainOrder) {
   TestConfig config1 = {
       "Behaviour1",
       std::variant<TestConfig::Parameters, TestConfig::FloatParameters>(),
-      nullptr,
+      "",
       "",
       100,
       0,
       1200.0f,
-  };
+      "",
+      ""};
   TestConfig config2 = {
       "Behaviour2",
       std::variant<TestConfig::Parameters, TestConfig::FloatParameters>(),
-      nullptr,
+      "",
       "",
       100,
       0,
       1200.0f,
-  };
+      "",
+      ""};
+
   TestQueue::push(config1);
   TestQueue::push(config2);
 

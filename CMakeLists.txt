@@ -55,6 +55,6 @@ add_subdirectory(testbed)
 if((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR MODERN_CMAKE_BUILD_TESTING)
    AND BUILD_TESTING)
    enable_testing()
-   add_subdirectory(test)
+   add_subdirectory(tests)
 endif()
 
