@@ -82,15 +82,7 @@ void user() {
   setupInteractions(*contactListener);
   salsa::TestConfig config = {"Flocking", flock_params, "Small", "speed",  100,
                               100,        100.0f,       "Tree",  "Default"};
-  json j = config;                      // Serialize to JSON
-  std::cout << j.dump(4) << std::endl;  // Print JSON
 
-  std::vector<std::vector<float>> loaded_permutations;
-  std::vector<std::string> loaded_parameter_names;
-  // salsa::loadPermutations(loaded_permutations, loaded_parameter_names,
-  //                         "permutations.json");
-  // queue.addPermutedTests(config, loaded_permutations,
-  // loaded_parameter_names);
   salsa::TestQueue::load("permutations");
 }
 
