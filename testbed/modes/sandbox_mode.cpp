@@ -321,7 +321,7 @@ class SandboxSimulator : public Test {
               vertices[i] = b2Mul(transform, polygonShape->m_vertices[i]);
             }
             debugDraw->DrawSolidPolygon(vertices, polygonShape->m_count,
-                                        b2Color(0.5f, 0.5f, 0.5f));
+                                        b2Color(0.5f, 1.0f, 0.5f));
             break;
           }
           case b2Shape::e_edge: {
