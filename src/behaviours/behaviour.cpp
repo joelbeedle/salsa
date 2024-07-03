@@ -27,6 +27,28 @@ void Behaviour::setParameters(
   }
 }
 
+std::unordered_map<std::string, float> Behaviour::getParameterValues() {
+  std::unordered_map<std::string, float> values;
+  for (const auto &[name, param] : parameters_) {
+    values[name] = param->value();
+  }
+  return values;
+}
+
+std::unordered_map<std::string, float> Behaviour::convertParametersToFloat(
+    std::unordered_map<std::string, behaviour::Parameter *> parameters) {
+  std::unordered_map<std::string, float> values;
+  for (const auto &[name, param] : parameters) {
+    values[name] = param->value();
+  }
+  return values;
+}
+
+std::unordered_map<std::string, float> Behaviour::convertParametersToFloat(
+    std::unordered_map<std::string, float> parameters) {
+  return parameters;
+}
+
 // namespace behaviours {
 void Behaviour::clampMagnitude(b2Vec2 &vector, const float maxMagnitude) {
   float lengthSquared = vector.LengthSquared();

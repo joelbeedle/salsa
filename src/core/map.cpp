@@ -115,6 +115,12 @@ Map map::load(const char *new_map_name) {
   return new_map;
 }
 
+void setNames() {
+  for (auto &map : registry) {
+    map.name = "Map";
+  }
+}
+
 void map::loadAll() {
   fs::path exec_path = getExecutablePath();
   fs::path directory = exec_path / ".." / ".." / "testbed" / "maps";
@@ -137,8 +143,16 @@ void map::loadAll() {
 
 std::vector<std::string> map::getMapNames() {
   std::vector<std::string> names;
-  for (const auto &map : registry) {
-    names.push_back(map.name);
+  fs::path exec_path = getExecutablePath();
+  fs::path directory = exec_path / ".." / ".." / "testbed" / "maps";
+  if (!fs::exists(directory)) {
+    throw std::runtime_error("Directory does not exist: " + directory.string());
+  }
+  for (const auto &entry : fs::directory_iterator(directory)) {
+    if (entry.path().extension() == ".json") {
+      std::string map_name = entry.path().stem().string();
+      names.push_back(map_name);
+    }
   }
   return names;
 }
