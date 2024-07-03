@@ -4,6 +4,7 @@
 #include <execution>
 
 #include "salsa/behaviours/registry.h"
+#include "salsa/utils/base_contact_listener.h"
 namespace salsa {
 
 Sim::Sim(b2World *world, int drone_count, int target_count,
@@ -30,10 +31,12 @@ Sim::Sim(TestConfig &config)
     : map_name_(config.map_name),
       num_drones_(config.num_drones),
       num_targets_(config.num_targets),
-      drone_configuration_(config.drone_config),
+      drone_configuration_(DroneConfiguration::getDroneConfigurationByName(
+          config.drone_config_name)),
       time_limit_(config.time_limit),
       target_type_(config.target_type),
-      contact_listener_(config.contact_listener),
+      contact_listener_(
+          BaseContactListener::getListenerByName(config.contact_listener_name)),
       test_config_(config) {
   is_stack_test_ = true;
 

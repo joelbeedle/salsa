@@ -341,9 +341,6 @@ class QueueSimulator : public Test {
         ImGui::EndCombo();
       }
 
-      static auto *listener =
-          salsa::BaseContactListener::getListenerByName(current_listener_name);
-
       // Get drone configuration for test
       auto droneConfigNames =
           salsa::DroneConfiguration::getDroneConfigurationNames();
@@ -361,11 +358,6 @@ class QueueSimulator : public Test {
         }
         ImGui::EndCombo();
       }
-
-      static auto *drone_config =
-          salsa::DroneConfiguration::getDroneConfigurationByName(
-              current_drone_config_name);
-
       auto targetNames = salsa::TargetFactory::getTargetNames();
       std::string current_target_name = targetNames[0];
       // Get target type from TargetFactory Registry
@@ -392,9 +384,15 @@ class QueueSimulator : public Test {
       // create new_config and add it to the queue
       if (ImGui::Button("Add Test", ImVec2(120, 0))) {
         salsa::TestConfig new_config = {
-            current_name,     new_params,          drone_config,
-            current_map_name, new_drone_count,     new_target_count,
-            new_time_limit,   current_target_name, listener};
+            current_name,
+            salsa::Behaviour::convertParametersToFloat(new_params),
+            current_drone_config_name,
+            current_map_name,
+            new_drone_count,
+            new_target_count,
+            new_time_limit,
+            current_target_name,
+            current_listener_name};
         queue_.push(new_config);
         added_new_test_ = true;
         ImGui::CloseCurrentPopup();
@@ -540,9 +538,6 @@ class QueueSimulator : public Test {
         ImGui::EndCombo();
       }
 
-      static auto *listener =
-          salsa::BaseContactListener::getListenerByName(current_listener_name);
-
       // Get drone configuration for test
       auto droneConfigNames =
           salsa::DroneConfiguration::getDroneConfigurationNames();
@@ -560,10 +555,6 @@ class QueueSimulator : public Test {
         }
         ImGui::EndCombo();
       }
-
-      static auto *drone_config =
-          salsa::DroneConfiguration::getDroneConfigurationByName(
-              current_drone_config_name);
 
       auto targetNames = salsa::TargetFactory::getTargetNames();
       std::string current_target_name = targetNames[0];
@@ -584,7 +575,11 @@ class QueueSimulator : public Test {
       ImGui::InputInt("Target Count", &new_target_count);
       ImGui::InputFloat("Time Limit", &new_time_limit);
 
-      if (ImGui::Button("Generate Permutations")) {
+      static std::vector<salsa::TestConfig> base;
+      static bool generated = false;
+
+      if (ImGui::Button("Generate")) {
+        base.clear();
         std::vector<std::vector<float>> lists;
 
         // Parse parameters
@@ -604,14 +599,6 @@ class QueueSimulator : public Test {
         std::vector<std::vector<float>> permutations;
         generatePermutations(permutations, lists);
 
-        nlohmann::json j;
-        j["permutations"] = permutations;
-        j["parameter_names"] = parameter_names;
-
-        std::ofstream file("permutations.json");
-        file << j.dump(4);
-        file.close();
-
         for (const auto &combination : permutations) {
           std::ostringstream oss;
           for (float value : combination) {
@@ -628,14 +615,74 @@ class QueueSimulator : public Test {
             *(new_params[name]) = static_cast<float>(combination[j]);
           }
           salsa::TestConfig new_config = {
-              current_name,     new_params,          drone_config,
-              current_map_name, new_drone_count,     new_target_count,
-              new_time_limit,   current_target_name, listener};
+              current_name,
+              salsa::Behaviour::convertParametersToFloat(new_params),
+              current_drone_config_name,
+              current_map_name,
+              new_drone_count,
+              new_target_count,
+              new_time_limit,
+              current_target_name,
+              current_listener_name};
 
-          queue_.push(new_config);
+          base.push_back(new_config);
+          generated = true;
+        }
+      }
+
+      if (!generated) {
+        ImGui::BeginDisabled();
+      }
+
+      if (ImGui::Button("Save Permutations", ImVec2(200, 0))) {
+        ImGui::OpenPopup("Save Permutations");
+      }
+
+      if (!generated) {
+        if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip))
+          ImGui::SetTooltip("Generate Permutations First");
+      }
+
+      if (ImGui::Button("Add Permutations to Queue", ImVec2(200, 0))) {
+        for (auto config : base) {
+          queue_.push(config);
+        }
+        added_test_permutation_ = true;
+        ImGui::CloseCurrentPopup();
+      }
+
+      if (!generated) {
+        ImGui::EndDisabled();
+        if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip))
+          ImGui::SetTooltip("Generate Permutations First");
+      }
+
+      if (ImGui::BeginPopup("Save Permutations")) {
+        static char filename[128] = "";
+        ImGui::InputText("Filename", filename, 128);
+        if (ImGui::Button("Save")) {
+          std::vector<salsa::TestConfig> old_tests;
+          for (const auto &config : queue_.getTests()) {
+            old_tests.push_back(config);
+          }
+          queue_.getTests().clear();
+          for (const auto &config : base) {
+            queue_.push(config);
+          }
+          queue_.save(filename);
+          queue_.getTests().clear();
+          for (const auto &config : old_tests) {
+            queue_.push(config);
+          }
+          ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel", ImVec2(120, 0))) {
           added_test_permutation_ = true;
           ImGui::CloseCurrentPopup();
         }
+        ImGui::EndPopup();
       }
 
       ImGui::SameLine();
@@ -784,7 +831,21 @@ class QueueSimulator : public Test {
         next_frame = true;
         skipped_test = true;
       }
-      if (sim->getDroneConfiguration() == nullptr) {
+
+      ImGui::SameLine();
+
+      if (ImGui::Button("Save Queue")) {
+        ImGui::OpenPopup("Save Queue");
+      }
+
+      if (ImGui::BeginPopup("Save Queue")) {
+        static char filename[128] = "";
+        ImGui::InputText("Filename", filename, 128);
+        if (ImGui::Button("Save")) {
+          queue_.save(filename);
+          ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
       }
 
       ImGui::SeparatorText("Graph Plotting Settings");

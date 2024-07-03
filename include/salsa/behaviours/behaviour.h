@@ -43,6 +43,15 @@ class Behaviour {
     return parameters_;
   }
 
+  /// @brief Retrieves a map of parameter names to their current values.
+  std::unordered_map<std::string, float> getParameterValues();
+
+  static std::unordered_map<std::string, float> convertParametersToFloat(
+      std::unordered_map<std::string, behaviour::Parameter *> parameters);
+
+  static std::unordered_map<std::string, float> convertParametersToFloat(
+      std::unordered_map<std::string, float> parameters);
+
   /// @brief Cleans up any resources or states specific to the behavior.
   ///
   /// @param drones List of all drones in the simulation, used for

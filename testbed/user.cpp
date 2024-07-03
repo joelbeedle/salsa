@@ -80,50 +80,18 @@ void user() {
   static auto contactListener =
       std::make_shared<salsa::BaseContactListener>("Default");
   setupInteractions(*contactListener);
-  salsa::TestConfig config = {"Flocking", flock_params, smallDrone,
-                              "speed",    100,          100,
-                              100.0f,     "Tree",       contactListener.get()};
+  salsa::TestConfig config = {"Flocking", flock_params, "Small", "speed",  100,
+                              100,        100.0f,       "Tree",  "Default"};
+  json j = config;                      // Serialize to JSON
+  std::cout << j.dump(4) << std::endl;  // Print JSON
+
   std::vector<std::vector<float>> loaded_permutations;
   std::vector<std::string> loaded_parameter_names;
   // salsa::loadPermutations(loaded_permutations, loaded_parameter_names,
   //                         "permutations.json");
   // queue.addPermutedTests(config, loaded_permutations,
   // loaded_parameter_names);
-  for (int i = 0; i < 4; i++) {
-    config.num_drones = 50;
-    config.num_targets = 1000;
-    salsa::TestQueue::push(config);
-  }
-  // config.num_drones = 100;
-  // config.num_targets = 100;
-  // salsa::TestQueue::push(config);
-  // config.num_drones = 100;
-  // config.num_targets = 1000;
-  // salsa::TestQueue::push(config);
-  // config.num_drones = 100;
-  // config.num_targets = 10000;
-  // salsa::TestQueue::push(config);
-
-  // config.num_drones = 500;
-  // config.num_targets = 100;
-  // salsa::TestQueue::push(config);
-  // config.num_drones = 500;
-  // config.num_targets = 1000;
-  // salsa::TestQueue::push(config);
-  //   config.num_drones = 500;
-  //   config.num_targets = 10000;
-  //   salsa::TestQueue::push(config);
-  //   salsa::TestQueue::push(config);
-
-  //   config.num_drones = 1000;
-  //   config.num_targets = 100;
-  //   salsa::TestQueue::push(config);
-  //   config.num_drones = 1000;
-  //   config.num_targets = 1000;
-  //   salsa::TestQueue::push(config);
-  //   config.num_drones = 1000;
-  //   config.num_targets = 10000;
-  //   salsa::TestQueue::push(config);
+  salsa::TestQueue::load("permutations");
 }
 
 }  // namespace testbed
