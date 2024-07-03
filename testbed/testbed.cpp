@@ -477,61 +477,78 @@ int run_headless(bool verbose) {
   s_settings.m_testIndex = b2Clamp(s_settings.m_testIndex, 0, g_testCount - 1);
   s_testSelection = s_settings.m_testIndex;
   s_test = std::move(g_testEntries[s_settings.m_testIndex].instance());
-  if (verbose) {
-    auto start = std::chrono::steady_clock::now();
-    int count = 0;
-    int original_size = salsa::TestQueue::size();
-    while (salsa::TestQueue::size() > 0) {
-      try {
-        auto test = salsa::TestQueue::pop();
-        count++;
-        salsa::Sim *sim = new salsa::Sim(test);
-        sim->setCurrentBehaviour(sim->current_behaviour_name());
-        std::cout << "(" << count << "/" << original_size << ")"
-                  << " Running test: " << test.behaviour_name << std::endl;
-        bool first_run = true;
+  b2World *world;
+  salsa::TestConfig test = salsa::TestQueue::pop();
+  salsa::TestQueue::push(test);
 
-        while (sim->current_time() < test.time_limit) {
-          sim->update();
-          sim->getWorld()->Step(1 / 60.0f, 8, 3);
-          sim->current_time() += (1.0f / 60.0f) * 1.0f;
-          auto now = std::chrono::steady_clock::now();
-          auto elapsed =
-              duration_cast<std::chrono::seconds>(now - start).count();
-          if (elapsed >= 3 || first_run ||
-              sim->current_time() >= test.time_limit) {
-            start = now;
-            const int cTotalLength = 20;
-            float lProgress = sim->current_time() / test.time_limit;
-            std::cout << "\r" << std::string(cTotalLength + 10, ' ') << "\r";
-            std::cout << "[" << std::string(cTotalLength * lProgress, '#')
-                      << std::string(cTotalLength * (1 - lProgress), '-')
-                      << "] " << std::setprecision(3) << 100 * lProgress << "%"
-                      << std::flush;
-            first_run = false;
-          }
-        }
-        std::cout << std::endl;
-        std::cout << "Finished test " << test.behaviour_name << std::endl;
-        testbed::plot(sim->getCurrentLogFile());
-      } catch (const std::exception &e) {
-        spdlog::error("Error: {}", e.what());
-        std::cerr << e.what() << std::endl;
-      }
-    }
-  } else {
-    while (true) {
+  salsa::Sim *sim = new salsa::Sim(test);
+  int count = 0;
+  int original_size = salsa::TestQueue::size();
+  while (salsa::TestQueue::size() > 0) {
+    try {
       auto test = salsa::TestQueue::pop();
-      salsa::Sim *sim = new salsa::Sim(test);
+      auto temp_sim = new salsa::Sim(test);
+      if (temp_sim == nullptr) {
+        return false;
+      }
+      auto old_sim = sim;
+      sim = temp_sim;
+      delete old_sim;
       sim->setCurrentBehaviour(sim->current_behaviour_name());
-      std::cout << "Running test " << test.behaviour_name << std::endl;
+      world = sim->getWorld();
+      std::cout << "(" << count << "/" << original_size << ")"
+                << " Running test: " << test.behaviour_name << std::endl;
+      std::cout << "Drones: " << test.num_drones
+                << " Targets: " << test.num_targets << std::endl;
+      bool first_run = true;
+      auto totalStart = std::chrono::high_resolution_clock::now();
+      auto updateStart = std::chrono::steady_clock::now();
 
       while (sim->current_time() < test.time_limit) {
+        world->Step(1 / 60.0f, 8, 3);
         sim->update();
-        sim->getWorld()->Step(1 / 60.0f, 8, 3);
         sim->current_time() += (1.0f / 60.0f) * 1.0f;
+
+        // Display Progress
+        auto now = std::chrono::steady_clock::now();
+        auto elapsed =
+            std::chrono::duration_cast<std::chrono::seconds>(now - updateStart)
+                .count();
+        if (verbose && (elapsed >= 3 || first_run ||
+                        sim->current_time() >= test.time_limit)) {
+          updateStart = now;
+          const int cTotalLength = 20;
+          float lProgress = sim->current_time() / test.time_limit;
+          std::cout << "\r" << std::string(cTotalLength + 10, ' ') << "\r";
+          std::cout << "[" << std::string(int(cTotalLength * lProgress), '#')
+                    << std::string(int(cTotalLength * (1 - lProgress)), '-')
+                    << "] " << std::setprecision(3) << 100 * lProgress << "%"
+                    << std::flush;
+          std::cout << "\t" << sim->current_time() << "s / " << test.time_limit
+                    << "s" << std::endl;
+          first_run = false;
+        }
       }
+
+      auto totalEnd = std::chrono::high_resolution_clock::now();
+      std::chrono::duration<double, std::milli> totalDuration =
+          totalEnd - totalStart;
+      double time_limit_milliseconds =
+          static_cast<double>(test.time_limit * 1000.0);
+      double time_taken_milliseconds = totalDuration.count();
+      std::cout << "Time taken: " << time_taken_milliseconds << "ms"
+                << " Time limit: " << time_limit_milliseconds << "ms"
+                << std::endl;
+      // Calculate the ratio of time taken to the time limit
+      double ratio = time_taken_milliseconds / time_limit_milliseconds;
+
+      std::cout << std::endl;
+      std::cout << "Finished test " << test.behaviour_name << " ";
+      std::cout << "(RTF: " << ratio << ")" << std::endl;
       testbed::plot(sim->getCurrentLogFile());
+    } catch (const std::exception &e) {
+      spdlog::error("Error: {}", e.what());
+      std::cerr << e.what() << std::endl;
     }
   }
 
@@ -541,6 +558,7 @@ int run_headless(bool verbose) {
 
   return 0;
 }
+
 //
 int run() {
 #if defined(_WIN32)
