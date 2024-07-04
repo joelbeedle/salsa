@@ -139,7 +139,7 @@ Both Sandbox and Queue modes allow the user to dynamically interact with the sim
 Headless mode can be entered using `./testbed --headless`. Headless mode runs much faster than the visual modes, as it is intended to iterate through simulations, outputting data. Verbose mode can be selected using `-v`, and a `.json` queue file (generated from the testbed) to use can be specified using `-q`.
 
 ### Queue Mode
-<img src="./docs/imgs/results.jpg" width="500">
+<img src="./docs/imgs/boxplot.jpg" width="500">
 - We used the Queue mode to generate the data used for the plot above. It is a powerful tool for collecting results.
 
 - In Queue mode, you can specify a number of simulations in a queue. Data is logged to the `testbed/results` folder.
