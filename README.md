@@ -2,6 +2,8 @@
 
 **S**warm **Al**gorithm **S**imul**a**tior Library and Testbed, written in C++.
 
+[SALSA Testbed Demonstration video](https://youtu.be/K64oUI9zK0c)
+
 ## Getting Started
 
 There is a Docker container available. It opens a noVNC web app on `localhost` with `salsa` pre-installed.
