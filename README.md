@@ -132,7 +132,7 @@ At any time, press escape to change modes.
 
 The testbed comes with a template `user.cpp` file, showing how to configure the testbed, and an example of using the Test Queue. There is more detail on how to create custom implementations in the Extensibility section.
 
-Both Sandbox and Queue modes allow the user to dynamically interact with the simulation as it is occuring. Queue mode is intended to collect data, and Sandbox mode is intended for algorithm development. Modes can be switched between seamlessly.
+Both Sandbox and Queue modes allow the user to dynamically interact with the simulation as it is occuring. Queue mode is intended to collect data, and Sandbox mode is intended for algorithm development. Modes can be switched between seamlessly. Registries are used internally inside the `salsa` library as communication interfaces.
 
 Headless mode can be entered using `./testbed --headless`. Headless mode runs much faster than the visual modes, as it is intended to iterate through simulations, outputting data. Verbose mode can be selected using `-v`, and a `.json` queue file (generated from the testbed) to use can be specified using `-q`.
 
@@ -169,6 +169,7 @@ Headless mode can be entered using `./testbed --headless`. Headless mode runs mu
     > Drones wont spawn inside solid objects, but they will spawn inside hollow polygons.
 
   - A square world boundary can be set by checking Draw Boundary and adjusting the size of the sides.
+  - Press `Q` to `undo` the last drawing action, or reset the cursor.
 
 - To save a map, click `File > Save As` and then enter a name when prompted. This will refresh the map registry, so if you want to use the map in a simulation straight away, you can.
 - To load a map, click `File > Load`, and select a map to load.
@@ -190,7 +191,7 @@ For more information on extending the various aspects of the testbed, expand a s
 To add a custom swarm algorithm:
 Create a new `.cpp` file inside `testbed/behaviors`, and name it, etc `my_alg.cpp`.
 
-Inside this file, import `<salsa/salsa.h>` to import all library headers.
+Inside this file, import `<salsa/salsa.h>` to import all library headers. (The following examples are as if the code is written inside the `salsa` namespace, for ease of reading)
 
 Create a class that extends the `Behaviour` class:
 
@@ -203,7 +204,7 @@ class MyAlg : public Behaviour {};
 Define any parameters as a behaviour::Parameter
 
 ```cpp
-class MyAlg : public salsa::Behaviour {
+class MyAlg : public Behaviour {
   private:
    behaviour::Parameter param_1_;
    behaviour::Parameter param_2_;
@@ -216,7 +217,7 @@ Implement a constructor that takes as arguments the behaviour parameters, and pa
 Then, create a key value pair in `parameters_`, a map of names to parameters, using as a key the display name, and as value a reference to the internal `behaviour::Parameter`.
 
 ```cpp
- class MyAlg : public salsa::Behaviour {
+ class MyAlg : public Behaviour {
    private:
     behaviour::Parameter param_1_;
     behaviour::Parameter param_2_;
@@ -247,7 +248,7 @@ After the class definition, create an instance and register it with the behaviou
 ```cpp
 auto alg = behaviour::Registry::get().add(
     "My Alg",
-    std::make_unique<MyAlg>(1.0, 3421.3));
+    std::make_unique<MyAlg>(param_1, param_2));
 ```
 
 This behaviour will now appear in the testbed, and can be set in a TestConfig using the behaviour namme specified, e.g. `My Alg`
@@ -274,7 +275,7 @@ In its constructor, a target **must** have the first 3 parameters as `b2World* w
 MyTarget(b2World* world, const b2Vec2 &position, int id, bool visible, float radius, int arg) {}
 ```
 
-A target must follow this pattern for its body definitions:
+A target should follow this pattern for its body definitions:
 
 ```cpp
   // Shape can be anything
@@ -380,7 +381,7 @@ contact_listener->addCollisionHandler(
       });
 ```
 
-We then pass the listener's name into the TestConfig for it to be used by a simulation.
+We then pass the listener's name into the `TestConfig` for it to be used by a simulation.
 
 </details>
 
