@@ -128,9 +128,7 @@ The testbed, when opened, presents the main menu. From here, we can access the f
 
 The testbed is extended from the original Box2D testbed. It has three interactive GUI modes, and a headless mode. The three GUI modes are Sandbox, Queue, and Map Creator.
 
-At any time, press escape to change modes.
-
-The testbed comes with a template `user.cpp` file, showing how to configure the testbed, and an example of using the Test Queue. There is more detail on how to create custom implementations in the Extensibility section.
+The testbed comes with a template `user.cpp` file, containing an example on how to configure the testbed and use the Test Queue. There is more detail on how to create custom implementations in the [Extensibility section](#extensibility).
 
 Both Sandbox and Queue modes allow the user to dynamically interact with the simulation as it is occuring. Queue mode is intended to collect data, and Sandbox mode is intended for algorithm development. Modes can be switched between seamlessly. Registries are used internally inside the `salsa` library as communication interfaces.
 
@@ -139,32 +137,32 @@ Headless mode can be entered using `./testbed --headless`. Headless mode runs mu
 ### Queue Mode
 <img src="./docs/imgs/boxplot.jpg" width="500">
 
-We used the Queue mode to generate the data used for the plot above. To run a similar queue (bar the Levy Flocking), you can use load [example queue](./example_queue.json).
+We used the Queue mode to generate the data used for the plot above. To run a similar queue (bar the Levy Flocking), you can load [example queue](./example_queue.json).
 
-- In Queue mode, you can specify a number of simulations in a queue. Data is logged to the `testbed/results` folder.
-- After the time limit for each runs out, plots that can be selected in the GUI are created from the data automatically.
+**Features:**
+- Create a test queue of various simulations and parameters, and get output data. Data is logged to the `testbed/results` folder.
+- After the time limit for each runs out, plots are created from the data automatically.
   > In headless mode, all plots are generated unless specified otherwise.
-- Then, the next simulation in the queue begins.
-- The Test Queue can be set beforehand in `user.cpp`, or generated in the GUI. Head to the Test Queue section on the left, click the `+` button, and choose whether to add a single test or add a group of tests, permuting behavior parameters.
+- The queue can be set beforehand in `user.cpp`, or generated in the GUI.
+  - To generate in the GUI: go to the Test Queue section, click the `+` button, and choose whether to add a single test or add a group of tests, permuting behavior parameters.
 
 #### Saving and Loading Queues
 
-- Queues can be saved and loaded through the GUI, and also in user code, using `TestQueue::load(filename)`. A saved queue can also be loaded in headless mode using the `-q` option.
-- Queues will be saved into the `build/testbed` directory, where the executable is.
+- Queues can be saved and loaded through the GUI, and also in user code, using `TestQueue::load(filename)` and `TestQueue::save(filename)`. A saved queue can also be independently loaded in headless mode using the `-q` option.
 
 ### Sandbox Mode
 
-- Sandbox mode gives the user the ability to dynamically change parameters, maps, drone configurations, etc., without setting a Test Queue beforehand.
-- Users can change swarm sizes, the map, the behaviour, and any parameters, and get instant feedback on what the changes do.
+Sandbox mode is used to test a behavior, without having to create tests. It is intended as a way for users to visually interact with their algorithms, and assess if they are functioning correctly.
 
-  > You still need to set the other definitions in `user.cpp`.
+**Features:**
+- Dynamically change parameters, maps, drone configurations, etc., on the go.
+- Change swarm sizes, map, behaviour, and any parameters, and get instant feedback on what the changes do.
 
 ### Map Creator
 
-- The Map Creator allows the user to create their own maps. The menu on the left is the main interface.
+The Map Creator allows the user to create their own maps. The menu on the left is the main interface.
 
 - **Drawing Tips:**
-
   - Drawing lines is done by clicking and holding, then dragging and releasing to end the line
   - Drawing shapes (hollow polygon, polygon) is done by clicking once, releasing, then clicking again to set the next vertex. Connect the last vertex to the first to draw the shape.
   - The drone spawn point should be set for where you want drones to spawn.
@@ -174,8 +172,9 @@ We used the Queue mode to generate the data used for the plot above. To run a si
   - A square world boundary can be set by checking Draw Boundary and adjusting the size of the sides.
   - Press `Q` to `undo` the last drawing action, or reset the cursor.
 
-- To save a map, click `File > Save As` and then enter a name when prompted. This will refresh the map registry, so if you want to use the map in a simulation straight away, you can.
-- To load a map, click `File > Load`, and select a map to load.
+#### Saving and Loading Maps
+- **To save**, click `File > Save As` and then enter a name when prompted. This will refresh the map registry, so if you want to use the map in a simulation straight away, you can.
+- **To load**, click `File > Load`, and select a map to load.
 
 ## Extensibility
 
