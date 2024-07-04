@@ -11,12 +11,15 @@ ENV VNC_PASSWD=123456
 ENV APT_INSTALL_PRE="apt -o Acquire::ForceIPv4=true update && DEBIAN_FRONTEND=noninteractive apt -o Acquire::ForceIPv4=true install -y --no-install-recommends"
 ENV APT_INSTALL_POST="&& apt clean -y && rm -rf /var/lib/apt/lists/*"
 # Make sure the dependencies are met
-RUN eval ${APT_INSTALL_PRE} python3-dev gdb pkg-config libspdlog-dev wayland-protocols libwayland-dev ninja-build tigervnc-standalone-server tigervnc-common tigervnc-tools fluxbox eterm cmake g++ gcc xterm git net-tools python3 python3-numpy ca-certificates scrot libx11-dev libxrandr-dev libxcursor-dev libudev-dev libopenal-dev libflac-dev libogg-dev libvorbis-dev libopenal-dev libpthread-stubs0-dev libxinerama-dev libglfw3 libglfw3-dev libxi-dev libxkbcommon-dev ${APT_INSTALL_POST}
+RUN eval ${APT_INSTALL_PRE} python3-dev gdb pkg-config libspdlog-dev wayland-protocols python3-pip libwayland-dev ninja-build tigervnc-standalone-server tigervnc-common tigervnc-tools fluxbox eterm cmake g++ gcc xterm git net-tools python3 python3-numpy ca-certificates scrot libx11-dev libxrandr-dev libxcursor-dev libudev-dev libopenal-dev libflac-dev libogg-dev libvorbis-dev libopenal-dev libpthread-stubs0-dev libxinerama-dev libglfw3 libglfw3-dev libxi-dev libxkbcommon-dev ${APT_INSTALL_POST}
 
 # Install VNC. Requires net-tools, python and python-numpy
 RUN git clone --branch v1.4.0 --single-branch https://github.com/novnc/noVNC.git /opt/noVNC
 RUN git clone --branch v0.11.0 --single-branch https://github.com/novnc/websockify.git /opt/noVNC/utils/websockify
 RUN ln -s /opt/noVNC/vnc.html /opt/noVNC/index.html
+
+# Install pandas, matplotlib, seaborn
+RUN pip3 install pandas matplotlib seaborn scipy
 
 # Add menu entries to the container
 RUN echo "?package(bash):needs=\"X11\" section=\"DockerCustom\" title=\"Xterm\" command=\"xterm -ls -bg black -fg white\"" >> /usr/share/menu/custom-docker && update-menus
