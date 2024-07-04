@@ -405,29 +405,31 @@ salsa::DroneConfiguration *drone_config = new salsa::DroneConfiguration(
 // user.cpp
 #include "testbed.h"
 
+using namespace salsa;
+
 void user() {
   // Get the default parameters for CustomBehaviour
-  auto behaviour_parameters = salsa::behaviour::Registry::getInstance().getBehaviour("Custom Behaviour")->getParameters();
+  auto behaviour_parameters = behaviour::Registry::get().behaviour("Custom Behaviour")->getParameters();
 
   // Create a drone configuration
-  auto *drone_config = new salsa::DroneConfiguration("My Config",
+  auto *drone_config = new DroneConfiguration("My Config",
       25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f);
 
   // Set up the listener to listen for collisions.
   // Has to be static, and named
-  static auto listener = std::make_shared<salsa::BaseContactListener>("Default");
+  static auto listener = std::make_shared<BaseContactListener>("Default");
 
   // Register the drones and targets with the collision manager
-  salsa::CollisionManager::registerType<salsa::Drone>({typeid(CustomTarget).name()});
-  salsa::CollisionManager::registerType<CustomTarget>({typeid(salsa::Drone).name()});
+  CollisionManager::registerType<Drone>({typeid(CustomTarget).name()});
+  CollisionManager::registerType<CustomTarget>({typeid(Drone).name()});
 
   // Add the target to the TargetFactory, supplying any custom parameters and their types
   // This can be done multiple times for the same Target class, with a different name.
-   salsa::TargetFactory::registerTarget<CustomTarget, bool, bool, float>("Custom_1", false,
+   TargetFactory::registerTarget<CustomTarget, bool, bool, float>("Custom_1", false,
                                                                 false, 5.0f);
 
   // Add a collision handler between Drone and Target types, when this collision is detected, userHandlingFunction is called to handle the collision.
-  listener.addColisionHandler(typeid(salsa::Drone), typeid(CustomTarget), userHandlingFunction)
+  listener.addColisionHandler(typeid(Drone), typeid(CustomTarget), userHandlingFunction)
 
   // Set up test environment
   auto map_name = "test" // "test.json" here is a map that has already been created and is in testbed/maps
@@ -435,7 +437,7 @@ void user() {
   auto num_targets = 1000;
   auto time_limit = 1200.0;
 
-  salsa::TestConfig test = {
+  TestConfig test = {
      "Custom Behaviour",
      behaviour_parameters,
      drone_config,
@@ -448,10 +450,10 @@ void user() {
   };
 
   // Add test to the Simulator's TestQueue
-  salsa::TestQueue::push(test);
+  TestQueue::push(test);
 
   // Or... load a queue that you've saved before:
-  salsa::TestQueue::load("my_queue");
+  TestQueue::load("my_queue");
 }
 ```
 
