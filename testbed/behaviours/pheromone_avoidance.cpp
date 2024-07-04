@@ -59,6 +59,36 @@ class PheromoneBehaviour : public Behaviour {
         count++;
       }
     }
+    if (count > 0) {
+      avoidanceSteering.x /= count;
+      avoidanceSteering.y /= count;
+      avoidanceSteering.Normalize();
+      avoidanceSteering *= currentDrone.max_speed();
+
+      steering += avoidanceSteering - currentDrone.velocity();
+      clampMagnitude(steering, currentDrone.max_force());
+    }
+
+    b2Vec2 acceleration =
+        steering + (obstacle_avoidance_weight_ *
+                    avoidObstacles(obstaclePoints, currentDrone));
+    b2Vec2 velocity = currentDrone.velocity();
+    b2Vec2 position = currentDrone.position();
+
+    velocity += acceleration;
+    float speed = 0.001f + velocity.Length();
+    b2Vec2 dir(velocity.x / speed, velocity.y / speed);
+
+    // Clamp speed
+    if (speed > currentDrone.max_speed()) {
+      speed = currentDrone.max_speed();
+    } else if (speed < 0) {
+      speed = 0.001f;
+    }
+    velocity = b2Vec2(dir.x * speed, dir.y * speed);
+
+    currentDrone.body()->SetLinearVelocity(velocity);
+    acceleration.SetZero();
   }
 
  private:
