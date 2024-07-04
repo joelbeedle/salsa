@@ -6,7 +6,7 @@
 
 There is a Docker container available. It opens a noVNC web app on `localhost` with `salsa` pre-installed.
 
-### Using the Docker container
+### Using the prebuilt Docker container
 
 This docker container **only** contains what is in the repository. If you want to extend the program, you need to clone the repository and build the docker container / the code.
 
@@ -16,9 +16,7 @@ This docker container **only** contains what is in the repository. If you want t
 docker run --shm-size=256m -it -p 5901:5901 -e VNC_PASSWD=123456 ghcr.io/joelbeedle/salsa:latest
 ```
 
----
-
-If you want to clone the repository and build it yourself:
+### Building the docker container yourself
 
 - **Clone the repository:**
 
@@ -43,7 +41,7 @@ To use the virtual machine:
 
 - Go to `http://localhost:5901` and enter the password `123456`
 
-- Right click, select `Applications > Terminal > Bash` and you will find yourself already in a terminal in the repository.
+- Right click, select `Applications > Shells > Bash` and you will find yourself already in a terminal in the repository.
 
 - The testbed application can be found at `./build/testbed/`
 
@@ -141,6 +139,7 @@ Both Simulation modes allow the user to dynamically change the simulation as it 
 - The Test Queue can be set beforehand in `user.cpp`, or generated in the GUI. Head to the Test Queue section on the left, click the `+` button, and choose whether to add a single test or add a group of tests, permuting behavior parameters.
 
 #### Saving and Loading Queues
+- Queues can be saved and loaded through the GUI, and also in user code, using `TestQueue::load(filename)`. A saved queue can also be loaded in headless mode using the `-q` option. 
 
 ### Sandbox Mode
 
