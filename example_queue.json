@@ -1,0 +1,230 @@
+[
+    {
+        "behaviour_name": "Uniform Random Walk",
+        "contact_listener_name": "Default",
+        "drone_config_name": "Small",
+        "keep": true,
+        "map_name": "tree_map",
+        "num_drones": 10,
+        "num_targets": 50000,
+        "parameters": {},
+        "target_type": "Tree",
+        "time_limit": 1200.0
+    },
+    {
+        "behaviour_name": "Uniform Random Walk",
+        "contact_listener_name": "Default",
+        "drone_config_name": "Small",
+        "keep": true,
+        "map_name": "tree_map",
+        "num_drones": 20,
+        "num_targets": 50000,
+        "parameters": {},
+        "target_type": "Tree",
+        "time_limit": 1200.0
+    },
+    {
+        "behaviour_name": "Uniform Random Walk",
+        "contact_listener_name": "Default",
+        "drone_config_name": "Small",
+        "keep": true,
+        "map_name": "tree_map",
+        "num_drones": 30,
+        "num_targets": 50000,
+        "parameters": {},
+        "target_type": "Tree",
+        "time_limit": 1200.0
+    },
+    {
+        "behaviour_name": "Uniform Random Walk",
+        "contact_listener_name": "Default",
+        "drone_config_name": "Small",
+        "keep": true,
+        "map_name": "tree_map",
+        "num_drones": 40,
+        "num_targets": 50000,
+        "parameters": {},
+        "target_type": "Tree",
+        "time_limit": 1200.0
+    },
+    {
+        "behaviour_name": "DSPBehaviour",
+        "contact_listener_name": "Default",
+        "drone_config_name": "Small",
+        "keep": true,
+        "map_name": "tree_map",
+        "num_drones": 10,
+        "num_targets": 50000,
+        "parameters": {},
+        "target_type": "Tree",
+        "time_limit": 1200.0
+    },
+    {
+        "behaviour_name": "DSPBehaviour",
+        "contact_listener_name": "Default",
+        "drone_config_name": "Small",
+        "keep": true,
+        "map_name": "tree_map",
+        "num_drones": 20,
+        "num_targets": 50000,
+        "parameters": {},
+        "target_type": "Tree",
+        "time_limit": 1200.0
+    },
+    {
+        "behaviour_name": "DSPBehaviour",
+        "contact_listener_name": "Default",
+        "drone_config_name": "Small",
+        "keep": true,
+        "map_name": "tree_map",
+        "num_drones": 30,
+        "num_targets": 50000,
+        "parameters": {},
+        "target_type": "Tree",
+        "time_limit": 1200.0
+    },
+    {
+        "behaviour_name": "DSPBehaviour",
+        "contact_listener_name": "Default",
+        "drone_config_name": "Small",
+        "keep": true,
+        "map_name": "tree_map",
+        "num_drones": 40,
+        "num_targets": 50000,
+        "parameters": {},
+        "target_type": "Tree",
+        "time_limit": 1200.0
+    },
+    {
+        "behaviour_name": "Flocking",
+        "contact_listener_name": "Default",
+        "drone_config_name": "Small",
+        "keep": true,
+        "map_name": "tree_map",
+        "num_drones": 10,
+        "num_targets": 50000,
+        "parameters": {
+            "Alignment Weight": 1.600000023841858,
+            "Cohesion Weight": 1.0,
+            "Obstacle Avoidance Weight": 4.0,
+            "Separation Distance": 250.0,
+            "Separation Weight": 3.0
+        },
+        "target_type": "Tree",
+        "time_limit": 1200.0
+    },
+    {
+        "behaviour_name": "Flocking",
+        "contact_listener_name": "Default",
+        "drone_config_name": "Small",
+        "keep": true,
+        "map_name": "tree_map",
+        "num_drones": 20,
+        "num_targets": 50000,
+        "parameters": {
+            "Alignment Weight": 1.600000023841858,
+            "Cohesion Weight": 1.0,
+            "Obstacle Avoidance Weight": 4.0,
+            "Separation Distance": 250.0,
+            "Separation Weight": 3.0
+        },
+        "target_type": "Tree",
+        "time_limit": 1200.0
+    },
+    {
+        "behaviour_name": "Flocking",
+        "contact_listener_name": "Default",
+        "drone_config_name": "Small",
+        "keep": true,
+        "map_name": "tree_map",
+        "num_drones": 30,
+        "num_targets": 50000,
+        "parameters": {
+            "Alignment Weight": 1.600000023841858,
+            "Cohesion Weight": 1.0,
+            "Obstacle Avoidance Weight": 4.0,
+            "Separation Distance": 250.0,
+            "Separation Weight": 3.0
+        },
+        "target_type": "Tree",
+        "time_limit": 1200.0
+    },
+    {
+        "behaviour_name": "Flocking",
+        "contact_listener_name": "Default",
+        "drone_config_name": "Small",
+        "keep": true,
+        "map_name": "tree_map",
+        "num_drones": 40,
+        "num_targets": 50000,
+        "parameters": {
+            "Alignment Weight": 1.600000023841858,
+            "Cohesion Weight": 1.0,
+            "Obstacle Avoidance Weight": 4.0,
+            "Separation Distance": 250.0,
+            "Separation Weight": 3.0
+        },
+        "target_type": "Tree",
+        "time_limit": 1200.0
+    },
+    {
+        "behaviour_name": "Pheromone Avoidance",
+        "contact_listener_name": "Default",
+        "drone_config_name": "Small",
+        "keep": true,
+        "map_name": "tree_map",
+        "num_drones": 10,
+        "num_targets": 50000,
+        "parameters": {
+            "Decay Rate": 0.5,
+            "Obstacle Avoidance Weight": 1.0
+        },
+        "target_type": "Tree",
+        "time_limit": 1200.0
+    },
+    {
+        "behaviour_name": "Pheromone Avoidance",
+        "contact_listener_name": "Default",
+        "drone_config_name": "Small",
+        "keep": true,
+        "map_name": "tree_map",
+        "num_drones": 20,
+        "num_targets": 50000,
+        "parameters": {
+            "Decay Rate": 0.5,
+            "Obstacle Avoidance Weight": 1.0
+        },
+        "target_type": "Tree",
+        "time_limit": 1200.0
+    },
+    {
+        "behaviour_name": "Pheromone Avoidance",
+        "contact_listener_name": "Default",
+        "drone_config_name": "Small",
+        "keep": true,
+        "map_name": "tree_map",
+        "num_drones": 30,
+        "num_targets": 50000,
+        "parameters": {
+            "Decay Rate": 0.5,
+            "Obstacle Avoidance Weight": 1.0
+        },
+        "target_type": "Tree",
+        "time_limit": 1200.0
+    },
+    {
+        "behaviour_name": "Pheromone Avoidance",
+        "contact_listener_name": "Default",
+        "drone_config_name": "Small",
+        "keep": true,
+        "map_name": "tree_map",
+        "num_drones": 40,
+        "num_targets": 50000,
+        "parameters": {
+            "Decay Rate": 0.5,
+            "Obstacle Avoidance Weight": 1.0
+        },
+        "target_type": "Tree",
+        "time_limit": 1200.0
+    }
+]
