@@ -18,6 +18,12 @@ This docker container **only** contains what is in the repository. If you want t
 docker run --shm-size=256m -it -p 5901:5901 -e VNC_PASSWD=123456 ghcr.io/joelbeedle/salsa:latest
 ```
 
+Go to `http://localhost:5901` and enter the password `123456`
+
+Right click, select `Applications > Shells > Bash` and you will find yourself already in a terminal in the repository.
+
+The testbed application can be found at `./build/testbed/`, run `./build/testbed/testbed` to run in GUI mode.
+
 ### Building the docker container yourself
 
 - **Clone the repository:**
@@ -39,13 +45,15 @@ docker build -t salsa-test/testbed .
 docker run --shm-size=256m -it -p 5901:5901 -e VNC_PASSWD=123456 salsa-test/testbed
 ```
 
-To use the virtual machine:
+Then, to use the machine:
 
 - Go to `http://localhost:5901` and enter the password `123456`
 
 - Right click, select `Applications > Shells > Bash` and you will find yourself already in a terminal in the repository.
 
 - The testbed application can be found at `./build/testbed/`
+
+- Learn how to [use the testbed](#using-the-testbed)
 
 ### Building it yourself
 
