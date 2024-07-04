@@ -84,7 +84,7 @@ void user() {
                               "tree_map", 100,          100,
                               100.0f,     "Tree",       "Default"};
 
-  salsa::TestQueue::load("permutations");
+  salsa::TestQueue::push(config);
 }
 
 }  // namespace testbed
