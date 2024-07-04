@@ -124,11 +124,17 @@ The testbed, when opened, presents the main menu. From here, we can access the f
   - Sandbox Mode
 - **Map Creator**
 
-## Testbed Details
+## Using the Testbed
 
-Both Simulation modes allow the user to dynamically change the simulation as it is occuring. Queue mode is intended to collect data, whereas Sandbox mode is intended for algorithm development. Modes can be switched between seamlessly.
+The testbed is extended from the original Box2D testbed. It has three interactive GUI modes, and a headless mode. The three GUI modes are Sandbox, Queue, and Map Creator.
 
-> If in Queue mode, and a simulation is running, it will be cut short if the mode is switched.
+At any time, press escape to change modes.
+
+The testbed comes with a template `user.cpp` file, showing how to configure the testbed, and an example of using the Test Queue. There is more detail on how to create custom implementations in the Extensibility section.
+
+Both Sandbox and Queue modes allow the user to dynamically interact with the simulation as it is occuring. Queue mode is intended to collect data, and Sandbox mode is intended for algorithm development. Modes can be switched between seamlessly.
+
+Headless mode can be entered using `./testbed --headless`. Headless mode runs much faster than the visual modes, as it is intended to iterate through simulations, outputting data. Verbose mode can be selected using `-v`, and a `.json` queue file (generated from the testbed) to use can be specified using `-q`.
 
 ### Queue Mode
 
@@ -139,17 +145,20 @@ Both Simulation modes allow the user to dynamically change the simulation as it 
 - The Test Queue can be set beforehand in `user.cpp`, or generated in the GUI. Head to the Test Queue section on the left, click the `+` button, and choose whether to add a single test or add a group of tests, permuting behavior parameters.
 
 #### Saving and Loading Queues
-- Queues can be saved and loaded through the GUI, and also in user code, using `TestQueue::load(filename)`. A saved queue can also be loaded in headless mode using the `-q` option. 
+
+- Queues can be saved and loaded through the GUI, and also in user code, using `TestQueue::load(filename)`. A saved queue can also be loaded in headless mode using the `-q` option.
+- Queues will be saved into the `build/testbed` directory, where the executable is.
 
 ### Sandbox Mode
 
 - Sandbox mode gives the user the ability to dynamically change parameters, maps, drone configurations, etc., without setting a Test Queue beforehand.
+- Users can change swarm sizes, the map, the behaviour, and any parameters, and get instant feedback on what the changes do.
 
   > You still need to set the other definitions in `user.cpp`.
 
 ### Map Creator
 
-- The Map Creator allows the user to create their own maps. Simply use the menu on the left.
+- The Map Creator allows the user to create their own maps. The menu on the left is the main interface.
 
 - **Drawing Tips:**
 
@@ -173,7 +182,7 @@ Users can extend the functionality of the testbed. They can add custom swarm alg
 For more information on extending the various aspects of the testbed, expand a section below.
 
 <details>
-  
+
 <summary>Adding new swarm Algorithms</summary>
 
 ### Add a Custom swarm Algorithm
@@ -431,7 +440,7 @@ void user() {
      drone_config,
      map_name,
      num_drones,
-     num_targets, 
+     num_targets,
      target_type,   // "Custom_1"
      listener_name, // "Default"
      time_limit,    // 100.0
