@@ -47,9 +47,9 @@ To use the virtual machine:
 
 - The testbed application can be found at `./build/testbed/`
 
-### Installation
+### Building it yourself
 
-`salsa` was designed with to be cross-platform.
+`salsa` was designed with to be cross-platform, for Windows, Linux, and macOS.
 
 #### Requirements
 
@@ -73,8 +73,6 @@ Requirements in bold are **essential**.
 - [googletest](https://github.com/google/googletest)
 
 These requirements are all either managed as git submodules, or are fetched and installed into `build/_deps` when configuring using CMake's [FetchContent](https://cmake.org/cmake/help/latest/module/FetchContent.html) module automatically, so you shouldn't have to do anything to set them up.
-
-It may be neccessary to install some extra dependencies on Linux (or just do `sudo apt-get install -y build-essentials ubuntu-desktop`). If you get build errors, install the missing packages.
 
 #### Steps
 
@@ -112,9 +110,9 @@ It may be neccessary to install some extra dependencies on Linux (or just do `su
 
 > There are also some common build configurations found in `CMakePresents.json`.
 
-### Running the Testbed
+### Running Testbed
 
-Now that the build is complete, to run the testbed:
+To run the testbed:
 
 - Navigate to the `build/testbed` directory and execute `./testbed`.
 - Use `./testbed --help` for a list of command line parameters
@@ -122,9 +120,9 @@ Now that the build is complete, to run the testbed:
 The testbed, when opened, presents the main menu. From here, we can access the following features:
 
 - **Simulators**
-  - Queue Mode
-  - Sandbox Mode
-- **Map Creator**
+  - [Queue Mode](#queue-mode)
+  - [Sandbox Mode](#sandbox-mode)
+- [**Map Creator**](#map-creator)
 
 ## Using the Testbed
 
@@ -140,7 +138,7 @@ Headless mode can be entered using `./testbed --headless`. Headless mode runs mu
 
 ### Queue Mode
 <img src="./docs/imgs/boxplot.jpg" width="500">
-- We used the Queue mode to generate the data used for the plot above. It is a powerful tool for collecting results.
+We used the Queue mode to generate the data used for the plot above. To run a similar queue (bar the Levy Flocking), you can use the [example provided here](example_queue.json)
 
 - In Queue mode, you can specify a number of simulations in a queue. Data is logged to the `testbed/results` folder.
 - After the time limit for each runs out, plots that can be selected in the GUI are created from the data automatically.
@@ -177,8 +175,6 @@ Headless mode can be entered using `./testbed --headless`. Headless mode runs mu
 
 - To save a map, click `File > Save As` and then enter a name when prompted. This will refresh the map registry, so if you want to use the map in a simulation straight away, you can.
 - To load a map, click `File > Load`, and select a map to load.
-
-- The testbed comes prepackaged with a few swarm algorithms, a drone configuration, and `Tree`s as targets.
 
 ## Extensibility
 
