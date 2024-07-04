@@ -129,7 +129,7 @@ class MapCreator : public Test {
 
     b2FixtureDef fixtureDef;
     fixtureDef.shape = &shape;
-    fixtureDef.density = 1.0f;  // Example density
+    fixtureDef.density = 1.0f;
 
     body->CreateFixture(&fixtureDef);
 
@@ -139,21 +139,18 @@ class MapCreator : public Test {
   void CreateCircle(const b2Vec2 &center, float radius) {
     b2BodyDef bodyDef;
     bodyDef.type = b2_staticBody;
-    bodyDef.position =
-        center;  // Set the body's position to the center parameter
+    bodyDef.position = b2Vec2(0.0, 0.0);
 
-    // Create the body using the definition in the world
     b2Body *body = m_world->CreateBody(&bodyDef);
 
-    // Define a circle shape
     b2CircleShape circleShape;
-    circleShape.m_p.Set(0.0f,
-                        0.0f);  // Position the shape at the body's local origin
-    circleShape.m_radius = radius;  // Set the radius of the circle
+    circleShape.m_p.Set(center.x, center.y);
+    circleShape.m_radius = radius;
 
-    // Create a fixture with the shape. Density is set to 0.0f because it's a
-    // static body
-    body->CreateFixture(&circleShape, 0.0f);
+    b2FixtureDef fixtureDef;
+    fixtureDef.shape = &circleShape;
+    fixtureDef.density = 1.0f;
+    body->CreateFixture(&fixtureDef);
     line_drawing = false;
   }
 
@@ -360,7 +357,6 @@ class MapCreator : public Test {
         g_debugDraw.DrawString(5, m_textLine, "Draw Mode: Polygon");
         break;
       case DRAW_CIRCLE:
-        g_debugDraw.DrawString(5, m_textLine, "Draw Mode: Circle");
         break;
       case DRAW_DRONE_SPAWN:
         g_debugDraw.DrawString(5, m_textLine, "Draw Mode: Drone Spawn");
@@ -422,7 +418,6 @@ class MapCreator : public Test {
       if (ImGui::Selectable("Line", selected == 0)) selected = 0;
       if (ImGui::Selectable("Polygon", selected == 1)) selected = 1;
       if (ImGui::Selectable("Hollow Polygon", selected == 2)) selected = 2;
-      if (ImGui::Selectable("Circle", selected == 3)) selected = 3;
       if (ImGui::Selectable("None", selected == 4)) selected = 4;
       ImGui::TreePop();
     }
@@ -440,7 +435,6 @@ class MapCreator : public Test {
     current_mode = (DrawMode)selected;
 
     ImGui::Separator();
-    bool to_save = ImGui::Button("Save Map");
     if (ImGui::BeginMenuBar()) {
       if (ImGui::BeginMenu("File")) {
         ShowMenu();

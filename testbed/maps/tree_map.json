@@ -1,0 +1,115 @@
+{
+    "bodies": [
+        {
+            "angle": 0.0,
+            "angular_damping": 0.0,
+            "bullet": false,
+            "fixed_rotation": false,
+            "fixtures": [
+                {
+                    "category_bits": 1,
+                    "density": 0.0,
+                    "edge": {
+                        "end": [
+                            2000.0,
+                            2000.0
+                        ],
+                        "start": [
+                            2000.0,
+                            0.0
+                        ]
+                    },
+                    "friction": 0.20000000298023224,
+                    "group_index": 0,
+                    "is_sensor": false,
+                    "mask_bits": 65535,
+                    "restitution": 0.0
+                },
+                {
+                    "category_bits": 1,
+                    "density": 0.0,
+                    "edge": {
+                        "end": [
+                            0.0,
+                            2000.0
+                        ],
+                        "start": [
+                            0.0,
+                            0.0
+                        ]
+                    },
+                    "friction": 0.20000000298023224,
+                    "group_index": 0,
+                    "is_sensor": false,
+                    "mask_bits": 65535,
+                    "restitution": 0.0
+                },
+                {
+                    "category_bits": 1,
+                    "density": 0.0,
+                    "edge": {
+                        "end": [
+                            2000.0,
+                            2000.0
+                        ],
+                        "start": [
+                            0.0,
+                            2000.0
+                        ]
+                    },
+                    "friction": 0.20000000298023224,
+                    "group_index": 0,
+                    "is_sensor": false,
+                    "mask_bits": 65535,
+                    "restitution": 0.0
+                },
+                {
+                    "category_bits": 1,
+                    "density": 0.0,
+                    "edge": {
+                        "end": [
+                            2000.0,
+                            0.0
+                        ],
+                        "start": [
+                            0.0,
+                            0.0
+                        ]
+                    },
+                    "friction": 0.20000000298023224,
+                    "group_index": 0,
+                    "is_sensor": false,
+                    "mask_bits": 65535,
+                    "restitution": 0.0
+                }
+            ],
+            "gravity_scale": 1.0,
+            "linear_damping": 0.0,
+            "position": [
+                0.0,
+                0.0
+            ],
+            "type": 0
+        },
+        {
+            "angle": 0.0,
+            "angular_damping": 0.0,
+            "bullet": false,
+            "fixed_rotation": false,
+            "gravity_scale": 1.0,
+            "linear_damping": 0.0,
+            "position": [
+                0.0,
+                0.0
+            ],
+            "type": 0
+        }
+    ],
+    "drone_spawn_point": [
+        924.5501708984375,
+        950.5350341796875
+    ],
+    "height": 2000.0,
+    "name": "tree_map",
+    "width": 2000.0
+}

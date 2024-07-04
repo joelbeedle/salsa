@@ -967,7 +967,7 @@ class QueueSimulator : public Test {
                 transform.p + b2Mul(transform.q, circleShape->m_p);
             debugDraw->DrawSolidCircle(position, circleShape->m_radius,
                                        transform.q.GetXAxis(),
-                                       b2Color(0.5f, 0.5f, 0.5f));
+                                       b2Color(0.5f, 1.0f, 0.5f));
             break;
           }
           case b2Shape::e_polygon: {

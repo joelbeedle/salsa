@@ -80,8 +80,9 @@ void user() {
   static auto contactListener =
       std::make_shared<salsa::BaseContactListener>("Default");
   setupInteractions(*contactListener);
-  salsa::TestConfig config = {"Flocking", flock_params, "Small", "speed",  100,
-                              100,        100.0f,       "Tree",  "Default"};
+  salsa::TestConfig config = {"Flocking", flock_params, "Small",
+                              "tree_map", 100,          100,
+                              100.0f,     "Tree",       "Default"};
 
   salsa::TestQueue::load("permutations");
 }
