@@ -134,6 +134,8 @@ Both Sandbox and Queue modes allow the user to dynamically interact with the sim
 
 Headless mode can be entered using `./testbed --headless`. Headless mode runs much faster than the visual modes, as it is intended to iterate through simulations, outputting data. Verbose mode can be selected using `-v`, and a `.json` queue file (generated from the testbed) to use can be specified using `-q`.
 
+An example of how to use **Sandbox** and **Queue** is shown in the [demonstration video](https://www.youtube.com/watch?v=K64oUI9zK0c)
+
 ### Queue Mode
 <img src="./docs/imgs/boxplot.jpg" width="500">
 
