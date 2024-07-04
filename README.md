@@ -155,7 +155,6 @@ Both Simulation modes allow the user to dynamically change the simulation as it 
 
   - Drawing lines is done by clicking and holding, then dragging and releasing to end the line
   - Drawing shapes (hollow polygon, polygon) is done by clicking once, releasing, then clicking again to set the next vertex. Connect the last vertex to the first to draw the shape.
-  - Drawing circles is done by clicking where the center of the circle should be, holding, and then dragging outwards to increase the size of the radius.
   - The drone spawn point should be set for where you want drones to spawn.
 
     > Drones wont spawn inside solid objects, but they will spawn inside hollow polygons.
