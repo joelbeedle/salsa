@@ -459,4 +459,4 @@ void user() {
 }
 ```
 
-When the executable is ran, it will run this code first, intialising everything, before beginning the simulations.
+This code will not compile. For an example that sets up a test queue, check the real `testbed/user.cpp` file.
