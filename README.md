@@ -293,18 +293,17 @@ A target must follow this pattern for its body definitions:
 ```
 
 We don't need to worry about creating the body, as this is done through the `Entity` class that `Target` inherits from. This is done to simplify creation and abstract the physics engine interface from the user.
-Once the target is fully defined, we register it with the `TargetFactory` and the collision manager, in our `main.cpp` entrypoint
+Once the target is fully defined, we register it with the `TargetFactory` and the collision manager, in our `user.cpp`.
 
 ```cpp
-// main.cpp
+// user.cpp
 // If we want drones to detect this target type and the target type to also detect the trees, define both.
 // If not, `registerType` should take < The thing you want to do the detecting >
 CollisionManager::registerType<Drone>({typeid(Tree).name()});
 CollisionManager::registerType<Tree>({typeid(Drone).name()});
 
 // Register our custom type with the TargetFactory. We supply it with template parameters corresponding to the **unique** parameters in our target class (AKA not the three that need to be there)
-// It takes function parameters equal to the name of the type, through salsa::get_type<T>
-TargetFactory::registerTargetType<MyTarget, bool, bool, float>(get_type<MyTarget>);
+TargetFactory::registerTarget<MyTarget, bool, bool, float>("Target Instance Name", false, false, true);
 ```
 
 Now the type is fully registered and can be included in the simulation through TestConfigs like as follows:
@@ -313,13 +312,12 @@ Now the type is fully registered and can be included in the simulation through T
   salsa::TestConfig config = {"My Alg",
                            behaviour_parameters,
                            drone_config,
-                           map,
+                           map_name,
                            drone_count,
                            target_count,
                            time_limit,
-                           get_type<MyTarget>(), // The target type name requested
-                           std::tuple(true, 5.0f, 3),   // an std::tuple of the parameters for the target
-                           contact_listener.get()};
+                           "Target Instance Name"
+                           contact_listener_name};
 ```
 
 </details>
@@ -331,10 +329,10 @@ Now the type is fully registered and can be included in the simulation through T
 ### Adding a new Contact Listener
 
 After registering types as shown above, collisions between them can be controlled via the `salsa::BaseContactListener` class. (This class could also be extended, if the user wishes)
-To do this, in the main testbed entrypoint `main.cpp`, create a new static shared pointer of `salsa::BaseContactListener` (it has to be static so it can be accessed from other scopes):
+To do this, in the main testbed entrypoint `main.cpp`, create a new static shared pointer of `salsa::BaseContactListener` (it has to be static so it can be accessed from other scopes), and give it a name:
 
 ```cpp
-  static auto contact_listener = std::make_shared<BaseContactListener>();
+  static auto contact_listener = std::make_shared<BaseContactListener>("Name");
 ```
 
 Then, add collision handlers to it using the `addCollisionHandler` function. This function takes two types, which can be retrieved via `salsa::get_type<Class Name>`, and a user defined function. This function needs to be `void`, and takes two function parameters: `b2Fixture*` and `b2Fixture*`. These two fixtures represent the two fixtures that have been found to be colliding.
@@ -373,7 +371,7 @@ contact_listener->addCollisionHandler(
       });
 ```
 
-We then pass this listener into the TestConfig for it to be used by a simulation.
+We then pass the listener's name into the TestConfig for it to be used by a simulation.
 
 </details>
 
