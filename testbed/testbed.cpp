@@ -359,8 +359,7 @@ static void UpdateUI() {
     ImGui::SetNextWindowSize({menuWidth, g_camera.m_height - 20.0f});
 
     ImGui::Begin("Tools", &g_debugDraw.m_showUI,
-                 ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
-                     ImGuiWindowFlags_NoCollapse);
+                 ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 
     if (ImGui::BeginTabBar("ControlTabs", ImGuiTabBarFlags_None)) {
       if (ImGui::BeginTabItem("Controls")) {

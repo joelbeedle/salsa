@@ -230,8 +230,8 @@ class QueueSimulator : public Test {
   }
 
   void UpdateUI() override {
-    ImGui::SetNextWindowPos(ImVec2(10.0f, 100.0f));
-    ImGui::Begin("Swarm Controls", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::SetNextWindowPos(ImVec2(10.0f, 50.0f));
+    ImGui::Begin("Swarm Controls", nullptr);
 
     // Modal windows
     if (add_new_test_) {

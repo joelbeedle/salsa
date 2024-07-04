@@ -80,11 +80,20 @@ void user() {
   static auto contactListener =
       std::make_shared<salsa::BaseContactListener>("Default");
   setupInteractions(*contactListener);
-  salsa::TestConfig config = {"Flocking", flock_params, "Small",
-                              "tree_map", 100,          100,
-                              100.0f,     "Tree",       "Default"};
+  salsa::TestConfig config = {"Flocking", flock_params, "Small", "tree_map", 10,
+                              50000,      1200.0f,      "Tree",  "Default"};
 
-  salsa::TestQueue::push(config);
+  // Load the test queue with our tree tests
+  auto names = salsa::behaviour::Registry::get().behaviour_names();
+  for (auto &name : names) {
+    config.behaviour_name = name;
+    config.parameters =
+        salsa::behaviour::Registry::get().behaviour(name)->getParameters();
+    for (int i = 10; i < 50; i += 10) {
+      config.num_drones = i;
+      salsa::TestQueue::push(config);
+    }
+  }
 }
 
 }  // namespace testbed
