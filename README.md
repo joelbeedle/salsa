@@ -138,7 +138,8 @@ Headless mode can be entered using `./testbed --headless`. Headless mode runs mu
 
 ### Queue Mode
 <img src="./docs/imgs/boxplot.jpg" width="500">
-We used the Queue mode to generate the data used for the plot above. To run a similar queue (bar the Levy Flocking), you can use the [example](./example_queue.json)
+
+We used the Queue mode to generate the data used for the plot above. To run a similar queue (bar the Levy Flocking), you can use load [example queue](./example_queue.json).
 
 - In Queue mode, you can specify a number of simulations in a queue. Data is logged to the `testbed/results` folder.
 - After the time limit for each runs out, plots that can be selected in the GUI are created from the data automatically.
