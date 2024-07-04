@@ -139,6 +139,7 @@ Both Simulation modes allow the user to dynamically change the simulation as it 
 - The Test Queue can be set beforehand in `user.cpp`, or generated in the GUI. Head to the Test Queue section on the left, click the `+` button, and choose whether to add a single test or add a group of tests, permuting behavior parameters.
 
 #### Saving and Loading Queues
+- Queues can be saved and loaded through the GUI, and also in user code, using `TestQueue::load(filename)`. A saved queue can also be loaded in headless mode using the `-q` option. 
 
 ### Sandbox Mode
 
