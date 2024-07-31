@@ -5,6 +5,6 @@
 
 namespace testbed {
 int run();
-int run_headless(bool verbose);
+int run_headless(bool verbose, std::string queue_path);
 };  // namespace testbed
 #endif

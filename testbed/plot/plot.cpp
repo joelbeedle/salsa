@@ -122,9 +122,10 @@ void add_rtf_to_csv(std::string log_file_path, int num_drones, int num_targets,
   std::filesystem::path results_dir =
       exec_path / ".." / ".." / "testbed" / "results";
   std::filesystem::path file_path = results_dir;
-  std::filesystem::path csv_filename = file_path / "results.csv";
+  std::string final_path = log_file_path + ".csv";
+  std::filesystem::path csv_filename = file_path / final_path;
 
-  std::cout << log_file_path << std::endl;
+  std::cout << final_path << std::endl;
   std::cout << "Adding RTF to " << csv_filename << std::endl;
   {
     std::ofstream csvFile(csv_filename, std::ios::app);

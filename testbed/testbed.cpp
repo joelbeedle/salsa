@@ -470,7 +470,7 @@ static void UpdateUI() {
   }
 }
 
-int run_headless(bool verbose) {
+int run_headless(bool verbose, std::string queue_path) {
   s_settings.Load();
 
   s_settings.m_testIndex = b2Clamp(s_settings.m_testIndex, 0, g_testCount - 1);
@@ -553,9 +553,8 @@ int run_headless(bool verbose) {
       std::cout << "Finished test " << test.behaviour_name << " ";
       std::cout << "(RTF: " << ratio << ")" << std::endl;
       if (verbose) {
-        spdlog::info("Adding test to results csv");
-        testbed::add_rtf_to_csv(sim->getCurrentLogFile(), test.num_drones,
-                                test.num_targets, ratio);
+        testbed::add_rtf_to_csv(queue_path, test.num_drones, test.num_targets,
+                                ratio);
       }
       testbed::plot(sim->getCurrentLogFile());
     } catch (const std::exception &e) {

@@ -50,7 +50,7 @@ int main(int argc, char** argv) {
       testbed::plot_drone_trace = true;
       testbed::plot_targets_found = true;
     }
-    testbed::run_headless(verbose);
+    testbed::run_headless(verbose, queue_path);
   } else {
     testbed::user();
     testbed::run();
