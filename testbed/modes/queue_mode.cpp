@@ -978,7 +978,7 @@ class QueueSimulator : public Test {
               vertices[i] = b2Mul(transform, polygonShape->m_vertices[i]);
             }
             debugDraw->DrawSolidPolygon(vertices, polygonShape->m_count,
-                                        b2Color(0.5f, 0.5f, 0.5f));
+                                        b2Color(0.5f, 1.0f, 0.5f));
             break;
           }
           case b2Shape::e_edge: {
@@ -986,7 +986,7 @@ class QueueSimulator : public Test {
                 static_cast<const b2EdgeShape *>(fixture->GetShape());
             b2Vec2 v1 = b2Mul(transform, edgeShape->m_vertex1);
             b2Vec2 v2 = b2Mul(transform, edgeShape->m_vertex2);
-            debugDraw->DrawSegment(v1, v2, b2Color(0.5f, 0.5f, 0.5f));
+            debugDraw->DrawSegment(v1, v2, b2Color(0.5f, 1.0f, 0.5f));
             break;
           }
           case b2Shape::e_chain: {
