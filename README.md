@@ -137,7 +137,9 @@ The testbed comes with a template `user.cpp` file, containing an example on how 
 
 Both Sandbox and Queue modes allow the user to dynamically interact with the simulation as it is occuring. Queue mode is intended to collect data, and Sandbox mode is intended for algorithm development. Modes can be switched between seamlessly. Registries are used internally inside the `salsa` library as communication interfaces.
 
-Headless mode can be entered using `./testbed --headless`. Headless mode runs much faster than the visual modes, as it is intended to iterate through simulations, outputting data. Verbose mode can be selected using `-v`, and a `.json` queue file (generated from the testbed) to use can be specified using `-q`.
+Headless mode can be entered using `./testbed --headless`. Headless mode runs much faster than the visual modes, as it is intended to iterate through simulations, outputting data. Verbose mode can be selected using `-v`, and a `.json` queue file (generated from the testbed) to use can be specified using `-q`. The `.json` file extension does not need to be included, but if it is, the program still runs.
+
+> Example: `./testbed --headless -v -q example_queue` 
 
 An example of how to use **Sandbox** and **Queue** is shown in the [demonstration video](https://www.youtube.com/watch?v=K64oUI9zK0c)
 
