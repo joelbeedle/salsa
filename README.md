@@ -169,8 +169,8 @@ We used the Queue mode to generate the data used for the plot above. To run a si
   - **Run the simulator headless, with verbosity, no plots, and specify the automatically generated test queue:** `./testbed --headless -v --no-plots -q performance_table_queue`
   - **wait until this is complete**
   - **Go to** `testbed/plot/`
-  - **Run** `python3 table.py performance_table_queue`
-  - **The table is displayed in the console, and saved to .csv as** `table.csv`
+  - **Run** `python3 table.py performance_table_queue.csv`
+  - **The table is displayed in the console**
 
 ### Sandbox Mode
 
