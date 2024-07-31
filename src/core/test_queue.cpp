@@ -71,7 +71,14 @@ bool TestQueue::save(const std::string& filename) {
 }
 
 bool TestQueue::load(const std::string& filename) {
-  std::ifstream file(filename + ".json");
+  std::string full_filename = filename;
+
+  // Check if the filename already ends with ".json"
+  if (filename.size() < 5 || filename.substr(filename.size() - 5) != ".json") {
+    full_filename += ".json";
+  }
+
+  std::ifstream file(full_filename);
   if (file.is_open()) {
     nlohmann::json j;
     file >> j;
@@ -82,6 +89,7 @@ bool TestQueue::load(const std::string& filename) {
   }
   return false;
 }
+
 void TestQueue::addPermutedTests(
     const TestConfig& base, const std::vector<std::vector<float>>& permutations,
     const std::vector<std::string>& parameter_names) {
