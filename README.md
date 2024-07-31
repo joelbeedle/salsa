@@ -161,15 +161,15 @@ We used the Queue mode to generate the data used for the plot above. To run a si
 
 #### Performance Analysis
 
-- The real-time factor performance of the simulator is assessed when ran headless and using the `-v` verbose setting. The simulator will then go through the test queue, and for each entry, when the test is complete, calculates the RTF. It outputs this into `results/results.csv`.
+- The real-time factor performance of the simulator is assessed when ran headless and using the `-v` verbose setting. The simulator will then go through the test queue, and for each entry, when the test is complete, calculates the RTF. It outputs this into `results/` with the `.csv` filename the same as the test queue configuration file.
 
 - To generate the data shown in `Table 1` of the paper:
-  - **Ensure** `results.csv` **is empty, or deleted**
+  - **Ensure that the** `.csv` **file is empty, or deleted**
   - **Build the simulator**
   - **Run the simulator headless, with verbosity, no plots, and specify the automatically generated test queue:** `./testbed --headless -v --no-plots -q performance_table_queue`
   - **wait until this is complete**
   - **Go to** `testbed/plot/`
-  - **Run** `python3 table.py`
+  - **Run** `python3 table.py performance_table_queue`
   - **The table is displayed in the console, and saved to .csv as** `table.csv`
 
 ### Sandbox Mode
