@@ -112,5 +112,6 @@ void user() {
       salsa::TestQueue::push(config);
     }
     salsa::TestQueue::save("example_queue");
-
-  }  // namespace testbed
+  }
+}
+}  // namespace testbed
