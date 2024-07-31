@@ -159,6 +159,19 @@ We used the Queue mode to generate the data used for the plot above. To run a si
 
 - Queues can be saved and loaded through the GUI, and also in user code, using `TestQueue::load(filename)` and `TestQueue::save(filename)`. A saved queue can also be independently loaded in headless mode using the `-q` option.
 
+#### Performance Analysis
+
+- The real-time factor performance of the simulator is assessed when ran headless and using the `-v` verbose setting. The simulator will then go through the test queue, and for each entry, when the test is complete, calculates the RTF. It outputs this into `results/` with the `.csv` filename the same as the test queue configuration file.
+
+- To generate the data shown in `Table 1` of the paper:
+  - **Ensure that the** `.csv` **file is empty, or deleted**
+  - **Build the simulator**
+  - **Run the simulator headless, with verbosity, no plots, and specify the automatically generated test queue:** `./testbed --headless -v --no-plots -q performance_table_queue`
+  - **wait until this is complete**
+  - **Go to** `testbed/plot/`
+  - **Run** `python3 table.py performance_table_queue.csv`
+  - **The table is displayed in the console**
+
 ### Sandbox Mode
 
 Sandbox mode is used to test a behavior, without having to create tests. It is intended as a way for users to visually interact with their algorithms, and assess if they are functioning correctly.
