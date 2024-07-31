@@ -468,3 +468,9 @@ void user() {
 ```
 
 This code will not compile. For an example that sets up a test queue, check the real `testbed/user.cpp` file.
+
+## Contributions
+Contributions are welcome for SALSA! Please see the [Contributing to SALSA guide](https://github.com/joelbeedle/salsa/blob/master/.github/CONTRIBUTING.md) for more information.
+
+## License
+SALSA is licensed under the (zlib License)[https://www.zlib.net/zlib_license.html]
