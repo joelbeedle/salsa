@@ -552,6 +552,11 @@ int run_headless(bool verbose) {
       std::cout << std::endl;
       std::cout << "Finished test " << test.behaviour_name << " ";
       std::cout << "(RTF: " << ratio << ")" << std::endl;
+      if (verbose) {
+        spdlog::info("Adding test to results csv");
+        testbed::add_rtf_to_csv(sim->getCurrentLogFile(), test.num_drones,
+                                test.num_targets, ratio);
+      }
       testbed::plot(sim->getCurrentLogFile());
     } catch (const std::exception &e) {
       spdlog::error("Error: {}", e.what());
