@@ -84,6 +84,24 @@ void user() {
                               50000,      1200.0f,      "Tree",  "Default"};
 
   // Load the test queue with our tree tests
+  // 10, 100, 500, 1000
+  // 100, 1000, 10000
+  std::vector<int> num_drones = {10, 100, 500, 1000};
+  std::vector<int> num_targets = {100, 1000, 10000};
+  int num_trials = 5;
+
+  for (int drones : num_drones) {
+    for (int targets : num_targets) {
+      for (int i = 0; i < num_trials; i++) {
+        config.num_drones = drones;
+        config.num_targets = targets;
+        salsa::TestQueue::push(config);
+      }
+    }
+  }
+  salsa::TestQueue::save("performance_table_queue");
+
+  salsa::TestQueue::getTests().clear();
   auto names = salsa::behaviour::Registry::get().behaviour_names();
   for (auto &name : names) {
     config.behaviour_name = name;
@@ -93,9 +111,6 @@ void user() {
       config.num_drones = i;
       salsa::TestQueue::push(config);
     }
-  }
+    salsa::TestQueue::save("example_queue");
 
-  salsa::TestQueue::save("example_queue");
-}
-
-}  // namespace testbed
+  }  // namespace testbed
