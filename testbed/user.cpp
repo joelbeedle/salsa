@@ -81,7 +81,7 @@ void user() {
       std::make_shared<salsa::BaseContactListener>("Default");
   setupInteractions(*contactListener);
   salsa::TestConfig config = {"Flocking", flock_params, "Small", "tree_map", 10,
-                              50000,      1200.0f,      "Tree",  "Default"};
+                              50000,      100.0f,       "Tree",  "Default"};
 
   // Load the test queue with our tree tests
   // 10, 100, 500, 1000
