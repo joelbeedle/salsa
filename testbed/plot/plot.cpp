@@ -117,4 +117,26 @@ void plot(std::string log_file_path) {
   return;
 }
 
+void add_rtf_to_csv(std::string log_file_path, int num_drones, int num_targets,
+                    double rtf) {
+  std::filesystem::path results_dir =
+      exec_path / ".." / ".." / "testbed" / "results";
+  std::filesystem::path file_path = results_dir;
+  std::filesystem::path csv_filename = file_path / "results.csv";
+
+  std::cout << log_file_path << std::endl;
+  std::cout << "Adding RTF to " << csv_filename << std::endl;
+  {
+    std::ofstream csvFile(csv_filename, std::ios::app);
+    if (csvFile.tellp() == 0) {  // Check if the file is empty
+      csvFile << "num_drones,num_targets,rtf\n";
+    }
+  }
+
+  std::ofstream csvFile;
+  csvFile.open(csv_filename, std::ios::app);
+  csvFile << num_drones << "," << num_targets << "," << rtf << "\n";
+  csvFile.close();
+}
+
 }  // namespace testbed
