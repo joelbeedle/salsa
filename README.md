@@ -2,6 +2,8 @@
 
 **S**warm **Al**gorithm **S**imul**a**tior Library and Testbed, written in C++.
 
+**SALSA** is intended for use primarily in swarm behavior algorithm testing. Ideally, it fits early-on in the process of developing software for swarms of drones, helping users to develop algorithms, and view prelimiary tests on algorithm effectiveness and correctness. After verification, depending on user requirements, could either stick with **SALSA**, maybe even extending it for their specific needs (such as adding their drone specifications, adding a movement model, or even a new testbed using the Library), or they could move on to more sophisticated software, now that they know what their algorithm **should** look like when performing correctly.
+
 [SALSA Testbed Demonstration video](https://youtu.be/K64oUI9zK0c)
 
 ## Getting Started
