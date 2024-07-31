@@ -2,7 +2,7 @@
 name: Add algorithm
 about: Add an algorithm to the testbed
 title: "[ALGORITHM]"
-labels: behaviour
+labels: behaviour, enhancement
 assignees: ''
 
 ---
