@@ -200,12 +200,14 @@ The Map Creator allows the user to create their own maps. The menu on the left i
 
 ## Extensibility
 
-Users can extend the functionality of the testbed. They can add custom swarm algorithms, targets for the drones to find, custom contact listeners and contact managers, as well as custom drone configurations. Users can create their own maps for the simulations and could set new custom data to log. It is also possible to add custom testbed modes, similar to the current `Queue` and `Sandbox` modes. 
+SALSA is designed with extensibility at it's heart - it works best when it's utilised and moulded to whatever the user wants.
+
+The testbed can be extended in multiple ways: users can create custom swarm algorithms, targets, contact listeners and managers, and drone configurations, alongside custom maps and data. New testbed modes could be added, similar to the current `Queue` and `Sandbox` modes. Furthermore, as the Library function is decoupled from our Testbed, a new testbed could be created entirely: perhaps targeting ground based robots, utilising the framework the Library provides in the same ways that our Testbed does.
 
 > [!IMPORTANT]
 > **Any new files need to be added to the testbed `CMakeLists.txt` file, in `MY_TESTBED_SOURCE_FILES`.**
 
-For more information on extending the various aspects of the testbed, expand a section below.
+For more information and examples on extending the various aspects of the testbed, expand a section below.
 
 <details>
 
