@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/721758864.svg)](https://zenodo.org/doi/10.5281/zenodo.13151118)
+
 # SALSA - Swarm Algorithm Simulator
 
 **S**warm **Al**gorithm **S**imul**a**tior Library and Testbed, written in C++.
