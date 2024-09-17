@@ -16,8 +16,8 @@ class DSPPoint {
   float R = (numAgents / 10.0f) * sqrt(searchAreaPerAgent / M_PI);
   float G_const = F_max * pow(R, p) * pow(2 - pow(1.5f, (1 - p)), p / (1 - p));
 
-  b2Vec2 position;
-  b2Vec2 velocity;
+  b2Vec2 position{};
+  b2Vec2 velocity{};
   b2Body *body;
 
   DSPPoint(b2World *world, const b2Vec2 &position) {
@@ -45,7 +45,7 @@ class DSPPoint {
     body->SetLinearVelocity(b2Vec2(0, 0));
   }
 
-  float gravDSPForce(b2Vec2 &position, b2Vec2 &otherPoint) {
+  float gravDSPForce(const b2Vec2 &position, const b2Vec2 &otherPoint) const {
     float distance = b2Distance(otherPoint, position);
     if (distance < 0.0001f) {
       distance = 0.0001f;
@@ -59,7 +59,7 @@ class DSPPoint {
     return result;
   }
 
-  void recalc(int numDrones) {
+  void recalc(const int numDrones) {
     numAgents = static_cast<float>(numDrones);
     searchAreaPerAgent = maxAreaCoverage / numAgents;
     R = (2 + (numAgents / 20.0f)) * sqrt(searchAreaPerAgent / M_PI);
@@ -67,15 +67,15 @@ class DSPPoint {
   }
 };
 
-class DSPBehaviour : public Behaviour {
+class DSPBehaviour final : public Behaviour {
  private:
   std::vector<DSPPoint *> dspPoints;
   float firstRun = true;
 
   struct DroneInfo {
-    bool isAtDSPPoint;
-    b2Vec2 dspPoint;
-    DSPPoint *dsp;
+    bool isAtDSPPoint{};
+    b2Vec2 dspPoint{};
+    DSPPoint *dsp{};
     bool beginWalk = false;
     float elapsedTime = 0.0f;
     // calculated from sqrt(4000000 + 4000000) / (2 * 10.0f);
@@ -83,7 +83,7 @@ class DSPBehaviour : public Behaviour {
     float timeToWalk = 141.421356237f;
     float elapsedTimeSinceLastForce = 0.0f;
     float randomTimeInterval = 1.0f;
-    b2Vec2 desiredVelocity;
+    b2Vec2 desiredVelocity{};
 
     DroneInfo() : randomTimeInterval(generateRandomTimeInterval()) {}
   };
@@ -91,13 +91,13 @@ class DSPBehaviour : public Behaviour {
   std::unordered_map<Drone *, DroneInfo> droneInformation;
 
  public:
-  DSPBehaviour() {}
+  DSPBehaviour() = default;
 
   void execute(const std::vector<std::unique_ptr<Drone>> &drones,
                Drone &currentDrone) override {
     if (droneInformation.find(&currentDrone) == droneInformation.end()) {
       droneInformation[&currentDrone] = DroneInfo();
-      DSPPoint *dsp = new DSPPoint(currentDrone.body()->GetWorld(),
+      auto *dsp = new DSPPoint(currentDrone.body()->GetWorld(),
                                    currentDrone.position());
       dsp->recalc(drones.size());
       droneInformation[&currentDrone].dsp = dsp;
@@ -109,13 +109,14 @@ class DSPBehaviour : public Behaviour {
     // collect DSP points from other drones
     DroneInfo &droneInfo = droneInformation[&currentDrone];
 
-    for (auto &drone : drones) {
-      bodies.push_back(drone.get()->body());
+    bodies.reserve(drones.size());
+for (auto &drone : drones) {
+      bodies.push_back(drone->body());
     }
     std::vector<b2Body *> neighbours = bodies;
     std::vector<b2Vec2> obstaclePoints = callback.obstaclePoints;
-    b2Vec2 obstacleAvoidance = avoidObstacles(obstaclePoints, currentDrone);
-    b2Vec2 neighbourAvoidance = avoidDrones(neighbours, currentDrone);
+    const b2Vec2 obstacleAvoidance = avoidObstacles(obstaclePoints, currentDrone);
+    const b2Vec2 neighbourAvoidance = avoidDrones(neighbours, currentDrone);
 
     b2Vec2 bspPos = droneInfo.dsp->body->GetPosition();
     b2Vec2 force(0.0f, 0.0f);
@@ -124,7 +125,7 @@ class DSPBehaviour : public Behaviour {
     for (auto &point : dspPoints) {
       if (point != droneInfo.dsp) {
         b2Vec2 pointPos = point->body->GetPosition();
-        float forceMagnitude = droneInfo.dsp->gravDSPForce(bspPos, pointPos);
+        const float forceMagnitude = droneInfo.dsp->gravDSPForce(bspPos, pointPos);
         b2Vec2 direction = directionTo(bspPos, pointPos);
         direction.Normalize();
         force +=
@@ -147,8 +148,7 @@ class DSPBehaviour : public Behaviour {
     b2Vec2 acceleration(0, 0);
     b2Vec2 steer(0, 0);
 
-    float distanceToDSP = b2Distance(position, bspPos);
-    if (distanceToDSP < 40.0f) {
+    if (const float distanceToDSP = b2Distance(position, bspPos); distanceToDSP < 40.0f) {
       if (!droneInfo.beginWalk && droneInfo.elapsedTime == 0.0f) {
         // Start the random walk if not already started and timer is reset
         droneInfo.beginWalk = true;
@@ -166,7 +166,7 @@ class DSPBehaviour : public Behaviour {
         if (droneInfo.elapsedTimeSinceLastForce >=
             droneInfo.randomTimeInterval) {
           // Change direction at regular intervals
-          float angle = static_cast<float>(std::rand()) / RAND_MAX * 2 * M_PI;
+          const float angle = static_cast<float>(std::rand()) / RAND_MAX * 2 * M_PI;
           droneInfo.desiredVelocity =
               b2Vec2(std::cos(angle) * currentDrone.max_speed(),
                      std::sin(angle) * currentDrone.max_speed());
@@ -196,7 +196,7 @@ class DSPBehaviour : public Behaviour {
     acceleration += neighbourAvoidance + (3.0f * obstacleAvoidance);
     velocity += acceleration;
     float speed = 0.001f + velocity.Length();
-    b2Vec2 dir(velocity.x / speed, velocity.y / speed);
+    const b2Vec2 dir(velocity.x / speed, velocity.y / speed);
 
     // Clamp speed
     if (speed > currentDrone.max_speed()) {
@@ -211,7 +211,7 @@ class DSPBehaviour : public Behaviour {
   }
 
   void clean(const std::vector<std::unique_ptr<Drone>> &drones) override {
-    for (auto &point : dspPoints) {
+    for (const auto &point : dspPoints) {
       b2World *world = point->body->GetWorld();
       world->DestroyBody(point->body);
     }
@@ -220,9 +220,9 @@ class DSPBehaviour : public Behaviour {
   }
 
  private:
-  b2Vec2 directionTo(b2Vec2 &position, b2Vec2 &otherPoint) {
-    float angle = atan2((otherPoint.y - position.y), otherPoint.x - position.x);
-    b2Vec2 direction(cos(angle), sin(angle));
+  static b2Vec2 directionTo(const b2Vec2 &position, const b2Vec2 &otherPoint) {
+    const float angle = atan2((otherPoint.y - position.y), otherPoint.x - position.x);
+    const b2Vec2 direction(cos(angle), sin(angle));
     return direction;
   }
   static float generateRandomTimeInterval() {

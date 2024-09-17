@@ -53,7 +53,7 @@ class SandboxSimulator : public Test {
 
  public:
   SandboxSimulator() {
-    salsa::DroneConfiguration *smallDrone = new salsa::DroneConfiguration(
+    auto *smallDrone = new salsa::DroneConfiguration(
         "sandbox_default", 25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f);
 
     g_debugDraw.SetFlags(b2Draw::e_shapeBit | b2Draw::e_jointBit);
@@ -61,15 +61,15 @@ class SandboxSimulator : public Test {
     sim = new salsa::Sim(m_world, 1, 0, smallDrone, 2000, 2000, 1000.0);
     new_count = 1;
 
-    auto behaviour_names = salsa::behaviour::Registry::get().behaviour_names();
+    const auto behaviour_names = salsa::behaviour::Registry::get().behaviour_names();
     sim->setCurrentBehaviour(behaviour_names[0]);
     // m_world->SetContactListener(contactListener_);
   }
   static std::unique_ptr<Test> Create() {
     return std::make_unique<SandboxSimulator>();
   }
-  void Build() { sim_builder->build(); }
-  void SetBuilder(salsa::SimBuilder *builder) {
+  static void Build() { sim_builder->build(); }
+  void SetBuilder(salsa::SimBuilder *builder)const {
     sim_builder = builder;
     builder->setWorld(m_world);
   }
@@ -80,12 +80,12 @@ class SandboxSimulator : public Test {
   }
 
   bool SetNextTestFromQueue() {
-    auto config = queue_.pop();
-    auto temp_sim = new salsa::Sim(config);
+    auto config = salsa::TestQueue::pop();
+    const auto temp_sim = new salsa::Sim(config);
     if (temp_sim == nullptr) {
       return false;
     }
-    auto old_sim = sim;
+    const auto old_sim = sim;
     sim = temp_sim;
     delete old_sim;
     sim->setCurrentBehaviour(sim->current_behaviour_name());
@@ -93,36 +93,36 @@ class SandboxSimulator : public Test {
     pause = false;
     return true;
   }
-  void SetWorld(b2World *world) { sim_builder->setWorld(world); }
-  void SetHeight(float height) { sim_builder->setWorldHeight(height); }
-  void SetWidth(float width) { sim_builder->setWorldWidth(width); }
-  float GetHeight() { return sim->world_height(); }
-  float GetWidth() { return sim->world_width(); }
-  void SetContactListener(salsa::BaseContactListener &listener) {
+  static void SetWorld(b2World *world) { sim_builder->setWorld(world); }
+  static void SetHeight(const float height) { sim_builder->setWorldHeight(height); }
+  static void SetWidth(const float width) { sim_builder->setWorldWidth(width); }
+  [[nodiscard]] float GetHeight()const { return sim->world_height(); }
+  [[nodiscard]] float GetWidth()const { return sim->world_width(); }
+  static void SetContactListener(salsa::BaseContactListener &listener) {
     sim_builder->setContactListener(listener);
   }
-  void AddBehaviour(const std::string &name,
+  static void AddBehaviour(const std::string &name,
                     std::unique_ptr<salsa::Behaviour> behaviour) {
     salsa::behaviour::Registry::get().add(name, std::move(behaviour));
   }
 
-  void SetConfiguration(salsa::DroneConfiguration *configuration) {
+  static void SetConfiguration(salsa::DroneConfiguration *configuration) {
     sim_builder->setDroneConfiguration(configuration);
   }
 
-  salsa::DroneConfiguration *GetConfiguration() {
+  [[nodiscard]] salsa::DroneConfiguration *GetConfiguration()const {
     return sim->getDroneConfiguration();
   }
 
-  void SetDroneCount(int count) { sim_builder->setDroneCount(count); }
+  static void SetDroneCount(const int count) { sim_builder->setDroneCount(count); }
 
   void Step(Settings &settings) override {
     // Run simulation steps here
     Test::Step(settings);
-    float timeStep =
-        settings.m_hertz > 0.0f ? 1.0f / settings.m_hertz : float(0.0f);
+    const float timeStep =
+        settings.m_hertz > 0.0f ? 1.0f / settings.m_hertz : 0.0f;
     pause = settings.m_pause;
-    std::vector<int> foundTreeIDs;
+     constexpr std::vector<int> foundTreeIDs;
     for (int i = 0; i < settings.m_simulationSpeed; i++) {
       m_world->Step(timeStep, settings.m_velocityIterations,
                     settings.m_positionIterations);
@@ -152,11 +152,11 @@ class SandboxSimulator : public Test {
       ImGui::SeparatorText("Current Behaviour");
       if (ImGui::BeginCombo("Behaviours",
                             sim->current_behaviour_name().c_str())) {
-        auto behaviourNames =
+        const auto behaviourNames =
             salsa::behaviour::Registry::get().behaviour_names();
 
         for (auto &name : behaviourNames) {
-          bool isSelected = (sim->current_behaviour_name() == name);
+          const bool isSelected = (sim->current_behaviour_name() == name);
           if (ImGui::Selectable(name.c_str(), isSelected)) {
             sim->current_behaviour_name() = name;
             sim->setCurrentBehaviour(name);
@@ -170,7 +170,7 @@ class SandboxSimulator : public Test {
 
       ImGui::SeparatorText("Behaviour Settings");
       bool changed = false;
-      auto behaviour = salsa::behaviour::Registry::get().behaviour(
+      const auto behaviour = salsa::behaviour::Registry::get().behaviour(
           sim->current_behaviour_name());
       for (auto [name, parameter] : behaviour->getParameters()) {
         changed |=
@@ -219,14 +219,13 @@ class SandboxSimulator : public Test {
 
       // Change drone count
       static int changed_count = new_count;
-      bool changed = ImGui::SliderInt("Drone Count", &new_count, 0, 100);
-      if (changed) {
+      if (bool changed = ImGui::SliderInt("Drone Count", &new_count, 0, 100)) {
         changed_count = new_count;
         pause = true;
         update_drone_count_ = true;
       }
 
-      auto mapNames = salsa::map::getMapNames();
+      const auto mapNames = salsa::map::getMapNames();
       static std::string current_map_name = mapNames[0];
       if (ImGui::BeginCombo("Map", current_map_name.c_str())) {
         for (auto &name : mapNames) {
@@ -251,7 +250,7 @@ class SandboxSimulator : public Test {
     ImGui::End();
   }
   void Draw(b2World *world, DebugDraw *debugDraw,
-            std::vector<int> foundTreeIDs) {
+            const std::vector<int>& foundTreeIDs) const {
     for (b2Body *body = world->GetBodyList(); body; body = body->GetNext()) {
       const b2Transform &transform = body->GetTransform();
 
@@ -264,8 +263,8 @@ class SandboxSimulator : public Test {
                       .categoryBits &&
               draw_visual_range_) {
             // This is a drone sensor, draw if wanted
-            const b2CircleShape *circleShape =
-                static_cast<const b2CircleShape *>(fixture->GetShape());
+             const auto circleShape =
+                dynamic_cast<const b2CircleShape *>(fixture->GetShape());
             b2Vec2 position =
                 transform.p + b2Mul(transform.q, circleShape->m_p);
             debugDraw->DrawCircle(position, circleShape->m_radius,
@@ -277,7 +276,7 @@ class SandboxSimulator : public Test {
         }
 
         if (fixture->GetUserData().pointer != 0) {
-          salsa::UserData *userData = reinterpret_cast<salsa::UserData *>(
+          auto *userData = reinterpret_cast<salsa::UserData *>(
               fixture->GetUserData().pointer);
           if (userData == nullptr) {
             std::cout << "User data is null" << std::endl;
@@ -285,13 +284,13 @@ class SandboxSimulator : public Test {
           }
           // Draw Drones
           std::string name = salsa::type(*(userData->object));
-          if (name.compare("salsa::Drone") == 0) {
-            salsa::Drone *drone = userData->as<salsa::Drone>();
+          if (name == "salsa::Drone") {
+            const auto *drone = userData->as<salsa::Drone>();
             // Draw drone
             b2Vec2 position = body->GetPosition();
             debugDraw->DrawSolidCircle(position, drone->radius(),
                                        transform.q.GetXAxis(), drone->color());
-          } else if (name.compare("b2_groundBody") && draw_targets_) {
+          } else if (name =="b2_groundBody" && draw_targets_) {
             // salsa::Target *target = userData->as<salsa::Target>();
             // b2Vec2 position = body->GetPosition();
             // debugDraw->DrawSolidCircle(position, target->getRadius(),
@@ -304,8 +303,8 @@ class SandboxSimulator : public Test {
         // Draw everything else that's not anything above with default values
         switch (fixture->GetType()) {
           case b2Shape::e_circle: {
-            const b2CircleShape *circleShape =
-                static_cast<const b2CircleShape *>(fixture->GetShape());
+            const auto *circleShape =
+                dynamic_cast<const b2CircleShape *>(fixture->GetShape());
             b2Vec2 position =
                 transform.p + b2Mul(transform.q, circleShape->m_p);
             debugDraw->DrawSolidCircle(position, circleShape->m_radius,
@@ -314,8 +313,8 @@ class SandboxSimulator : public Test {
             break;
           }
           case b2Shape::e_polygon: {
-            const b2PolygonShape *polygonShape =
-                static_cast<const b2PolygonShape *>(fixture->GetShape());
+            const auto *polygonShape =
+                dynamic_cast<const b2PolygonShape *>(fixture->GetShape());
             b2Vec2 vertices[b2_maxPolygonVertices];
             for (int i = 0; i < polygonShape->m_count; ++i) {
               vertices[i] = b2Mul(transform, polygonShape->m_vertices[i]);
@@ -325,17 +324,17 @@ class SandboxSimulator : public Test {
             break;
           }
           case b2Shape::e_edge: {
-            const b2EdgeShape *edgeShape =
-                static_cast<const b2EdgeShape *>(fixture->GetShape());
+            const auto *edgeShape =
+                dynamic_cast<const b2EdgeShape *>(fixture->GetShape());
             b2Vec2 v1 = b2Mul(transform, edgeShape->m_vertex1);
             b2Vec2 v2 = b2Mul(transform, edgeShape->m_vertex2);
             debugDraw->DrawSegment(v1, v2, b2Color(0.5f, 1.0f, 0.5f));
             break;
           }
           case b2Shape::e_chain: {
-            const b2ChainShape *chainShape =
-                static_cast<const b2ChainShape *>(fixture->GetShape());
-            int32 count = chainShape->m_count;
+            const auto *chainShape =
+                dynamic_cast<const b2ChainShape *>(fixture->GetShape());
+            const int32 count = chainShape->m_count;
             const b2Vec2 *vertices = chainShape->m_vertices;
             b2Vec2 v1 = b2Mul(transform, vertices[0]);
             for (int32 i = 1; i < count; ++i) {

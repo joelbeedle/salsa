@@ -6,7 +6,7 @@
 #include <memory>
 #include <unordered_map>
 namespace salsa {
-class PheromoneBehaviour : public Behaviour {
+class PheromoneBehaviour final : public Behaviour {
  private:
   struct Pheromone {
     b2Vec2 position;
@@ -19,7 +19,7 @@ class PheromoneBehaviour : public Behaviour {
   behaviour::Parameter obstacle_avoidance_weight_;
 
  public:
-  PheromoneBehaviour(float decayRate, float obstacleAvoidanceWeight)
+  PheromoneBehaviour(const float decayRate, const float obstacleAvoidanceWeight)
       : decay_rate_(decayRate, 0.0f, 50.0f),
         obstacle_avoidance_weight_(obstacleAvoidanceWeight, 0.0f, 3.0f) {
     // Register parameters in the map
@@ -45,15 +45,14 @@ class PheromoneBehaviour : public Behaviour {
     b2Vec2 avoidanceSteering(0, 0);
     int32 count = 0;
 
-    for (auto &pair : pheromones) {
-      Pheromone &Pheromone = pair.second;
-      float distance = b2Distance(currentDrone.position(), Pheromone.position);
+    for (auto& snd : pheromones | std::views::values) {
+      auto & [position, intensity] = snd;
 
-      if (distance < currentDrone.obstacle_view_range() && distance > 0) {
-        b2Vec2 awayFromPheromone = currentDrone.position() - Pheromone.position;
+      if (const float distance = b2Distance(currentDrone.position(), position); distance < currentDrone.obstacle_view_range() && distance > 0) {
+        b2Vec2 awayFromPheromone = currentDrone.position() - position;
         awayFromPheromone.Normalize();
 
-        awayFromPheromone *= (1.0f / (distance)) * Pheromone.intensity;
+        awayFromPheromone *= (1.0f / (distance)) * intensity;
 
         avoidanceSteering += awayFromPheromone;
         count++;

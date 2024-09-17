@@ -16,11 +16,11 @@ Drone::Drone(b2World *world, const b2Vec2 &position, Behaviour &behaviour,
       behaviour_(&behaviour),
       camera_view_range_(config.cameraViewRange),
       obstacle_view_range_(config.obstacleViewRange),
+      drone_detection_range_(config.droneDetectionRange),
       max_speed_(config.maxSpeed),
       max_force_(config.maxForce),
       radius_(config.radius),
-      mass_(config.mass),
-      drone_detection_range_(config.droneDetectionRange) {
+      mass_(config.mass) {
   b2CircleShape circleShape;
   circleShape.m_radius = radius_;
   b2FixtureDef fixtureDef;
@@ -31,7 +31,7 @@ Drone::Drone(b2World *world, const b2Vec2 &position, Behaviour &behaviour,
   float density_box2d = mass_ / area_m2;
 
   fixtureDef.density = density_box2d;
-  UserData *userData = new UserData();
+  auto *userData = new UserData();
   userData->object = this;
   CollisionConfig c = CollisionManager::getCollisionConfig<Drone>();
   fixtureDef.filter.categoryBits = 0x0002;
@@ -54,7 +54,7 @@ Drone::Drone(b2World *world, const b2Vec2 &position, Behaviour &behaviour,
   std::vector<b2Body *> obstacles;
 }
 
-Drone::~Drone() {}
+Drone::~Drone() = default;
 
 void Drone::create_fixture() {
   b2CircleShape shape;
@@ -64,10 +64,10 @@ void Drone::create_fixture() {
   fixtureDef.shape = &shape;
   fixtureDef.isSensor = true;
 
-  CollisionConfig config = CollisionManager::getCollisionConfig<Drone>();
-  fixtureDef.filter.categoryBits = config.categoryBits;
-  fixtureDef.filter.maskBits = config.maskBits;
-  UserData *userData = new UserData();
+  auto [categoryBits, maskBits] = CollisionManager::getCollisionConfig<Drone>();
+  fixtureDef.filter.categoryBits = categoryBits;
+  fixtureDef.filter.maskBits = maskBits;
+  auto *userData = new UserData();
   userData->object = this;
 
   fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(userData);
@@ -86,7 +86,7 @@ void Drone::update(const std::vector<std::unique_ptr<Drone>> &drones) {
   if (behaviour_) {
     behaviour_->execute(drones, *this);
   }
-  b2Vec2 position = body_->GetPosition();
+  const b2Vec2 position = body_->GetPosition();
 
   body_->SetTransform(position, body_->GetAngle());
 }

@@ -47,7 +47,7 @@ class DroneConfiguration {
   /// @brief Fetches a drone configuration by its name.
   /// @param name Name of the drone configuration to retrieve.
   /// @return Pointer to the DroneConfiguration, or nullptr if not found.
-  static DroneConfiguration *getDroneConfigurationByName(std::string name);
+  static DroneConfiguration *getDroneConfigurationByName(const std::string &name);
 
   const std::string &name() const { return name_; }
 };

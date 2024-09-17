@@ -20,7 +20,7 @@ std::string generateRandomString(int length);
 /// @brief Abstract base class for an Observer in the Observer pattern.
 class Observer {
  public:
-  virtual ~Observer() {}
+  virtual ~Observer() = default;
 
   /// @brief Pure virtual function to update the observer with a JSON message
   /// @param message A JSON object containing the update data.
@@ -28,7 +28,7 @@ class Observer {
 };
 
 /// @brief Singleton Logger class for asynchronous simulation logging.
-class Logger : public Observer {
+class Logger final : public Observer {
  private:
   static std::shared_ptr<spdlog::logger>
       logger_;  ///< Static logger shared across instances.
@@ -38,7 +38,7 @@ class Logger : public Observer {
 
   /// @brief Initialise or re-initialize the logger with a specified file sink
   /// @param log_file The file to output log data to
-  void init_logger(const std::string& log_file);
+  static void init_logger(const std::string& log_file);
 
  public:
   // Delete copy constructor and assignment operator
@@ -46,7 +46,7 @@ class Logger : public Observer {
   Logger& operator=(const Logger&) = delete;
 
   /// @brief Destructor for Logger class. Shuts down the logger.
-  ~Logger();
+  ~Logger() override;
 
   /// @brief Get the singleton instance of the logger
   /// @return Reference to the singleton instance of the logger
@@ -57,7 +57,7 @@ class Logger : public Observer {
   ///
   /// Internally, just calls `init_logger` with the new log file.
   /// @param new_log_file
-  void switch_log_file(const std::string& new_log_file);
+  static void switch_log_file(const std::string& new_log_file);
 
   /// @brief Update the log with a new message.
   ///

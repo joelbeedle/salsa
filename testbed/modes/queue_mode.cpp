@@ -1,7 +1,7 @@
 #include <box2d/box2d.h>
 #include <plot/plot.h>
 #include <salsa/salsa.h>
-#include <stdio.h>
+#include <cstdio>
 
 #include <chrono>
 #include <fstream>
@@ -25,8 +25,7 @@ struct DroneParameters {
   float mass;
   float radius;
 };
-class QueueSimulator : public Test {
- private:
+class QueueSimulator final : public Test {
   salsa::Sim *sim;
   static salsa::SimBuilder *sim_builder;
   bool draw_visual_range_ = true;
@@ -55,7 +54,7 @@ class QueueSimulator : public Test {
  public:
   QueueSimulator() {
     pause = true;
-    salsa::DroneConfiguration *smallDrone = new salsa::DroneConfiguration(
+    auto *smallDrone = new salsa::DroneConfiguration(
         "hidden", 25.0f, 50.0f, 10.0f, 0.3f, 1.0f, 1.5f, 4000.0f);
 
     g_debugDraw.SetFlags(b2Draw::e_shapeBit | b2Draw::e_jointBit);
@@ -70,28 +69,28 @@ class QueueSimulator : public Test {
     return std::make_unique<QueueSimulator>();
   }
 
-  void Build() { sim_builder->build(); }
+  static void Build() { sim_builder->build(); }
 
-  void SetBuilder(salsa::SimBuilder *builder) {
+  void SetBuilder(salsa::SimBuilder *builder)const {
     sim_builder = builder;
     builder->setWorld(m_world);
   }
 
-  void UseQueue(salsa::TestQueue stack) {
+  void UseQueue(const salsa::TestQueue stack) {
     using_queue_ = true;
     queue_ = stack;
   }
 
   bool SetNextTestFromQueue() {
-    auto config = queue_.pop();
+    auto config = salsa::TestQueue::pop();
     auto temp_sim = new salsa::Sim(config);
     if (temp_sim == nullptr) {
       return false;
     }
-    auto old_sim = sim;
+    const auto old_sim = sim;
     sim = temp_sim;
     std::string current_log_file = old_sim->getCurrentLogFile();
-    if (current_log_file != "" && !skipped_test)
+    if (!current_log_file.empty() && !skipped_test)
       testbed::plot(current_log_file);
     delete old_sim;
     sim->setCurrentBehaviour(sim->current_behaviour_name());
@@ -104,8 +103,8 @@ class QueueSimulator : public Test {
     skipped_test = false;
     target_positions_.clear();
     target_colors_.clear();
-    auto targets = sim->getTargets();
-    int size = targets.size();
+    const auto targets = sim->getTargets();
+    const int size = targets.size();
     target_positions_.reserve(size);
     target_colors_.reserve(size);
     bool radius_set = false;
@@ -120,28 +119,28 @@ class QueueSimulator : public Test {
 
     return true;
   }
-  void SetWorld(b2World *world) { sim_builder->setWorld(world); }
-  void SetHeight(float height) { sim_builder->setWorldHeight(height); }
-  void SetWidth(float width) { sim_builder->setWorldWidth(width); }
-  float GetHeight() { return sim->world_height(); }
-  float GetWidth() { return sim->world_width(); }
-  void SetContactListener(salsa::BaseContactListener &listener) {
+  static void SetWorld(b2World *world) { sim_builder->setWorld(world); }
+  static void SetHeight(float height) { sim_builder->setWorldHeight(height); }
+  static void SetWidth(float width) { sim_builder->setWorldWidth(width); }
+  [[nodiscard]] float GetHeight()const { return sim->world_height(); }
+  [[nodiscard]] float GetWidth()const { return sim->world_width(); }
+  static void SetContactListener(salsa::BaseContactListener &listener) {
     sim_builder->setContactListener(listener);
   }
-  void AddBehaviour(const std::string &name,
+  static void AddBehaviour(const std::string &name,
                     std::unique_ptr<salsa::Behaviour> behaviour) {
     salsa::behaviour::Registry::get().add(name, std::move(behaviour));
   }
 
-  void SetConfiguration(salsa::DroneConfiguration *configuration) {
+  static void SetConfiguration(salsa::DroneConfiguration *configuration) {
     sim_builder->setDroneConfiguration(configuration);
   }
 
-  salsa::DroneConfiguration *GetConfiguration() {
+  [[nodiscard]] salsa::DroneConfiguration *GetConfiguration()const {
     return sim->getDroneConfiguration();
   }
 
-  void SetDroneCount(int count) { sim_builder->setDroneCount(count); }
+  static void SetDroneCount(const int count) { sim_builder->setDroneCount(count); }
 
   void generatePermutations(std::vector<std::vector<float>> &results,
                             const std::vector<std::vector<float>> &lists,
@@ -159,7 +158,7 @@ class QueueSimulator : public Test {
   }
 
   // Function to parse a list of values from a string
-  std::vector<float> parseList(const std::string &str) {
+  static std::vector<float> parseList(const std::string &str) {
     std::vector<float> list;
     std::istringstream iss(str);
     std::string value;
@@ -174,7 +173,7 @@ class QueueSimulator : public Test {
   }
 
   // Function to generate a list of values from a range
-  std::vector<float> generateRange(float min, float max, float step) {
+  static std::vector<float> generateRange(const float min, const float max, const float step) {
     std::vector<float> range;
     for (float value = min; value <= max + step / 2; value += step) {
       value = std::round(value * 1e6) / 1e6;  // Reduce precision issues
@@ -188,20 +187,18 @@ class QueueSimulator : public Test {
   void Step(Settings &settings) override {
     // Run simulation steps here
     Test::Step(settings);
-    float timeStep =
-        settings.m_hertz > 0.0f ? 1.0f / settings.m_hertz : float(0.0f);
     pause = settings.m_pause;
-    std::vector<int> foundIds;
+     constexpr std::vector<int> foundIds;
     for (int i = 0; i < settings.m_simulationSpeed; i++) {
       if (!pause) sim->update();
     }
 
-    for (auto &target : sim->getTargetsFoundThisStep()) {
+    for (const auto &target : sim->getTargetsFoundThisStep()) {
       target_colors_[target->id()] = trueColour;
     }
     if (queue_empty) {
       pause = true;
-      queue_empty = queue_.isEmpty();
+      queue_empty = salsa::TestQueue::isEmpty();
     }
     if (!pause)
       sim->current_time() +=
@@ -260,17 +257,17 @@ class QueueSimulator : public Test {
     ImGui::SetNextWindowPos(
         ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f),
         ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-    if (ImGui::BeginPopupModal("Add Test", NULL,
+    if (ImGui::BeginPopupModal("Add Test", nullptr,
                                ImGuiWindowFlags_AlwaysAutoResize)) {
       auto behaviourNames = salsa::behaviour::Registry::get().behaviour_names();
       static std::string current_name = behaviourNames[0];
-      static std::string new_map_name = "";
+      static std::string new_map_name;
       static int new_drone_count = 0;
       static int new_target_count = 0;
       static float new_time_limit = 0.0f;
       static bool to_change = false;
       static b2World *new_world = nullptr;
-      static std::string new_target_type = "";
+      static std::string new_target_type;
       // Get behaviour name for test
       if (ImGui::BeginCombo("Behaviour", current_name.c_str())) {
         auto behaviourNames =
@@ -297,9 +294,9 @@ class QueueSimulator : public Test {
           new_params;
       if (new_params.empty() || to_change) {
         new_params.clear();
-        for (const auto &pair : chosen_params) {
-          new_params[pair.first] =
-              pair.second->clone();  // Clone each Parameter and insert into the
+        for (const auto & [fst, snd] : chosen_params) {
+          new_params[fst] =
+              snd->clone();  // Clone each Parameter and insert into the
           // new map
           to_change = false;
         }
@@ -393,7 +390,7 @@ class QueueSimulator : public Test {
             new_time_limit,
             current_target_name,
             current_listener_name};
-        queue_.push(new_config);
+        salsa::TestQueue::push(new_config);
         added_new_test_ = true;
         ImGui::CloseCurrentPopup();
       }
@@ -408,11 +405,11 @@ class QueueSimulator : public Test {
     ImGui::SetNextWindowPos(
         ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f),
         ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-    if (ImGui::BeginPopupModal("Add Test Permutation", NULL,
+    if (ImGui::BeginPopupModal("Add Test Permutation", nullptr,
                                ImGuiWindowFlags_AlwaysAutoResize)) {
       auto behaviourNames = salsa::behaviour::Registry::get().behaviour_names();
       static std::string current_name = behaviourNames[0];
-      static std::string new_map_name = "";
+      static std::string new_map_name;
       static int new_drone_count = 0;
       static int new_target_count = 0;
       static float new_time_limit = 0.0f;
@@ -448,12 +445,12 @@ class QueueSimulator : public Test {
         parameter_names.clear();
         selections.clear();
         range_storage.clear();
-        for (const auto &pair : chosen_params) {
-          parameter_names.push_back(pair.first);
-          input_storage[pair.first] =
+        for (const auto& key : chosen_params | std::views::keys) {
+          parameter_names.push_back(key);
+          input_storage[key] =
               std::string(128, '\0');  // Initialize with null characters
           selections.push_back(0);
-          range_storage[pair.first] = {0.0f, 0.0f, 0.0f};
+          range_storage[key] = {0.0f, 0.0f, 0.0f};
         }
         to_change = false;
       }
@@ -644,8 +641,8 @@ class QueueSimulator : public Test {
       }
 
       if (ImGui::Button("Add Permutations to Queue", ImVec2(200, 0))) {
-        for (auto config : base) {
-          queue_.push(config);
+        for (const auto& config : base) {
+          salsa::TestQueue::push(config);
         }
         added_test_permutation_ = true;
         ImGui::CloseCurrentPopup();
@@ -662,17 +659,17 @@ class QueueSimulator : public Test {
         ImGui::InputText("Filename", filename, 128);
         if (ImGui::Button("Save")) {
           std::vector<salsa::TestConfig> old_tests;
-          for (const auto &config : queue_.getTests()) {
+          for (const auto &config : salsa::TestQueue::getTests()) {
             old_tests.push_back(config);
           }
-          queue_.getTests().clear();
+          salsa::TestQueue::getTests().clear();
           for (const auto &config : base) {
-            queue_.push(config);
+            salsa::TestQueue::push(config);
           }
-          queue_.save(filename);
-          queue_.getTests().clear();
+          salsa::TestQueue::save(filename);
+          salsa::TestQueue::getTests().clear();
           for (const auto &config : old_tests) {
-            queue_.push(config);
+            salsa::TestQueue::push(config);
           }
           ImGui::CloseCurrentPopup();
         }
@@ -739,7 +736,7 @@ class QueueSimulator : public Test {
       ImGui::BeginChild("Current Test", ImVec2(200, 100), true,
                         ImGuiWindowFlags_None | ImGuiWindowFlags_MenuBar);
       if (ImGui::BeginMenuBar()) {
-        ImGui::MenuItem("Current Test", NULL, false, false);
+        ImGui::MenuItem("Current Test", nullptr, false, false);
       }
       ImGui::EndMenuBar();
 
@@ -755,12 +752,11 @@ class QueueSimulator : public Test {
       ImGui::BeginChild("Next Test", ImVec2(200, 100), true,
                         ImGuiWindowFlags_None | ImGuiWindowFlags_MenuBar);
       if (ImGui::BeginMenuBar()) {
-        ImGui::MenuItem("Next Test", NULL, false, false);
+        ImGui::MenuItem("Next Test", nullptr, false, false);
       }
-      salsa::TestConfig next_config;
       ImGui::EndMenuBar();
-      try {
-        next_config = queue_.peek();
+      try {salsa::TestConfig next_config;
+        next_config = salsa::TestQueue::peek();
         ImGui::Text("Behaviour: %s", next_config.behaviour_name.c_str());
         ImGui::Text("Drone Count: %d", next_config.num_drones);
         ImGui::Text("Target Count: %d", next_config.num_targets);
@@ -778,10 +774,10 @@ class QueueSimulator : public Test {
       ImGui::BeginChild("Test Queue", ImVec2(0, 100), true,
                         ImGuiWindowFlags_None | ImGuiWindowFlags_MenuBar);
       if (ImGui::BeginMenuBar()) {
-        ImGui::MenuItem("Test Queue", NULL, false, false);
+        ImGui::MenuItem("Test Queue", nullptr, false, false);
         if (ImGui::BeginMenu("Options")) {
           if (ImGui::MenuItem("Clear Queue")) {
-            queue_.getTests().clear();
+            salsa::TestQueue::getTests().clear();
           }
           ImGui::EndMenu();
         }
@@ -798,8 +794,7 @@ class QueueSimulator : public Test {
         }
         ImGui::EndMenuBar();
       }
-      int testIndex = 0;
-      auto &tests = queue_.getTests();
+      auto &tests = salsa::TestQueue::getTests();
       for (int i = 0; i < tests.size(); ++i) {
         auto &test = tests[i];
 
@@ -842,7 +837,7 @@ class QueueSimulator : public Test {
         static char filename[128] = "";
         ImGui::InputText("Filename", filename, 128);
         if (ImGui::Button("Save")) {
-          queue_.save(filename);
+          salsa::TestQueue::save(filename);
           ImGui::CloseCurrentPopup();
         }
         ImGui::EndPopup();
@@ -899,7 +894,7 @@ class QueueSimulator : public Test {
     ImGui::End();
   }
   void Draw(b2World *world, DebugDraw *debugDraw,
-            std::vector<int> foundTreeIDs) {
+            const std::vector<int>& foundTreeIDs) {
     if (draw_targets_) {
       if (first_run_) {
         debugDraw->DrawAllTargets(target_positions_, target_colors_,
@@ -921,8 +916,8 @@ class QueueSimulator : public Test {
                       .categoryBits &&
               draw_visual_range_) {
             // This is a drone sensor, draw if wanted
-            const b2CircleShape *circleShape =
-                static_cast<const b2CircleShape *>(fixture->GetShape());
+            const auto *circleShape =
+                dynamic_cast<const b2CircleShape *>(fixture->GetShape());
             b2Vec2 position =
                 transform.p + b2Mul(transform.q, circleShape->m_p);
             debugDraw->DrawCircle(position, circleShape->m_radius,
@@ -934,7 +929,7 @@ class QueueSimulator : public Test {
         }
 
         if (fixture->GetUserData().pointer != 0) {
-          salsa::UserData *userData = reinterpret_cast<salsa::UserData *>(
+          auto *userData = reinterpret_cast<salsa::UserData *>(
               fixture->GetUserData().pointer);
           if (userData == nullptr) {
             std::cout << "User data is null" << std::endl;
@@ -942,13 +937,13 @@ class QueueSimulator : public Test {
           }
           // Draw Drones
           std::string name = salsa::type(*(userData->object));
-          if (name.compare("salsa::Drone") == 0) {
-            salsa::Drone *drone = userData->as<salsa::Drone>();
+          if (name == "salsa::Drone") {
+            const auto *drone = userData->as<salsa::Drone>();
             // Draw drone
             b2Vec2 position = body->GetPosition();
             debugDraw->DrawSolidCircle(position, drone->radius(),
                                        transform.q.GetXAxis(), drone->color());
-          } else if (name.compare("b2_groundBody") && draw_targets_) {
+          } else if (name == "b2_groundBody" && draw_targets_) {
             // salsa::Target *target = userData->as<salsa::Target>();
             // b2Vec2 position = body->GetPosition();
             // debugDraw->DrawSolidCircle(position, target->getRadius(),
@@ -961,8 +956,8 @@ class QueueSimulator : public Test {
         // Draw everything else that's not anything above with default values
         switch (fixture->GetType()) {
           case b2Shape::e_circle: {
-            const b2CircleShape *circleShape =
-                static_cast<const b2CircleShape *>(fixture->GetShape());
+             const auto  circleShape =
+                dynamic_cast<const b2CircleShape *>(fixture->GetShape());
             b2Vec2 position =
                 transform.p + b2Mul(transform.q, circleShape->m_p);
             debugDraw->DrawSolidCircle(position, circleShape->m_radius,
@@ -971,8 +966,8 @@ class QueueSimulator : public Test {
             break;
           }
           case b2Shape::e_polygon: {
-            const b2PolygonShape *polygonShape =
-                static_cast<const b2PolygonShape *>(fixture->GetShape());
+            const auto *polygonShape =
+                dynamic_cast<const b2PolygonShape *>(fixture->GetShape());
             b2Vec2 vertices[b2_maxPolygonVertices];
             for (int i = 0; i < polygonShape->m_count; ++i) {
               vertices[i] = b2Mul(transform, polygonShape->m_vertices[i]);
@@ -982,17 +977,17 @@ class QueueSimulator : public Test {
             break;
           }
           case b2Shape::e_edge: {
-            const b2EdgeShape *edgeShape =
-                static_cast<const b2EdgeShape *>(fixture->GetShape());
+            const auto *edgeShape =
+                dynamic_cast<const b2EdgeShape *>(fixture->GetShape());
             b2Vec2 v1 = b2Mul(transform, edgeShape->m_vertex1);
             b2Vec2 v2 = b2Mul(transform, edgeShape->m_vertex2);
             debugDraw->DrawSegment(v1, v2, b2Color(0.5f, 1.0f, 0.5f));
             break;
           }
           case b2Shape::e_chain: {
-            const b2ChainShape *chainShape =
-                static_cast<const b2ChainShape *>(fixture->GetShape());
-            int32 count = chainShape->m_count;
+            const auto *chainShape =
+                dynamic_cast<const b2ChainShape *>(fixture->GetShape());
+            const int32 count = chainShape->m_count;
             const b2Vec2 *vertices = chainShape->m_vertices;
             b2Vec2 v1 = b2Mul(transform, vertices[0]);
             for (int32 i = 1; i < count; ++i) {
@@ -1011,5 +1006,5 @@ class QueueSimulator : public Test {
     }
   }
 };
-static int testIndex2 =
+static int testIndex =
     RegisterTest("Simulator", "Queue Mode", QueueSimulator::Create);

@@ -7,20 +7,20 @@
 #include "salsa/utils/base_contact_listener.h"
 namespace salsa {
 
-Sim::Sim(b2World *world, int drone_count, int target_count,
-         DroneConfiguration *configuration, float border_width,
-         float border_height, float time_limit)
+Sim::Sim(b2World *world, const int drone_count, const int target_count,
+         DroneConfiguration *config, const float border_width,
+         const float border_height, const float time_limit)
     : world_(world),
-      num_drones_(drone_count),
-      num_targets_(target_count),
-      drone_configuration_(configuration),
-      border_width_(border_width),
       border_height_(border_height),
-      time_limit_(time_limit) {
-  b2Vec2 gravity(0.0f, 0.0f);
+      border_width_(border_width),
+      time_limit_(time_limit),
+      drone_configuration_(config),
+      num_drones_(drone_count),
+      num_targets_(target_count) {
+  const b2Vec2 gravity(0.0f, 0.0f);
   world_->SetGravity(gravity);
 
-  logger_.switch_log_file("test.log");
+  salsa::Logger::switch_log_file("test.log");
   createBounds();
   drone_spawn_position_ = b2Vec2(border_width_ / 2, border_height_ / 2);
 
@@ -62,7 +62,7 @@ Sim::Sim(TestConfig &config)
       << milliseconds.count() << "_" << current_behaviour_name_.c_str()
       << "/result.log";
   current_log_file_ = oss.str();
-  logger_.switch_log_file(current_log_file_);
+  salsa::Logger::switch_log_file(current_log_file_);
 
   world_->SetContactListener(contact_listener_);
   addObserver(std::shared_ptr<Logger>(&logger_, [](auto *) {}));
@@ -101,7 +101,7 @@ Sim::Sim(TestConfig &config)
 }
 
 Sim::~Sim() {
-  for (auto &obstacle : obstacles_) {
+  for (const auto &obstacle : obstacles_) {
     world_->DestroyBody(obstacle);
   }
 }
@@ -110,7 +110,7 @@ void Sim::update() {
   if (current_time_ <= time_limit_ && current_time_ > 0.0) {
     num_time_steps_++;
     targets_found_this_step_.clear();
-    for (auto &drone : drones_) {
+    for (const auto &drone : drones_) {
       drone->update(drones_);
       targets_found_this_step_.insert(targets_found_this_step_.end(),
                                       drone->targets_found().begin(),
@@ -126,7 +126,7 @@ void Sim::update() {
       }
     }
     int targets_found = countFoundTargets();
-    nlohmann::json old_message = {{"targets_found", targets_found}};
+    const nlohmann::json old_message = {{"targets_found", targets_found}};
     if (num_time_steps_ >= log_interval_) {
       nlohmann::json message;
       message["time"] = current_time_;
@@ -134,7 +134,7 @@ void Sim::update() {
       message["id"] = 0;
       message["caller_type"] = "Sim";
 
-      for (auto &observer : observers_) {
+      for (const auto &observer : observers_) {
         observer->update(message);
       }
       num_time_steps_ = 0;
@@ -151,7 +151,7 @@ void Sim::reset() {
   createDrones(*behaviour_, *drone_configuration_, SpawnType::CIRCULAR);
 }
 
-void Sim::applyCurrentBehaviour() {
+void Sim::applyCurrentBehaviour()const {
   for (auto &drone : drones_) {
     drone->behaviour() = behaviour_;
   }
@@ -181,28 +181,26 @@ void Sim::createDrones(Behaviour &behaviour, DroneConfiguration &configuration,
       createDronesCircular(behaviour, configuration);
       break;
     case SpawnType::RANDOM:
-      createDronesRandom(behaviour, configuration);
     default:
       createDronesRandom(behaviour, configuration);
   }
   logger::get()->info("Created {} drones", drones_.size());
 }
 
-void Sim::createDronesRandom(Behaviour &behaviour, DroneConfiguration &config) {
-  const float margin = 2.0f;
-  for (int i = 0; i < num_drones_; i++) {
+void Sim::createDronesRandom(Behaviour &behaviour, const DroneConfiguration &config) {
+  for (int i = 0; i < num_drones_; i++) { constexpr float margin = 2.0f;
     float x = (rand() % static_cast<int>(border_width_ - 2 * margin)) + margin;
     float y = (rand() % static_cast<int>(border_height_ - 2 * margin)) + margin;
     drones_.push_back(
         DroneFactory::createDrone(world_, b2Vec2(x, y), behaviour, config));
   }
-  for (auto &drone : drones_) {
+  for (const auto &drone : drones_) {
     drone->addObserver(std::shared_ptr<Logger>(&logger_, [](auto *) {}));
   }
 }
 
 void Sim::createDronesCircular(Behaviour &behaviour,
-                               DroneConfiguration &config) {
+                               const DroneConfiguration &config) {
   // Calculate the total area needed for all drones
   float droneArea = M_PI * std::pow(config.radius, 2);
   float totalDroneArea = std::pow(num_drones_, 2) * droneArea;
@@ -216,30 +214,30 @@ void Sim::createDronesCircular(Behaviour &behaviour,
 
   for (int i = 0; i < num_drones_; i++) {
     // generate random angle and radius within the required circle
-    float theta = static_cast<float>(rand()) / RAND_MAX * 2.0f * M_PI;
+    const float theta = static_cast<float>(rand()) / RAND_MAX * 2.0f * M_PI;
     // Ensure drones fit within the required circle, leaving a margin equal to
     // the drone's radius
-    float r = sqrt(static_cast<float>(rand()) / RAND_MAX) *
+    const float r = sqrt(static_cast<float>(rand()) / RAND_MAX) *
               (requiredCircleRadius - config.radius);
 
     // Convert polar coordinates (r, theta) to Cartesian coordinates (x, y)
-    float x = centerX + r * cos(theta);
-    float y = centerY + r * sin(theta);
+    const float x = centerX + r * cos(theta);
+    const float y = centerY + r * sin(theta);
 
     drones_.push_back(
         DroneFactory::createDrone(world_, b2Vec2(x, y), behaviour, config));
   }
   int current_id = 0;
-  for (auto &drone : drones_) {
+  for (const auto &drone : drones_) {
     drone->color(b2Color(0.7f, 0.5f, 0.5f));
     drone->id(current_id++);
     drone->addObserver(std::shared_ptr<Logger>(&logger_, [](auto *) {}));
   }
 }
 
-void Sim::setDroneCount(int count) { num_drones_ = count; }
+void Sim::setDroneCount(const int count) { num_drones_ = count; }
 
-int Sim::getDroneCount() { return num_drones_; }
+int Sim::getDroneCount()const { return num_drones_; }
 
 int &Sim::num_drones() { return num_drones_; }
 const int &Sim::num_drones() const { return num_drones_; }
@@ -248,7 +246,7 @@ void Sim::setDroneConfiguration(DroneConfiguration *configuration) {
   drone_configuration_ = configuration;
 }
 
-void Sim::updateDroneSettings() {
+void Sim::updateDroneSettings()const {
   for (auto &drone : drones_) {
     drone->max_force(drone_configuration_->maxForce);
     drone->max_speed(drone_configuration_->maxSpeed);
@@ -289,9 +287,9 @@ void Sim::createTargets(Params... params) {
   logger::get()->info("Targets created");
 }
 
-void Sim::setTargetType(const std::string &type) { target_type_ = type; }
+void Sim::setTargetType(const std::string &type_name) { target_type_ = type_name; }
 
-void Sim::setTargetCount(int count) { num_targets_ = count; }
+void Sim::setTargetCount(const int count) { num_targets_ = count; }
 
 std::vector<std::shared_ptr<Target>> &Sim::getTargets() { return targets_; }
 
@@ -343,7 +341,7 @@ const float &Sim::current_time() const { return current_time_; }
 
 float &Sim::time_limit() { return time_limit_; }
 
-b2World *Sim::getWorld() { return world_; }
+b2World *Sim::getWorld()const { return world_; }
 
 void Sim::setWorld(b2World *world) { world_ = world; }
 
@@ -357,7 +355,7 @@ const std::string &Sim::current_behaviour_name() const {
   return current_behaviour_name_;
 }
 
-DroneConfiguration *Sim::getDroneConfiguration() {
+DroneConfiguration *Sim::getDroneConfiguration()const {
   return drone_configuration_;
 }
 
@@ -381,7 +379,7 @@ void Sim::setCurrentDroneConfiguration(DroneConfiguration &configuration) {
 
 void Sim::changeMap(std::string name) {
   logger::get()->info("Changing map to {}", name);
-  map::Map map = map::load(name.c_str());
+  const map::Map map = map::load(name.c_str());
   map_ = map;
   world_ = map.world;
   border_width_ = map.width;
