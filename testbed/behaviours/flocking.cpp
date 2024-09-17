@@ -4,20 +4,19 @@
 #include <valarray>
 namespace salsa {
 
-class DroneQueryCallback : public b2QueryCallback {
+class DroneQueryCallback final : public b2QueryCallback {
  public:
   std::vector<b2Body *> foundWalls;
 
   bool ReportFixture(b2Fixture *fixture) override {
-    b2Body *body = fixture->GetBody();
-    if (body->GetType() == b2_staticBody) {
+    if (b2Body *body = fixture->GetBody(); body->GetType() == b2_staticBody) {
       foundWalls.push_back(body);
     }
     return true;
   }
 };
 
-class FlockingBehaviour : public Behaviour {
+class FlockingBehaviour final : public Behaviour {
  private:
   std::vector<b2Body *> obstacles;
 
@@ -28,9 +27,9 @@ class FlockingBehaviour : public Behaviour {
   behaviour::Parameter obstacle_avoidance_weight_;
 
  public:
-  FlockingBehaviour(float separationDistance, float alignmentWeight,
-                    float cohesionWeight, float separationWeight,
-                    float obstacleAvoidanceWeight)
+  FlockingBehaviour(const float separationDistance, const float alignmentWeight,
+                    const float cohesionWeight, const float separationWeight,
+                    const float obstacleAvoidanceWeight)
       : separation_distance_(separationDistance, 0.0f, 1000.0f),
         alignment_weight_(alignmentWeight, 0.0f, 2.0f),
         cohesion_weight_(cohesionWeight, 0.0f, 2.0f),
@@ -61,16 +60,16 @@ class FlockingBehaviour : public Behaviour {
     int32 neighbours = 0;
     b2Vec2 centreOfMass(0, 0);
 
-    float currentMaxSpeed = currentDrone.max_speed();
-    float currentMaxForce = currentDrone.max_force();
+    const float currentMaxSpeed = currentDrone.max_speed();
+    const float currentMaxForce = currentDrone.max_force();
 
     for (auto &drone : drones) {
-      b2Body *body = drone->body();
+      const b2Body *body = drone->body();
       b2Vec2 bodyPos = body->GetPosition();
       if (body == currentDrone.body()) {
         continue;
       }
-      float distance = b2Distance(currentDrone.position(), bodyPos);
+      const float distance = b2Distance(currentDrone.position(), bodyPos);
       if (distance > currentDrone.drone_detection_range()) {
         continue;
       }
@@ -116,11 +115,11 @@ class FlockingBehaviour : public Behaviour {
       clampMagnitude(separateSteering, currentMaxForce);
     }
 
-    b2Vec2 alignment = alignSteering;
-    b2Vec2 separation = separateSteering;
-    b2Vec2 cohesion = cohereSteering;
-    b2Vec2 obstacleAvoidance = avoidObstacles(obstaclePoints, currentDrone);
-    b2Vec2 toPoint = steerTo(b2Vec2(0, 0), currentDrone);
+    const b2Vec2 alignment = alignSteering;
+    const b2Vec2 separation = separateSteering;
+    const b2Vec2 cohesion = cohereSteering;
+    const b2Vec2 obstacleAvoidance = avoidObstacles(obstaclePoints, currentDrone);
+    const b2Vec2 toPoint = steerTo(b2Vec2(0, 0), currentDrone);
     b2Vec2 acceleration =
         (alignment_weight_ * alignment) + (separation_weight_ * separation) +
         (cohesion_weight_ * cohesion) +
@@ -130,7 +129,7 @@ class FlockingBehaviour : public Behaviour {
 
     velocity += acceleration;
     float speed = 0.001f + velocity.Length();
-    b2Vec2 dir(velocity.x / speed, velocity.y / speed);
+    const b2Vec2 dir(velocity.x / speed, velocity.y / speed);
 
     // Clamp speed
     if (speed > currentMaxSpeed) {
@@ -146,7 +145,7 @@ class FlockingBehaviour : public Behaviour {
 
  private:
   b2Vec2 align(const std::vector<std::unique_ptr<Drone>> &drones,
-               Drone &currentDrone) {
+               const Drone &currentDrone) {
     b2Vec2 steering(0, 0);
     b2Vec2 avgVec(0, 0);
     int32 neighbours = 0;
@@ -168,7 +167,7 @@ class FlockingBehaviour : public Behaviour {
     return steering;
   }
   b2Vec2 separate(const std::vector<std::unique_ptr<Drone>> &drones,
-                  Drone &currentDrone) {
+                  const Drone &currentDrone) {
     b2Vec2 steering(0, 0);
     b2Vec2 avgVec(0, 0);
     int32 neighbours = 0;
@@ -201,7 +200,7 @@ class FlockingBehaviour : public Behaviour {
     return steering;
   }
   b2Vec2 cohere(const std::vector<std::unique_ptr<Drone>> &drones,
-                Drone &currentDrone) {
+                const Drone &currentDrone) {
     b2Vec2 steering(0, 0);
     b2Vec2 centreOfMass(0, 0);
     int32 neighbours = 0;

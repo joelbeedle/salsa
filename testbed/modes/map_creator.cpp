@@ -1,7 +1,6 @@
 #include <box2d/box2d.h>
 #include <salsa/core/map.h>
 
-#include <filesystem>
 #include <fstream>
 #include <iostream>
 
@@ -13,7 +12,7 @@
 #include "test.h"
 using namespace salsa;
 
-class myQueryCallback : public b2QueryCallback {
+class myQueryCallback final : public b2QueryCallback {
  public:
   std::vector<b2Body *> bodies;
   bool ReportFixture(b2Fixture *fixture) override {
@@ -23,7 +22,7 @@ class myQueryCallback : public b2QueryCallback {
     return true;
   }
 };
-class MapCreator : public Test {
+class MapCreator final : public Test {
  private:
   enum DrawMode {
     DRAW_LINE,
@@ -33,14 +32,14 @@ class MapCreator : public Test {
     DRAW_NONE,
     DRAW_DRONE_SPAWN,
   };
-  char map_name[128];
+  char map_name[128]{};
   DrawMode current_mode = DRAW_NONE;
   bool line_drawing = false;
-  b2Vec2 line_spawn_point;
+  b2Vec2 line_spawn_point{};
   std::vector<b2Vec2> points;
   float circle_radius = 0.0f;
 
-  b2Vec2 drone_spawn_point;
+  b2Vec2 drone_spawn_point{};
 
   bool draw_boundary = false;
   std::vector<b2Body *> boundary_bodies;
@@ -106,7 +105,7 @@ class MapCreator : public Test {
     line_drawing = false;
   }
 
-  void CreateEdge(const b2Vec2 &start, const b2Vec2 &end) {
+  void CreateEdge(const b2Vec2 &start, const b2Vec2 &end)const {
     b2BodyDef bd;
     bd.type = b2_staticBody;
     b2Body *body = m_world->CreateBody(&bd);
@@ -125,7 +124,7 @@ class MapCreator : public Test {
     b2Body *body = m_world->CreateBody(&bd);
 
     b2PolygonShape shape;
-    shape.Set(&vertices[0], (int32)vertices.size());
+    shape.Set(&vertices[0], static_cast<int32>(vertices.size()));
 
     b2FixtureDef fixtureDef;
     fixtureDef.shape = &shape;
@@ -165,12 +164,11 @@ class MapCreator : public Test {
     }
     std::cout << "CompleteLine\n";
 
-    b2Vec2 diff = worldPt - line_spawn_point;
-    float length = diff.Length();
-    if (length < 0.1f) {
+    const b2Vec2 diff = worldPt - line_spawn_point;
+    if (const float length = diff.Length();length < 0.1f) {
       return;
     }
-    b2BodyDef bd;
+    const b2BodyDef bd;
     b2Body *body = m_world->CreateBody(&bd);
     b2EdgeShape shape;
     shape.SetTwoSided(line_spawn_point, worldPt);
@@ -181,7 +179,7 @@ class MapCreator : public Test {
   void MouseDown(const b2Vec2 &p) override {
     m_mouseWorld = p;
 
-    if (m_mouseJoint != NULL) {
+    if (m_mouseJoint != nullptr) {
       return;
     }
 
@@ -203,11 +201,11 @@ class MapCreator : public Test {
 
   void RightMouseDown(const b2Vec2 &p) override {
     m_mouseWorld = p;
-    if (m_mouseJoint != NULL) {
+    if (m_mouseJoint != nullptr) {
       return;
     }
-    b2AABB aabb;
-    b2Vec2 d;
+    b2AABB aabb{};
+    b2Vec2 d{};
 
     d.Set(0.001f, 0.001f);
     aabb.lowerBound = p - d;
@@ -225,7 +223,7 @@ class MapCreator : public Test {
   void MouseUp(const b2Vec2 &p) override {
     if (m_mouseJoint) {
       m_world->DestroyJoint(m_mouseJoint);
-      m_mouseJoint = NULL;
+      m_mouseJoint = nullptr;
     }
 
     if (current_mode == DRAW_POLYGON && line_drawing) {
@@ -260,7 +258,7 @@ class MapCreator : public Test {
     }
   }
 
-  void Keyboard(int key) override {
+  void Keyboard(const int key) override {
     switch (key) {
       case GLFW_KEY_Q:
         if (line_drawing) {
@@ -276,16 +274,15 @@ class MapCreator : public Test {
   }
 
   void SaveMap() {
-    map::Map new_map = {map_name, boundary_side_length, boundary_side_length,
+    const map::Map new_map = {map_name, boundary_side_length, boundary_side_length,
                         drone_spawn_point, m_world};
     map::save(new_map);
     pause = false;
   }
 
   void LoadMap(const char *new_map_name) {
-    map::Map map = map::load(new_map_name);
-    b2World *world = map.world;
-    std::copy(new_map_name, new_map_name + 128, map_name);
+    auto [name, width, height, drone_spawn_point, world] = map::load(new_map_name);
+    std::copy_n(new_map_name, 128, map_name);
 
     m_world->SetDebugDraw(nullptr);     // Detach from the old world
     world->SetDebugDraw(&g_debugDraw);  // Attach to the new world
@@ -297,7 +294,7 @@ class MapCreator : public Test {
     pause = false;
   }
 
-  void PrintBodiesAndFixtures(b2World *world) {
+  static void PrintBodiesAndFixtures(b2World *world) {
     for (b2Body *body = world->GetBodyList(); body; body = body->GetNext()) {
       std::cout << "Body: " << body << std::endl;
       for (b2Fixture *fixture = body->GetFixtureList(); fixture;
@@ -322,20 +319,11 @@ class MapCreator : public Test {
       b2Color c(0.9f, 0.9f, 0.9f);
       switch (current_mode) {
         case DRAW_LINE:
-          g_debugDraw.DrawSegment(line_spawn_point, m_mouseWorld, c);
-          break;
         case DRAW_HOLLOW_POLYGON:
-          g_debugDraw.DrawSegment(line_spawn_point, m_mouseWorld, c);
-          break;
         case DRAW_POLYGON:
           g_debugDraw.DrawSegment(line_spawn_point, m_mouseWorld, c);
           break;
         case DRAW_CIRCLE:
-          g_debugDraw.DrawSegment(line_spawn_point, m_mouseWorld, c);
-
-          g_debugDraw.DrawCircle(line_spawn_point,
-                                 (m_mouseWorld - line_spawn_point).Length(), c);
-          break;
         case DRAW_DRONE_SPAWN:
           g_debugDraw.DrawSegment(line_spawn_point, m_mouseWorld, c);
           g_debugDraw.DrawCircle(line_spawn_point,
@@ -385,7 +373,7 @@ class MapCreator : public Test {
     }
   }
   void ShowMenu() {
-    ImGui::MenuItem("(demo menu)", NULL, false, false);
+    ImGui::MenuItem("(demo menu)", nullptr, false, false);
     if (ImGui::MenuItem("New")) {
       new_map = true;
     }
@@ -432,7 +420,7 @@ class MapCreator : public Test {
       ImGui::TreePop();
     }
 
-    current_mode = (DrawMode)selected;
+    current_mode = static_cast<DrawMode>(selected);
 
     ImGui::Separator();
     if (ImGui::BeginMenuBar()) {
@@ -456,7 +444,7 @@ class MapCreator : public Test {
         ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f),
         ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
-    if (ImGui::BeginPopupModal("Save As", NULL,
+    if (ImGui::BeginPopupModal("Save As", nullptr,
                                ImGuiWindowFlags_AlwaysAutoResize)) {
       static char str1[128] = "";
       if (ImGui::IsWindowFocused() && !ImGui::IsAnyItemActive() &&
@@ -466,7 +454,7 @@ class MapCreator : public Test {
       ImGui::Separator();
 
       if (ImGui::Button("Save", ImVec2(120, 0))) {
-        std::copy(str1, str1 + 128, map_name);
+        std::copy_n(str1, 128, map_name);
         saved_map_as = true;
         SaveMap();
         ImGui::CloseCurrentPopup();
@@ -485,7 +473,7 @@ class MapCreator : public Test {
       open_map = false;
     }
 
-    if (ImGui::BeginPopupModal("Open Map", NULL,
+    if (ImGui::BeginPopupModal("Open Map", nullptr,
                                ImGuiWindowFlags_AlwaysAutoResize)) {
       static char str1[128] = "";
       if (ImGui::IsAnyItemFocused() && !ImGui::IsAnyItemActive() &&
@@ -512,8 +500,8 @@ class MapCreator : public Test {
     ImGui::Begin("Boundary Settings", nullptr,
                  ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
     ImGui::Checkbox("Draw Boundary", &draw_boundary);
-    bool changed = false;
     if (draw_boundary) {
+      bool changed = false;
       ImGui::Text("Boundary Length");
       changed = ImGui::SliderFloat("Length", &boundary_side_length, 0.0f,
                                    4000.0f, "%.1fm");

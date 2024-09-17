@@ -10,7 +10,7 @@
 #include <unordered_map>
 #include <vector>
 namespace salsa {
-class UniformRandomWalkBehaviour : public Behaviour {
+class UniformRandomWalkBehaviour final : public Behaviour {
  private:
   std::unordered_map<std::string, behaviour::Parameter *> parameters_;
   behaviour::Parameter max_magnitude_;
@@ -22,14 +22,14 @@ class UniformRandomWalkBehaviour : public Behaviour {
     float randomTimeInterval;
     b2Vec2 desiredVelocity;
 
-    DroneTimerInfo() : randomTimeInterval(generateRandomTimeInterval()) {}
+    DroneTimerInfo() : randomTimeInterval(generateRandomTimeInterval()),desiredVelocity() {}
   };
 
   std::unordered_map<Drone *, DroneTimerInfo> droneTimers;
 
  public:
-  UniformRandomWalkBehaviour(float maxMagnitude, float forceWeight,
-                             float obstacleAvoidanceWeight)
+  UniformRandomWalkBehaviour(const float maxMagnitude, const float forceWeight,
+                             const float obstacleAvoidanceWeight)
       : max_magnitude_(maxMagnitude, 0.0f, 20.0f),
         force_weight_(forceWeight, 0.0f, 20.0f),
         obstacle_avoidance_weight_(obstacleAvoidanceWeight, 0.0f, 3.0f) {
@@ -39,11 +39,11 @@ class UniformRandomWalkBehaviour : public Behaviour {
     std::srand(std::time(nullptr));
   }
 
-  virtual ~UniformRandomWalkBehaviour() override {}
+  ~UniformRandomWalkBehaviour() override = default;
 
   void execute(const std::vector<std::unique_ptr<Drone>> &drones,
                Drone &currentDrone) override {
-    if (droneTimers.find(&currentDrone) == droneTimers.end()) {
+    if (!droneTimers.contains(&currentDrone)  ) {
       droneTimers[&currentDrone] = DroneTimerInfo();
       droneTimers[&currentDrone].desiredVelocity = currentDrone.velocity();
     }
@@ -55,14 +55,14 @@ class UniformRandomWalkBehaviour : public Behaviour {
 
     DroneTimerInfo &timerInfo = droneTimers[&currentDrone];
     timerInfo.elapsedTimeSinceLastForce += delta_time_;
-    b2Vec2 force = b2Vec2(0, 0);
-    b2Vec2 steer = b2Vec2(0, 0);
-    b2Vec2 obstacleAvoidance = avoidObstacles(obstaclePoints, currentDrone);
-    b2Vec2 neighbourAvoidance = avoidDrones(neighbours, currentDrone);
+    auto  force = b2Vec2(0, 0);
+    auto  steer = b2Vec2(0, 0);
+    const b2Vec2 obstacleAvoidance = avoidObstacles(obstaclePoints, currentDrone);
+    const b2Vec2 neighbourAvoidance = avoidDrones(neighbours, currentDrone);
 
     // Check if it's time to apply a new random force
     if (timerInfo.elapsedTimeSinceLastForce >= timerInfo.randomTimeInterval) {
-      float angle = static_cast<float>(std::rand()) / RAND_MAX * 2 * M_PI;
+      const float angle = static_cast<float>(std::rand()) / RAND_MAX * 2 * M_PI;
 
       // New desired velocity based on random angle
       timerInfo.desiredVelocity =
@@ -79,13 +79,13 @@ class UniformRandomWalkBehaviour : public Behaviour {
 
     b2Vec2 velocity = currentDrone.velocity();
     b2Vec2 position = currentDrone.position();
-    b2Vec2 acceleration = (force_weight_ * steer) +
+    const b2Vec2 acceleration = (force_weight_ * steer) +
                           (obstacle_avoidance_weight_ * obstacleAvoidance) +
                           neighbourAvoidance;
 
     velocity += acceleration;
     float speed = 0.001f + velocity.Length();
-    b2Vec2 dir(velocity.x / speed, velocity.y / speed);
+    const b2Vec2 dir(velocity.x / speed, velocity.y / speed);
 
     // Clamp speed
     if (speed > currentDrone.max_speed()) {

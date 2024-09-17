@@ -26,7 +26,7 @@ class Entity {
  protected:
   b2Body *body_;    ///< Pointer to the Box2D body associated with this entity.
   b2World *world_;  ///< Pointer to the Box2D world in which this entity exists.
-  int id_;          ///< Numeric identifier for the entity.
+  int id_{};          ///< Numeric identifier for the entity.
   float radius_;    ///< Radius of the entity, used for collision and rendering.
   b2Color color_;   ///< Color of the entity, used for rendering.
   std::string type_name_;  ///< String representing the type of the entity.

@@ -41,7 +41,7 @@ void from_json(const json& j, TestConfig& config) {
   j.at("keep").get_to(config.keep);
 }
 
-void TestQueue::push(TestConfig test) { tests_.push_back(test); }
+void TestQueue::push(const TestConfig& test) { tests_.push_back(test); }
 
 TestConfig TestQueue::pop() {
   if (tests_.empty()) {
@@ -60,9 +60,8 @@ TestConfig TestQueue::peek() {
 }
 
 bool TestQueue::save(const std::string& filename) {
-  json j = tests_;
-  std::ofstream file(filename + ".json");
-  if (file.is_open()) {
+  const json j = tests_;
+  if (std::ofstream file(filename + ".json"); file.is_open()) {
     file << j.dump(4);
     file.close();
     return true;
@@ -78,8 +77,7 @@ bool TestQueue::load(const std::string& filename) {
     full_filename += ".json";
   }
 
-  std::ifstream file(full_filename);
-  if (file.is_open()) {
+  if (std::ifstream file(full_filename); file.is_open()) {
     nlohmann::json j;
     file >> j;
     file.close();
@@ -95,8 +93,8 @@ void TestQueue::addPermutedTests(
     const std::vector<std::string>& parameter_names) {
   for (const auto& combination : permutations) {
     std::unordered_map<std::string, salsa::behaviour::Parameter*> new_params;
-    TestConfig modifiedConfig = base;  // Copy base config
-    auto chosen_behaviour =
+    const TestConfig& modifiedConfig = base;  // Copy base config
+    const auto chosen_behaviour =
         salsa::behaviour::Registry::get().behaviour(base.behaviour_name);
     auto chosen_params = chosen_behaviour->getParameters();
     for (size_t j = 0; j < parameter_names.size(); ++j) {
@@ -111,9 +109,8 @@ void TestQueue::addPermutedTests(
 
 void loadPermutations(std::vector<std::vector<float>>& permutations,
                       std::vector<std::string>& parameter_names,
-                      std::string filename) {
-  std::ifstream file(filename);
-  if (file.is_open()) {
+                      const std::string& filename) {
+  if (std::ifstream file(filename); file.is_open()) {
     nlohmann::json j;
     file >> j;
     file.close();

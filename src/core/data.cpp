@@ -3,7 +3,7 @@
 #include "salsa/core/map.h"
 using namespace salsa;
 
-std::string salsa::generateRandomString(int length) {
+std::string salsa::generateRandomString(const int length) {
   const std::string characters =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   std::string randomString;
@@ -27,7 +27,7 @@ Logger& Logger::getInstance() {
 }
 
 void Logger::init_logger(const std::string& log_file) {
-  std::filesystem::path log_path = salsa::map::getExecutablePath() / ".." /
+  const std::filesystem::path log_path = salsa::map::getExecutablePath() / ".." /
                                    ".." / "testbed" / "results" / log_file;
   spdlog::drop("async_logger");
   spdlog::init_thread_pool(8192,

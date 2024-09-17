@@ -36,13 +36,13 @@ class BaseContactListener : public b2ContactListener {
   virtual ~BaseContactListener();
 
   /// @brief Registers a collision handler for a specific pair of object types.
-  /// @param type_a Name of the first object type.
+  /// @param type1 Name of the first object type.
   /// @param type_b Name of the second object type.
   /// @param handler The function to call when objects of type_a and type_b
   /// collide.
   void addCollisionHandler(
-      std::string type_a, std::string type_b,
-      std::function<void(b2Fixture *, b2Fixture *)> handler);
+      std::string type1, std::string type2,
+      const std::function<void(b2Fixture*, b2Fixture*)> &handler);
 
   /// @brief Called when two fixtures begin to touch.
   /// @param contact The contact point information about the collision.
