@@ -13,6 +13,11 @@
 #include "imgui.h"
 #include "settings.h"
 #include "test.h"
+#include "ui/ui_builder.h"
+#include "ui/components/behaviour_settings_component.h"
+#include "ui/components/drone_configuration_component.h"
+#include "ui/components/sandbox_settings_component.h"
+#include "ui/components/visual_settings_component.h"
 #define MAX_TIME 1200.0f
 
 struct DroneParameters {
@@ -144,111 +149,19 @@ class SandboxSimulator : public Test {
   }
 
   void UpdateUI() override {
-    ImGui::SetNextWindowPos(ImVec2(10.0f, 100.0f));
-    ImGui::Begin("Swarm Controls", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+    UIBuilder builder;
 
-    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-    if (ImGui::CollapsingHeader("Behaviour Settings")) {
-      ImGui::SeparatorText("Current Behaviour");
-      if (ImGui::BeginCombo("Behaviours",
-                            sim->current_behaviour_name().c_str())) {
-        const auto behaviourNames =
-            salsa::behaviour::Registry::get().behaviour_names();
+    builder.setTitle("Swarm Controls")
+           .setPosition(ImVec2(10.0f, 50.0f));
 
-        for (auto &name : behaviourNames) {
-          const bool isSelected = (sim->current_behaviour_name() == name);
-          if (ImGui::Selectable(name.c_str(), isSelected)) {
-            sim->current_behaviour_name() = name;
-            sim->setCurrentBehaviour(name);
-          }
-          if (isSelected) {
-            ImGui::SetItemDefaultFocus();
-          }
-        }
-        ImGui::EndCombo();
-      }
+    builder.addComponent(std::make_unique<BehaviorSettingsComponent>(sim))
+           .addComponent(std::make_unique<VisualSettingsComponent>(draw_visual_range_, draw_targets_, sim))
+           .addComponent(std::make_unique<DroneSettingsComponent>(sim))
+           .addComponent(std::make_unique<SimulationSettingsComponent>(sim, pause, update_drone_count_, new_count, m_world, g_camera));
 
-      ImGui::SeparatorText("Behaviour Settings");
-      bool changed = false;
-      const auto behaviour = salsa::behaviour::Registry::get().behaviour(
-          sim->current_behaviour_name());
-      for (auto [name, parameter] : behaviour->getParameters()) {
-        changed |=
-            ImGui::SliderFloat(name.c_str(), &(parameter->value()),
-                               parameter->min_value(), parameter->max_value());
-      }
-
-      if (changed) {
-        sim->setCurrentBehaviour(sim->current_behaviour_name());
-      }
-      ImGui::SeparatorText("Visual Settings");
-      ImGui::Checkbox("Draw Drone visual range", &draw_visual_range_);
-      ImGui::Checkbox("Draw Targets", &draw_targets_);
-
-      if (ImGui::Button("Reset Simulation")) {
-        sim->reset();
-      }
-    }
-
-    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-    if (ImGui::CollapsingHeader("Drone Settings")) {
-      // Drone settings window
-      ImGui::SeparatorText("Drone Preset Settings");
-      bool droneChanged = false;
-      droneChanged |= ImGui::SliderFloat(
-          "maxSpeed", &sim->getDroneConfiguration()->maxSpeed, 0.0f, 50.0f);
-      droneChanged |= ImGui::SliderFloat(
-          "maxForce", &sim->getDroneConfiguration()->maxForce, 0.0f, 10.0f);
-      droneChanged |= ImGui::SliderFloat(
-          "cameraViewRange", &sim->getDroneConfiguration()->cameraViewRange,
-          0.0f, 100.0f);
-      droneChanged |= ImGui::SliderFloat(
-          "obstacleViewRange", &sim->getDroneConfiguration()->obstacleViewRange,
-          0.0f, 100.0f);
-      droneChanged |= ImGui::SliderFloat(
-          "droneDetectionRange",
-          &sim->getDroneConfiguration()->droneDetectionRange, 0.0f, 4000.0f);
-
-      if (droneChanged) {
-        sim->updateDroneSettings();
-      }
-    }
-    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-    if (ImGui::CollapsingHeader("Simulation Settings")) {
-      ImGui::SeparatorText("Simulation Settings");
-
-      // Change drone count
-      static int changed_count = new_count;
-      if (bool changed = ImGui::SliderInt("Drone Count", &new_count, 0, 100)) {
-        changed_count = new_count;
-        pause = true;
-        update_drone_count_ = true;
-      }
-
-      const auto mapNames = salsa::map::getMapNames();
-      static std::string current_map_name = mapNames[0];
-      if (ImGui::BeginCombo("Map", current_map_name.c_str())) {
-        for (auto &name : mapNames) {
-          bool isSelected = (current_map_name == name);
-          if (ImGui::Selectable(name.c_str(), isSelected)) {
-            // set current map in sim and reset
-            current_map_name = name;
-            sim->changeMap(name);
-            m_world = sim->getWorld();
-            g_camera.m_center = sim->getDroneSpawnPosition();
-            g_camera.m_zoom = 10.0f;
-          }
-          if (isSelected) {
-            ImGui::SetItemDefaultFocus();
-          }
-        }
-        ImGui::EndCombo();
-      }
-
-      auto new_map = salsa::map::getMap(current_map_name);
-    }
-    ImGui::End();
+    builder.render();
   }
+
   void Draw(b2World *world, DebugDraw *debugDraw,
             const std::vector<int>& foundTreeIDs) const {
     for (b2Body *body = world->GetBodyList(); body; body = body->GetNext()) {
