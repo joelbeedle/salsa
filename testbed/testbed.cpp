@@ -685,7 +685,10 @@ int run() {
       snprintf(buffer, sizeof(buffer), "%s : %s", entry.category, entry.name);
       s_test->DrawTitle(buffer);
     }
-
+    float gridSize = g_debugDraw.DrawStaticGrid(b2Color(0.5f, 0.5f, 0.5f));  // Light gray grid
+    snprintf(buffer, sizeof(buffer), "Grid size: %.1f m", gridSize);
+    // Draw the current grid size to screen
+    g_debugDraw.DrawString(5, g_camera.m_height - 40, buffer);
     s_test->Step(s_settings);
 
     if (start_menu) {
