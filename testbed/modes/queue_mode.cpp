@@ -192,7 +192,7 @@ class QueueSimulator final : public Test {
     // Run simulation steps here
     Test::Step(settings);
     pause = settings.m_pause;
-     constexpr std::vector<int> foundIds;
+    const std::vector<int> foundIds;
     for (int i = 0; i < settings.m_simulationSpeed; i++) {
       if (!pause) sim->update();
     }
