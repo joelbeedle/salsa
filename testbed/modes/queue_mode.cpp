@@ -91,14 +91,10 @@ class QueueSimulator final : public Test {
 
   bool SetNextTestFromQueue() {
     auto config = salsa::TestQueue::pop();
-    auto temp_sim = new salsa::Sim(config);
-    if (temp_sim == nullptr) {
-      return false;
-    }
+    const auto temp_sim = new salsa::Sim(config);
     const auto old_sim = sim;
     sim = temp_sim;
-    std::string current_log_file = old_sim->getCurrentLogFile();
-    if (!current_log_file.empty() && !skipped_test)
+    if (const std::string current_log_file = old_sim->getCurrentLogFile(); !current_log_file.empty() && !skipped_test)
       testbed::plot(current_log_file);
     delete old_sim;
     sim->setCurrentBehaviour(sim->current_behaviour_name());
