@@ -1,3 +1,14 @@
+## [1.1.1](https://github.com/joelbeedle/salsa/compare/v1.1.0...v1.1.1) (2024-09-18)
+
+
+### Bug Fixes
+
+* **pheromone avoidance:** change std::views::values ([eb4d6b4](https://github.com/joelbeedle/salsa/commit/eb4d6b4538f8b44283ed837ef86759d6b39e004a))
+* **queue mode:** fix constexpr issue ([5aa1586](https://github.com/joelbeedle/salsa/commit/5aa1586530df75f4245f484ab4906ed1bb3a23b6))
+* **sandbox mode:** fix bug in constexpr ([5268aa1](https://github.com/joelbeedle/salsa/commit/5268aa1cbc504463d5aaef45019551322b3dcffe))
+* **sandbox mode:** remove use of std::views for unordered_map chosen_params ([33a7974](https://github.com/joelbeedle/salsa/commit/33a7974641e55eff50c40f31d0282bc100437e1e))
+* **ui builder:** add import string ([8be5698](https://github.com/joelbeedle/salsa/commit/8be5698572dd5b915b54e61f935a116192c0df70))
+
 # [1.1.0](https://github.com/joelbeedle/salsa/compare/v1.0.1...v1.1.0) (2024-09-18)
 
 
