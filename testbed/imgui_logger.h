@@ -38,13 +38,18 @@ protected:
   void sink_it_(const spdlog::details::log_msg& msg) override {
     // Format the message using spdlog's formatter
     spdlog::memory_buf_t formatted;
-    auto duration_since_epoch = msg.time.time_since_epoch();
-    auto seconds_since_epoch = std::chrono::duration_cast<std::chrono::seconds>(duration_since_epoch);
+    const auto duration_since_epoch = msg.time.time_since_epoch();
+    const auto seconds_since_epoch = std::chrono::duration_cast<std::chrono::seconds>(duration_since_epoch);
     std::time_t log_time = seconds_since_epoch.count();
 
     // Convert to a human-readable format (e.g., "2024-09-18 13:22:34")
-    std::tm tm_buf;
-    localtime_r(&log_time, &tm_buf);  // Convert to local time
+    std::tm tm_buf{};
+    #if defined(_WIN32) || defined(_WIN64)
+      localtime_r(&log_time, &tm_buf);  // Convert to local time
+    #else
+      localtime_r(&log_time, &tm_buf);  // Convert to local time
+    #endif
+
 
     char time_buffer[64];
     std::strftime(time_buffer, sizeof(time_buffer), "%Y-%m-%d %H:%M:%S", &tm_buf);
