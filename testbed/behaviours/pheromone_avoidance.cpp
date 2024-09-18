@@ -44,8 +44,8 @@ class PheromoneBehaviour final : public Behaviour {
 
     b2Vec2 avoidanceSteering(0, 0);
     int32 count = 0;
-
-    for (auto& snd : pheromones | std::views::values) {
+    // const auto & [fst, snd] : chosen_params
+    for (auto& [fst, snd] : pheromones) {
       auto & [position, intensity] = snd;
 
       if (const float distance = b2Distance(currentDrone.position(), position); distance < currentDrone.obstacle_view_range() && distance > 0) {
