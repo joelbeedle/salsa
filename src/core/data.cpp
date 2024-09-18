@@ -35,7 +35,6 @@ void Logger::init_logger(const std::string& log_file) {
   logger_ = spdlog::basic_logger_mt<spdlog::async_factory>("async_logger",
                                                            log_path.string());
   logger_->set_pattern("%v");
-  spdlog::set_default_logger(logger_);
   spdlog::set_level(spdlog::level::info);
   spdlog::flush_every(std::chrono::seconds(3));
 }

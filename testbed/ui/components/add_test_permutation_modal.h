@@ -8,6 +8,7 @@
 
 
 #include "base_modal_component.h"
+#include "logger.h"
 #include "salsa/behaviours/registry.h"
 #include "salsa/core/test_queue.h"
 #include "salsa/entity/target_factory.h"
@@ -45,8 +46,7 @@ protected:
         // Behavior selection
       // Get behaviour name for test
       if (ImGui::BeginCombo("Behaviour", current_name.c_str())) {
-        const auto behaviourNames = salsa::behaviour::Registry::get().behaviour_names();
-        for (auto &name : behaviourNames) {
+        for (const auto behaviourNames = salsa::behaviour::Registry::get().behaviour_names(); auto &name : behaviourNames) {
           bool isSelected = (current_name == name);
           if (ImGui::Selectable(name.c_str(), isSelected)) {
             current_name = name;
@@ -196,136 +196,12 @@ protected:
     }
 
     // Override the default buttons with custom ones
-    void renderModalButtons() override {
-      if (ImGui::Button("Generate")) {
-        base.clear();
-        std::vector<std::vector<float>> lists;
-
-        // Parse parameters
-        for (size_t i = 0; i < parameter_names.size(); ++i) {
-          const auto &name = parameter_names[i];
-          if (selections[i] == 0) {  // Range
-            std::istringstream iss(input_storage[name]);
-            float min, max, step;
-            iss >> min >> max >> step;
-            lists.push_back(generateRange(min, max, step));
-          } else {  // List
-            lists.push_back(parseList(input_storage[name]));
-          }
-        }
-
-        // Generate permutations
-        std::vector<std::vector<float>> permutations;
-        generatePermutations(permutations, lists);
-
-        for (const auto &combination : permutations) {
-          std::ostringstream oss;
-          for (float value : combination) {
-            oss << value << " ";
-          }
-          std::cout << oss.str() << std::endl;
-        }
-        for (const auto &combination : permutations) {
-          std::unordered_map<std::string, salsa::behaviour::Parameter *>
-              new_params;
-          for (size_t j = 0; j < parameter_names.size(); ++j) {
-            const auto &name = parameter_names[j];
-            new_params[name] = chosen_params[name]->clone();
-            *(new_params[name]) = static_cast<float>(combination[j]);
-          }
-          salsa::TestConfig new_config = {
-              current_name,
-              salsa::Behaviour::convertParametersToFloat(new_params),
-              current_drone_config_name,
-              current_map_name,
-              new_drone_count,
-              new_target_count,
-              new_time_limit,
-              current_target_name,
-              current_listener_name};
-
-          base.push_back(new_config);
-          generated = true;
-        }
-      }
-
-      if (!generated) {
-        ImGui::BeginDisabled();
-      }
-
-      if (ImGui::Button("Save Permutations", ImVec2(200, 0))) {
-        ImGui::OpenPopup("Save Permutations");
-      }
-
-      if (!generated) {
-        if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip))
-          ImGui::SetTooltip("Generate Permutations First");
-      }
-
-      if (ImGui::Button("Add Permutations to Queue", ImVec2(200, 0))) {
-        for (const auto& config : base) {
-          salsa::TestQueue::push(config);
-        }
-        ImGui::CloseCurrentPopup();
-      }
-
-      if (!generated) {
-        ImGui::EndDisabled();
-        if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip))
-          ImGui::SetTooltip("Generate Permutations First");
-      }
-
-      if (ImGui::BeginPopup("Save Permutations")) {
-        static char filename[128] = "";
-        ImGui::InputText("Filename", filename, 128);
-        if (ImGui::Button("Save")) {
-          std::vector<salsa::TestConfig> old_tests;
-          for (const auto &config : salsa::TestQueue::getTests()) {
-            old_tests.push_back(config);
-          }
-          salsa::TestQueue::getTests().clear();
-          for (const auto &config : base) {
-            salsa::TestQueue::push(config);
-          }
-          salsa::TestQueue::save(filename);
-          salsa::TestQueue::getTests().clear();
-          for (const auto &config : old_tests) {
-            salsa::TestQueue::push(config);
-          }
-          ImGui::CloseCurrentPopup();
-        }
-
-        ImGui::SameLine();
-        if (ImGui::Button("Cancel", ImVec2(120, 0))) {
-          ImGui::CloseCurrentPopup();
-        }
-        ImGui::EndPopup();
-      }
-
-      ImGui::SameLine();
-      if (ImGui::Button("Cancel", ImVec2(120, 0))) {
-        ImGui::CloseCurrentPopup();
-      }
-
-    }
-
+    void renderModalButtons() override;
 
 private:
-    // Generate permutations logic
-  void generatePermutations(std::vector<std::vector<float>> &results,
-                            const std::vector<std::vector<float>> &lists,
-                            std::vector<float> current = {}, size_t depth = 0) {
-    if (depth == lists.size()) {
-      results.push_back(current);
-      return;
-    }
-
-    for (const auto &item : lists[depth]) {
-      current.push_back(item);
-      generatePermutations(results, lists, current, depth + 1);
-      current.pop_back();
-    }
-  }
+    static void generatePermutations(std::vector<std::vector<float>> &results,
+                                     const std::vector<std::vector<float>> &lists,
+                                     std::vector<float> current = {}, size_t depth = 0, size_t maxDepth = 1000);
 
   // Function to parse a list of values from a string
   static std::vector<float> parseList(const std::string &str) {
@@ -344,9 +220,21 @@ private:
 
   // Function to generate a list of values from a range
   static std::vector<float> generateRange(const float min, const float max, const float step) {
+      if (step == 0.0f) {
+        throw std::invalid_argument("Step size cannot be zero, which would cause an infinite loop.");
+      }
+
+      if (min > max && step > 0) {
+        throw std::invalid_argument("Step size must be negative for a decreasing range (min > max).");
+      }
+
+      if (min < max && step < 0) {
+        throw std::invalid_argument("Step size must be positive for an increasing range (min < max).");
+      }
+
     std::vector<float> range;
     for (float value = min; value <= max + step / 2; value += step) {
-      value = std::round(value * 1e6) / 1e6;  // Reduce precision issues
+      value = static_cast<float>(std::round(value * 1e6) / 1e6);
       if (value <= max) {
         range.push_back(value);
       }

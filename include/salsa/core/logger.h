@@ -8,8 +8,7 @@
 
 #include <memory>
 
-namespace salsa {
-namespace logger {
+namespace salsa::logger {
 
 // Declaration of logger accessor and setter
 std::shared_ptr<spdlog::logger>& get();
@@ -18,6 +17,5 @@ void set(std::shared_ptr<spdlog::logger> custom_logger);
 // Logging utility functions
 void log_info(const std::string& message);
 void log_error(const std::string& message);
-}  // namespace logger
-}  // namespace salsa
+}
 #endif  // LOGGER_H

@@ -8,6 +8,7 @@
 #include <vector>
 #include <string>
 
+#include "logger.h"
 #include "imgui.h"
 #include "ui_component.h"
 

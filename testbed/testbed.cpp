@@ -46,6 +46,7 @@
 #include <crtdbg.h>
 #endif
 #include "plot/plot.h"
+#include "logger.h"
 
 namespace testbed {
 
@@ -602,7 +603,7 @@ int run() {
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-  sprintf(buffer, "Box2D Testbed Version %d.%d.%d", b2_version.major,
+  snprintf(buffer, sizeof(buffer), "Box2D Testbed Version %d.%d.%d", b2_version.major,
           b2_version.minor, b2_version.revision);
 
   bool fullscreen = false;
@@ -611,10 +612,10 @@ int run() {
         glfwCreateWindow(1920, 1080, buffer, glfwGetPrimaryMonitor(), NULL);
   } else {
     g_mainWindow = glfwCreateWindow(g_camera.m_width, g_camera.m_height, buffer,
-                                    NULL, NULL);
+                                    nullptr, nullptr);
   }
 
-  if (g_mainWindow == NULL) {
+  if (g_mainWindow == nullptr) {
     fprintf(stderr, "Failed to open GLFW g_mainWindow.\n");
     glfwTerminate();
     return -1;
@@ -626,10 +627,9 @@ int run() {
 
   // Load OpenGL functions using glad
   int version = gladLoadGL(glfwGetProcAddress);
-  printf("GL %d.%d\n", GLAD_VERSION_MAJOR(version),
-         GLAD_VERSION_MINOR(version));
-  printf("OpenGL %s, GLSL %s\n", glGetString(GL_VERSION),
-         glGetString(GL_SHADING_LANGUAGE_VERSION));
+  LOG_INFO("GL {}.{}", GLAD_VERSION_MAJOR(version), GLAD_VERSION_MINOR(version));
+  LOG_INFO("OpenGL {}, GLSL {}", reinterpret_cast<const char*>(glGetString(GL_VERSION)),
+            reinterpret_cast<const char*>(glGetString(GL_SHADING_LANGUAGE_VERSION)));
 
   glfwSetWindowSizeCallback(g_mainWindow, ResizeWindowCallback);
   glfwSetKeyCallback(g_mainWindow, KeyCallback);
@@ -682,7 +682,7 @@ int run() {
       ImGui::End();
 
       const TestEntry &entry = g_testEntries[s_settings.m_testIndex];
-      sprintf(buffer, "%s : %s", entry.category, entry.name);
+      snprintf(buffer, sizeof(buffer), "%s : %s", entry.category, entry.name);
       s_test->DrawTitle(buffer);
     }
 
@@ -697,7 +697,7 @@ int run() {
     // ImGui::ShowDemoWindow();
 
     if (g_debugDraw.m_showUI) {
-      sprintf(buffer, "%.1f ms", 1000.0 * frameTime.count());
+      snprintf(buffer, sizeof(buffer), "%.1f ms", 1000.0 * frameTime.count());
       g_debugDraw.DrawString(5, g_camera.m_height - 20, buffer);
     }
 

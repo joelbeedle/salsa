@@ -243,10 +243,10 @@ class QueueSimulator final : public Test {
        .addComponent(std::make_unique<TestQueueComponent>(sim, pause, next_frame, skipped_test, add_new_test_, add_test_permutation_))   // Test queue
        .addComponent(std::make_unique<GraphPlottingSettingsComponent>())   // Graph plotting settings
        .addComponent(std::make_unique<DroneSettingsComponent>(sim));   // Drone settings
-
     // Render the UI
     builder.render();
-
+    if (testbed::imgui_logger_sink->is_open) testbed::imgui_logger_sink->render();
+    ImGui::End();
   }
 
   void Draw(b2World *world, DebugDraw *debugDraw,

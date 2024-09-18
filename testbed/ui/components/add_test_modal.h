@@ -39,14 +39,12 @@ public:
 protected:
   // Render the specific content for the "Add Test" modal
   void renderModalContent() override {
-      const auto behaviourNames = salsa::behaviour::Registry::get().behaviour_names();
-
-      if (ImGui::BeginCombo("Behaviour", current_name.c_str())) {
-        auto behaviourNames =
+    if (ImGui::BeginCombo("Behaviour", current_name.c_str())) {
+      const auto behaviourNames =
             salsa::behaviour::Registry::get().behaviour_names();
 
         for (auto &name : behaviourNames) {
-          bool isSelected = (current_name == name);
+          const bool isSelected = (current_name == name);
           if (ImGui::Selectable(name.c_str(), isSelected)) {
             current_name = name;
             to_change = true;
