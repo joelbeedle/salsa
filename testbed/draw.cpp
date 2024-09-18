@@ -821,7 +821,7 @@ struct GLRenderGrid {
     float unroundedGridSize = baseGridSize * pow(2.0f, ceil(log2(zoomLevel)));
 
     // Define the allowed grid sizes
-    const std::vector<float> allowedGridSizes = {1.0f, 10.0f, 100.0f, 500.0f, 1000.0f, 10000.0f};
+    const std::vector<float> allowedGridSizes = {1.0f, 10.0f, 100.0f, 500.0f, 1000.0f, 10000.0f, 50000.0f, 100000.0f};
 
     // Find the nearest grid size from the allowed sizes
     float nearestGridSize = allowedGridSizes[0];
