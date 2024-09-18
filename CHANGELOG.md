@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/joelbeedle/salsa/compare/v1.2.0...v1.3.0) (2024-09-18)
+
+
+### Features
+
+* **grid:** create grid ([0edce97](https://github.com/joelbeedle/salsa/commit/0edce97d97536071a5e82a0c6910fa3f61b86b39))
+
 # [1.2.0](https://github.com/joelbeedle/salsa/compare/v1.1.1...v1.2.0) (2024-09-18)
 
 
