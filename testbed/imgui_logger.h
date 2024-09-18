@@ -45,9 +45,9 @@ protected:
     // Convert to a human-readable format (e.g., "2024-09-18 13:22:34")
     std::tm tm_buf{};
     #if defined(_WIN32) || defined(_WIN64)
-      localtime_r(&log_time, &tm_buf);  // Convert to local time
+      localtime_s(&log_time, &tm_buf);
     #else
-      localtime_r(&log_time, &tm_buf);  // Convert to local time
+      localtime_r(&log_time, &tm_buf);
     #endif
 
 
