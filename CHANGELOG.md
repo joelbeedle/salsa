@@ -1,3 +1,17 @@
+# [1.2.0](https://github.com/joelbeedle/salsa/compare/v1.1.1...v1.2.0) (2024-09-18)
+
+
+### Bug Fixes
+
+* **imgui_logger:** add windows definition for localtime function ([a8dedbc](https://github.com/joelbeedle/salsa/commit/a8dedbce7572b694f98648511e8252e1260713eb))
+* **imgui_logger:** add windows definition for localtime function ([b6b249f](https://github.com/joelbeedle/salsa/commit/b6b249f9bfb90292fe7910f1721672000cbe3558))
+* **imgui_logger:** reorder parameters to localtime_s ([65c9d6b](https://github.com/joelbeedle/salsa/commit/65c9d6bbced49e4dd36aa935547e923d4dba20ec))
+
+
+### Features
+
+* improve logging and add log ui ([8cbb35f](https://github.com/joelbeedle/salsa/commit/8cbb35f1c3acf8a99d3dd6bad19793d0b7e80dd7))
+
 ## [1.1.1](https://github.com/joelbeedle/salsa/compare/v1.1.0...v1.1.1) (2024-09-18)
 
 
