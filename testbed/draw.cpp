@@ -806,6 +806,182 @@ struct GLRenderTargets {
   }
 };
 
+struct GLRenderGrid {
+    GLuint VAO, VBO, EBO;
+    GLuint m_programId;
+    GLint m_cameraPosUniform;
+    GLint m_zoomUniform;
+    std::vector<float> gridVertices;
+
+  float GetDynamicGridSize(float zoomLevel) {
+    // Calculate the base grid size based on zoom level
+    float baseGridSize = 10.0f;  // Base grid size
+
+    // Calculate the unrounded grid size
+    float unroundedGridSize = baseGridSize * pow(2.0f, ceil(log2(zoomLevel)));
+
+    // Define the allowed grid sizes
+    const std::vector<float> allowedGridSizes = {1.0f, 10.0f, 100.0f, 500.0f, 1000.0f, 10000.0f};
+
+    // Find the nearest grid size from the allowed sizes
+    float nearestGridSize = allowedGridSizes[0];
+    for (float gridSize : allowedGridSizes) {
+      if (fabs(unroundedGridSize - gridSize) < fabs(unroundedGridSize - nearestGridSize)) {
+        nearestGridSize = gridSize;
+      }
+    }
+
+    return nearestGridSize;
+  }
+
+  std::vector<float> GenerateGridVertices(float gridSize, float gridStartX, float gridStartY, float gridExtentX, float gridExtentY) {
+    std::vector<float> gridVertices;
+
+    // Generate vertical lines
+    for (float x = gridStartX; x <= gridExtentX; x += gridSize) {
+      gridVertices.push_back(x);
+      gridVertices.push_back(gridStartY);
+
+      gridVertices.push_back(x);
+      gridVertices.push_back(gridExtentY);
+    }
+
+    // Generate horizontal lines
+    for (float y = gridStartY; y <= gridExtentY; y += gridSize) {
+      gridVertices.push_back(gridStartX);
+      gridVertices.push_back(y);
+
+      gridVertices.push_back(gridExtentX);
+      gridVertices.push_back(y);
+    }
+
+    return gridVertices;
+  }
+
+  void UpdateGridBuffer(const std::vector<float>& gridVertices) {
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, gridVertices.size() * sizeof(float), gridVertices.data(), GL_STATIC_DRAW);
+
+    glBindVertexArray(0);
+  }
+
+
+
+
+    void Create() {
+        // Vertex shader for the grid
+        const char *vs = R"(
+#version 330 core
+layout(location = 0) in vec2 v_position;  // The grid vertex positions in world coordinates
+
+uniform mat4 projectionMatrix;  // The projection matrix for transforming the grid
+
+void main()
+{
+    // Transform the grid vertex positions using the projection matrix
+                gl_Position = projectionMatrix * vec4(v_position, 0.0, 1.0);
+								gl_Position.z = gl_Position.w * 0.75;
+}
+        )";
+
+        // Fragment shader for the grid
+        const char *fs = R"(
+#version 330 core
+out vec4 FragColor;
+
+      const vec3 gridColor = vec3(0.5, 0.5, 0.5);  // Light gray for grid lines
+
+void main()
+{
+    // Set the color for the grid lines
+    FragColor = vec4(gridColor, 0.8);
+}
+        )";
+
+        // Create shader program
+        m_programId = sCreateShaderProgram(vs, fs);
+
+        // Get uniform locations
+        glGenVertexArrays(1, &VAO);
+        glGenBuffers(1, &VBO);
+
+        glBindVertexArray(VAO);
+
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, gridVertices.size() * sizeof(float), gridVertices.data(), GL_STATIC_DRAW);
+
+        // Enable vertex attribute 0 for the vertex positions
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+
+        glBindVertexArray(0);
+  }
+
+    void Destroy() {
+        if (VAO) {
+            glDeleteVertexArrays(1, &VAO);
+            glDeleteBuffers(1, &VBO);
+            VAO = 0;
+        }
+
+        if (m_programId) {
+            glDeleteProgram(m_programId);
+            m_programId = 0;
+        }
+    }
+
+    float Render(float zoom, const b2Vec2& cameraPos) {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+
+    float halfWidthInWorld = (g_camera.m_width / 2.0f) * zoom;
+    float halfHeightInWorld = (g_camera.m_height / 2.0f) * zoom;
+
+    // Calculate the world coordinates of the screen corners
+    b2Vec2 bottomLeft = cameraPos - b2Vec2(halfWidthInWorld, halfHeightInWorld);
+    b2Vec2 topRight = cameraPos + b2Vec2(halfWidthInWorld, halfHeightInWorld);
+    // Calculate the dynamic grid size based on the zoom level
+    float gridSize = GetDynamicGridSize(zoom);
+    float gridStartX = floor(bottomLeft.x / gridSize) * gridSize;
+    float gridStartY = floor(bottomLeft.y / gridSize) * gridSize;
+    float gridExtentX = ceil(topRight.x / gridSize) * gridSize;
+    float gridExtentY = ceil(topRight.y / gridSize) * gridSize;
+
+    // Generate the grid vertices based on the new grid size
+    float gridExtent = 100.0f;  // Set the extent of the grid (can be larger or smaller)
+    std::vector<float> gridVertices = GenerateGridVertices(gridSize, gridStartX, gridStartY, gridExtentX, gridExtentY);
+
+    // Update the grid buffer with the new vertices
+    UpdateGridBuffer(gridVertices);
+
+    // Activate the grid shader
+    glUseProgram(m_programId);
+
+    // Set the projection matrix uniform
+    float proj[16] = {0.0f};
+    g_camera.BuildProjectionMatrix(proj, 0.1f);
+    glUniformMatrix4fv(glGetUniformLocation(m_programId, "projectionMatrix"), 1, GL_FALSE, proj);
+
+    // Set the grid color
+    glUniform3f(glGetUniformLocation(m_programId, "gridColor"), 0.2, 0.2, 0.2);
+
+    // Bind the grid VAO and draw the grid lines
+    glBindVertexArray(VAO);
+    glDrawArrays(GL_LINES, 0, gridVertices.size() / 2);
+    glBindVertexArray(0);
+
+    // Unbind the shader program
+    glUseProgram(0);
+    glDisable(GL_BLEND);
+
+    return gridSize;
+  }
+};
+
+
 //
 DebugDraw::DebugDraw() {
   m_showUI = true;
@@ -814,6 +990,7 @@ DebugDraw::DebugDraw() {
   m_triangles = NULL;
   m_targets = NULL;
   m_text = NULL;
+  m_grid = NULL;
 }
 
 //
@@ -834,6 +1011,8 @@ void DebugDraw::Create() {
   m_triangles->Create();
   m_targets = new GLRenderTargets;
   m_targets->Create();
+  m_grid = new GLRenderGrid;
+  m_grid->Create();
 }
 
 //
@@ -849,6 +1028,10 @@ void DebugDraw::Destroy() {
   m_triangles->Destroy();
   delete m_triangles;
   m_triangles = NULL;
+
+  m_grid->Destroy();
+  delete m_grid;
+  m_grid = NULL;
 
   delete m_text;
   m_text = NULL;
@@ -1064,5 +1247,11 @@ void DebugDraw::Flush() {
   m_triangles->Flush();
   m_lines->Flush();
   m_points->Flush();
+  m_grid->Render(g_camera.m_zoom, g_camera.m_center);
   // m_targets->Flush();
+}
+
+float DebugDraw::DrawStaticGrid(const b2Color& color) {
+  float gridSize = m_grid->Render(g_camera.m_zoom, g_camera.m_center);
+  return gridSize;
 }

@@ -37,6 +37,7 @@ struct GLRenderTriangles;
 struct GLRenderTargets;
 struct GLRenderText;
 struct GLFWwindow;
+struct GLRenderGrid;
 
 //
 struct Camera {
@@ -92,8 +93,10 @@ class DebugDraw : public b2Draw {
                    const std::vector<b2Color> &colors,
                    const std::vector<int> &changedIDs);
   void DrawAllTargets(const std::vector<b2Vec2> &positions,
-                      const std::vector<b2Color> &colors, const float radius);
+                      const std::vector<b2Color> &colors, float radius);
   void DrawText(int x, int y, const char *string);
+
+  float DrawStaticGrid(const b2Color &color);
 
   void Flush();
 
@@ -103,6 +106,7 @@ class DebugDraw : public b2Draw {
   GLRenderTriangles *m_triangles;
   GLRenderTargets *m_targets;
   GLRenderText *m_text;
+  GLRenderGrid *m_grid;
 };
 
 extern DebugDraw g_debugDraw;
