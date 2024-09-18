@@ -38,15 +38,14 @@ Sim::Sim(TestConfig &config)
       contact_listener_(
           BaseContactListener::getListenerByName(config.contact_listener_name)),
       test_config_(config) {
+  logger::get()->info("Sim Initialised");
   is_stack_test_ = true;
-
   // Load map
   map_ = salsa::map::load(map_name_.c_str());
   world_ = map_.world;
   border_width_ = map_.width;
   border_height_ = map_.height;
   drone_spawn_position_ = map_.drone_spawn_point;
-
   b2Vec2 gravity(0.0f, 0.0f);
   world_->SetGravity(gravity);
   current_behaviour_name_ = config.behaviour_name;

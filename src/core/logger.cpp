@@ -2,10 +2,12 @@
 
 #include "salsa/core/logger.h"
 
+#include <spdlog/sinks/basic_file_sink.h>
+
 using namespace salsa;
 // Initialize and manage the static logger
 std::shared_ptr<spdlog::logger>& logger::get() {
-  static std::shared_ptr<spdlog::logger> logger = spdlog::default_logger();
+  static std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("salsa");
   return logger;
 }
 

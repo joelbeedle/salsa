@@ -37,6 +37,9 @@ set (MY_TESTBED_SOURCE_FILES
 		ui/components/add_test_modal.cpp
 		ui/components/add_test_permutation_modal.cpp
 		ui/components/sandbox_settings_component.h
+		logger.h
+		logger.cpp
+		imgui_logger.h
 		# tests/drone_swarm_test.cpp
 	# tests/swarm_test.cpp
 )

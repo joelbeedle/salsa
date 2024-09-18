@@ -46,6 +46,7 @@
 #include <crtdbg.h>
 #endif
 #include "plot/plot.h"
+#include "logger.h"
 
 namespace testbed {
 
@@ -626,10 +627,9 @@ int run() {
 
   // Load OpenGL functions using glad
   int version = gladLoadGL(glfwGetProcAddress);
-  printf("GL %d.%d\n", GLAD_VERSION_MAJOR(version),
-         GLAD_VERSION_MINOR(version));
-  printf("OpenGL %s, GLSL %s\n", glGetString(GL_VERSION),
-         glGetString(GL_SHADING_LANGUAGE_VERSION));
+  LOG_INFO("GL {}.{}", GLAD_VERSION_MAJOR(version), GLAD_VERSION_MINOR(version));
+  LOG_INFO("OpenGL {}, GLSL {}", reinterpret_cast<const char*>(glGetString(GL_VERSION)),
+            reinterpret_cast<const char*>(glGetString(GL_SHADING_LANGUAGE_VERSION)));
 
   glfwSetWindowSizeCallback(g_mainWindow, ResizeWindowCallback);
   glfwSetKeyCallback(g_mainWindow, KeyCallback);

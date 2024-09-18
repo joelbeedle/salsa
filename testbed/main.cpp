@@ -5,9 +5,11 @@
 
 #include <CLI/CLI.hpp>
 
+#include "logger.h"
 #include "plot/plot.h"
 #include "testbed.h"
 #include "user.h"
+
 int main(int argc, char** argv) {
   CLI::App app{"Testbed for salsa simulation"};
 
@@ -24,9 +26,11 @@ int main(int argc, char** argv) {
       ->needs("--headless");
   CLI11_PARSE(app, argc, argv);
 
-  auto testbed_console = spdlog::stdout_color_mt("testbed_console");
+  const auto testbed_console = spdlog::stdout_color_mt("testbed_console");
   testbed_console->set_level(spdlog::level::info);
-  // spdlog::register_logger(testbed_console);
+
+  testbed::setupLogger();
+
   salsa::map::loadAll();
   testbed::init_python();
   if (headless) {
@@ -34,11 +38,12 @@ int main(int argc, char** argv) {
     testbed::user();
 
     if (queue_path != "none") {
-      std::cout << "Loading queue from " << queue_path << std::endl;
+      LOG_INFO("Loading queue from {}", queue_path);
       if (salsa::TestQueue::load(queue_path)) {
-        std::cout << "Queue loaded successfully" << std::endl;
+        LOG_INFO("Queue loaded");
       } else {
-        std::cout << "Failed to load queue" << std::endl;
+        LOG_ERROR("Failed to load queue from {}", queue_path);
+        testbed::logger->error("Failed to load queue from {}", queue_path);
         return 1;
       }
     }
