@@ -36,7 +36,7 @@ std::unordered_map<std::string, float> Behaviour::getParameterValues() {
 }
 
 std::unordered_map<std::string, float> Behaviour::convertParametersToFloat(
-    std::unordered_map<std::string, behaviour::Parameter *> parameters) {
+    const std::unordered_map<std::string, behaviour::Parameter *>& parameters) {
   std::unordered_map<std::string, float> values;
   for (const auto &[name, param] : parameters) {
     values[name] = param->value();
@@ -51,23 +51,21 @@ std::unordered_map<std::string, float> Behaviour::convertParametersToFloat(
 
 // namespace behaviours {
 void Behaviour::clampMagnitude(b2Vec2 &vector, const float maxMagnitude) {
-  float lengthSquared = vector.LengthSquared();
-  if (lengthSquared > maxMagnitude * maxMagnitude && lengthSquared > 0) {
+  if (float lengthSquared = vector.LengthSquared(); lengthSquared > maxMagnitude * maxMagnitude && lengthSquared > 0) {
     vector.Normalize();
     vector *= maxMagnitude;
   }
 }
 
-b2Vec2 Behaviour::avoidDrones(std::vector<b2Body *> &neighbours,
-                              Drone &currentDrone) {
+b2Vec2 Behaviour::avoidDrones(const std::vector<b2Body *> &neighbours,
+                              const Drone &currentDrone) {
   b2Vec2 steering(0, 0);
   int32 count = 0;
-  b2Body *currentBody = currentDrone.body();
+  const b2Body *currentBody = currentDrone.body();
 
   for (auto &drone : neighbours) {
     if (drone != currentBody) {
-      float d = b2Distance(currentDrone.position(), drone->GetPosition());
-      if (d < currentDrone.camera_view_range() && d > 0) {
+      if (const float d = b2Distance(currentDrone.position(), drone->GetPosition()); d < currentDrone.camera_view_range() && d > 0) {
         b2Vec2 diff = currentDrone.position() - drone->GetPosition();
         diff.Normalize();
         diff.x /= d;
@@ -91,14 +89,13 @@ b2Vec2 Behaviour::avoidDrones(std::vector<b2Body *> &neighbours,
   return steering;
 }
 
-b2Vec2 Behaviour::avoidObstacles(std::vector<b2Vec2> &obstaclePoints,
-                                 Drone &currentDrone) {
+b2Vec2 Behaviour::avoidObstacles(const std::vector<b2Vec2> &obstaclePoints,
+                                 const Drone &currentDrone) {
   b2Vec2 steering(0, 0);
   int32 count = 0;
 
   for (auto &point : obstaclePoints) {
-    float distance = b2Distance(currentDrone.position(), point);
-    if (distance < currentDrone.obstacle_view_range() && distance > 0) {
+    if (float distance = b2Distance(currentDrone.position(), point); distance < currentDrone.obstacle_view_range() && distance > 0) {
       b2Vec2 diff = currentDrone.position() - point;
       // Make sure it's weighted by the inverse distance
       diff.Normalize();
@@ -122,10 +119,10 @@ b2Vec2 Behaviour::avoidObstacles(std::vector<b2Vec2> &obstaclePoints,
   return steering;
 }
 
-void Behaviour::performRayCasting(Drone &currentDrone,
+void Behaviour::performRayCasting(const Drone &currentDrone,
                                   RayCastCallback &callback) {
-  float rayRange = currentDrone.obstacle_view_range();
-  float deltaAngle = 45.0f;
+  const float rayRange = currentDrone.obstacle_view_range();
+   constexpr float deltaAngle = 45.0f;
 
   for (float angle = 0; angle < 360; angle += deltaAngle) {
     b2Vec2 start = currentDrone.position();
@@ -136,8 +133,8 @@ void Behaviour::performRayCasting(Drone &currentDrone,
   }
 }
 
-b2Vec2 Behaviour::steerTo(b2Vec2 target, Drone &currentDrone) {
-  b2Vec2 position = currentDrone.position();
+b2Vec2 Behaviour::steerTo(const b2Vec2 target, const Drone &currentDrone) {
+  const b2Vec2 position = currentDrone.position();
   b2Vec2 desired = target - position;
   float d = desired.Length();
   b2Vec2 steer(0.0f, 0.0f);

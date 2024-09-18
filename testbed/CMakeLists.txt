@@ -23,7 +23,21 @@ set (MY_TESTBED_SOURCE_FILES
 	behaviours/uniform_random_walk.cpp
 	behaviours/dsp.cpp
 	main.cpp
-	# tests/drone_swarm_test.cpp
+		ui/ui_component.h
+		ui/ui_builder.h
+		ui/ui_builder.cpp
+		ui/components/base_modal_component.h
+		ui/components/add_test_modal.h
+		ui/components/add_test_permutation_modal.h
+		ui/components/behaviour_settings_component.h
+		ui/components/visual_settings_component.h
+		ui/components/test_queue_component.h
+		ui/components/graph_plotting_settings_compoment.h
+		ui/components/drone_configuration_component.h
+		ui/components/add_test_modal.cpp
+		ui/components/add_test_permutation_modal.cpp
+		ui/components/sandbox_settings_component.h
+		# tests/drone_swarm_test.cpp
 	# tests/swarm_test.cpp
 )
 

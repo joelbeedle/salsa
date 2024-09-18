@@ -38,7 +38,7 @@ class Sim {
   map::Map map_;    ///< The map of the simulation environment
   b2World* world_;  ///< The Box2D world for the simulation
   salsa::BaseContactListener*
-      contact_listener_;  ///< The contact listener for the simulation
+      contact_listener_{};  ///< The contact listener for the simulation
 
   /// @name Simulation properties
   /// These properties originate from the test configuration and are used to
@@ -49,7 +49,7 @@ class Sim {
   std::string map_name_;
   float border_height_;
   float border_width_;
-  b2Vec2 drone_spawn_position_;
+  b2Vec2 drone_spawn_position_{};
   float time_limit_ = -1.0f;
   float current_time_ = 0.0f;
   bool is_stack_test_ = false;
@@ -70,8 +70,8 @@ class Sim {
   /// The list of drones in the simulation.
   std::vector<std::unique_ptr<salsa::Drone>> drones_;
   int num_drones_;   ///< The number of drones in the simulation
-  float max_speed_;  ///< The maximum speed of the drones
-  float max_force_;  ///< The maximum force of the drones
+  float max_speed_{};  ///< The maximum speed of the drones
+  float max_force_{};  ///< The maximum force of the drones
   ///@}
 
   /// @name Target properties
@@ -89,12 +89,12 @@ class Sim {
 
   // Obstacles in the environment
   std::vector<b2Body*> obstacles_;
-  float obstacle_view_range_;
+  float obstacle_view_range_{};
 
   // Behaviour management
-  salsa::Behaviour* behaviour_;
+  salsa::Behaviour* behaviour_{};
   std::string current_behaviour_name_;
-  float camera_view_range_;
+  float camera_view_range_{};
 
   // Visualization flags
   bool draw_visual_range_ = false;
@@ -108,11 +108,11 @@ class Sim {
   int log_interval_ = 50;  // time steps between logs
   // Private methods for internal use
   void createBounds();
-  void applyCurrentBehaviour();
+  void applyCurrentBehaviour()const;
   void createDronesCircular(Behaviour& behaviour,
-                            DroneConfiguration& configuration);
+                            const DroneConfiguration& configuration);
   void createDronesRandom(Behaviour& behaviour,
-                          DroneConfiguration& configuration);
+                          const DroneConfiguration& configuration);
 
  public:
   // Constructors and Destructor
@@ -144,7 +144,7 @@ class Sim {
   /// Functions dedicated to Behaviour management
   ///@{
   /// @brief Adds a behaviour to the simulation.
-  void addBehaviour(const std::string& name,
+  static void addBehaviour(const std::string& name,
                     std::unique_ptr<salsa::Behaviour> behaviour);
 
   /// @brief Sets the current behaviour of the simulation.
@@ -172,7 +172,7 @@ class Sim {
                     SpawnType mode);
 
   void setDroneCount(int count);
-  int getDroneCount();
+  int getDroneCount()const;
   int& num_drones();
   const int& num_drones() const;
   void setDroneConfiguration(DroneConfiguration* configuration);
@@ -181,7 +181,7 @@ class Sim {
   /// Iterates through each drone in the simulation and updates their max force,
   /// max speed, view range, obstacle range, drone detection range, and sensor
   /// range, to be consistent with the current simulation drone configuration.
-  void updateDroneSettings();
+  void updateDroneSettings()const;
   std::vector<std::unique_ptr<salsa::Drone>>& getDrones();
 
   /// @brief Sets the vector of drones to the simulation.
@@ -250,13 +250,13 @@ class Sim {
   const float& current_time() const;
   float& time_limit();
   std::string& getCurrentLogFile();
-  b2World* getWorld();
+  b2World* getWorld()const;
   void setWorld(b2World* world);
   map::Map getMap();
   salsa::TestConfig& test_config();
   std::string& current_behaviour_name();
   const std::string& current_behaviour_name() const;
-  DroneConfiguration* getDroneConfiguration();
+  DroneConfiguration* getDroneConfiguration()const;
   const DroneConfiguration* drone_configuration() const;
   void setCurrentDroneConfiguration(DroneConfiguration& configuration);
   void changeMap(std::string name);

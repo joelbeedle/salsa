@@ -51,7 +51,7 @@ class TestQueue {
  public:
   /// Adds a test configuration to the back of the test queue.
   /// @param test The test configuration to add.
-  static void push(TestConfig test);
+  static void push(const TestConfig& test);
 
   /// Adds multiple permuted test configurations based on a base configuration.
   /// @param base The base test configuration.
@@ -91,7 +91,7 @@ class TestQueue {
 /// @param filename The name of the file to load from.
 void loadPermutations(std::vector<std::vector<float>>& permutations,
                       std::vector<std::string>& parameter_names,
-                      std::string filename);
+                      const std::string& filename);
 
 }  // namespace salsa
 

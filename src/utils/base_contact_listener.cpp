@@ -1,6 +1,7 @@
 #include "salsa/utils/base_contact_listener.h"
 
 #include <string>
+#include <utility>
 
 #include "box2d/b2_body.h"
 #include "salsa/core/logger.h"
@@ -10,7 +11,7 @@
 namespace salsa {
 std::vector<BaseContactListener *> BaseContactListener::registry_;
 
-BaseContactListener::BaseContactListener(std::string name) : name_(name) {
+BaseContactListener::BaseContactListener(std::string name) : name_(std::move(name)) {
   registry_.push_back(this);
 }
 
@@ -22,7 +23,7 @@ BaseContactListener::~BaseContactListener() {
 
 void BaseContactListener::addCollisionHandler(
     std::string type1, std::string type2,
-    std::function<void(b2Fixture *, b2Fixture *)> handler) {
+    const std::function<void(b2Fixture *, b2Fixture *)>& handler) {
   logger::get()->info("Adding collision handler for types: {} and {}", type1,
                       type2);
   collision_handlers_[{type1, type2}] = handler;
@@ -45,9 +46,9 @@ void BaseContactListener::BeginContact(b2Contact *contact) {
   b2Fixture *fixtureB = contact->GetFixtureB();
 
   // Only consider interactions between two dynamic bodies
-  UserData *userDataA =
+  auto *userDataA =
       reinterpret_cast<UserData *>(fixtureA->GetUserData().pointer);
-  UserData *userDataB =
+  auto *userDataB =
       reinterpret_cast<UserData *>(fixtureB->GetUserData().pointer);
 
   if (!userDataA || !userDataB) {
@@ -57,7 +58,7 @@ void BaseContactListener::BeginContact(b2Contact *contact) {
     logger::get()->error("One of the UserData objects is null.");
     return;
   }
-  auto handlerIt =
+  const auto handlerIt =
       collision_handlers_.find({demangle(typeid(*(userDataA->object)).name()),
                                 demangle(typeid(*(userDataB->object)).name())});
 
@@ -73,7 +74,8 @@ void BaseContactListener::BeginContact(b2Contact *contact) {
 
 std::vector<std::string> BaseContactListener::getListenerNames() {
   std::vector<std::string> names;
-  for (const auto *listener : registry_) {
+  names.reserve(registry_.size());
+for (const auto *listener : registry_) {
     names.push_back(listener->name());
   }
   return names;

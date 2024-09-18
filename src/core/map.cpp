@@ -46,7 +46,7 @@ Map map::load(const char *new_map_name) {
                                     (std::string(new_map_name) + ".json");
   salsa::logger::get()->info("Loading map from: {}", file_path.string());
 
-  b2World *world = new b2World(b2Vec2(0.0f, 0.0f));
+  auto *world = new b2World(b2Vec2(0.0f, 0.0f));
   Map new_map;
   std::ifstream file(file_path);
   if (!file.is_open()) {
@@ -63,7 +63,7 @@ Map map::load(const char *new_map_name) {
 
   for (auto &body_json : map["bodies"]) {
     b2BodyDef body_def;
-    body_def.type = (b2BodyType)body_json["type"];
+    body_def.type = static_cast<b2BodyType>(body_json["type"]);
     body_def.position.Set(body_json["position"][0], body_json["position"][1]);
     body_def.angle = body_json["angle"];
     body_def.linearDamping = body_json["linear_damping"];
@@ -91,7 +91,7 @@ Map map::load(const char *new_map_name) {
           vertices.emplace_back(vertex[0], vertex[1]);
         }
         shape.Set(&vertices[0],
-                  (int32)vertices.size());  // Properly set the vertices
+                  static_cast<int32>(vertices.size()));  // Properly set the vertices
         fixture_def.shape = &shape;
       } else if (fixture_json.find("circle") != fixture_json.end()) {
         b2CircleShape shape;
@@ -116,14 +116,14 @@ Map map::load(const char *new_map_name) {
 }
 
 void setNames() {
-  for (auto &map : registry) {
-    map.name = "Map";
+  for (auto & [name, width, height, drone_spawn_point, world] : registry) {
+    name = "Map";
   }
 }
 
 void map::loadAll() {
-  fs::path exec_path = getExecutablePath();
-  fs::path directory = exec_path / ".." / ".." / "testbed" / "maps";
+  const fs::path exec_path = getExecutablePath();
+  const fs::path directory = exec_path / ".." / ".." / "testbed" / "maps";
   if (!fs::exists(directory)) {
     throw std::runtime_error("Directory does not exist: " + directory.string());
   }
@@ -143,8 +143,8 @@ void map::loadAll() {
 
 std::vector<std::string> map::getMapNames() {
   std::vector<std::string> names;
-  fs::path exec_path = getExecutablePath();
-  fs::path directory = exec_path / ".." / ".." / "testbed" / "maps";
+  const fs::path exec_path = getExecutablePath();
+  const fs::path directory = exec_path / ".." / ".." / "testbed" / "maps";
   if (!fs::exists(directory)) {
     throw std::runtime_error("Directory does not exist: " + directory.string());
   }
@@ -201,7 +201,7 @@ void map::save(Map new_map) {
 
       b2Shape *shape = fixture->GetShape();
       if (shape->GetType() == b2Shape::e_polygon) {
-        b2PolygonShape *polygon = (b2PolygonShape *)shape;
+        auto *polygon = dynamic_cast<b2PolygonShape *>(shape);
         nlohmann::json polygon_json;
         for (int i = 0; i < polygon->m_count; ++i) {
           polygon_json.push_back(
@@ -209,13 +209,13 @@ void map::save(Map new_map) {
         }
         fixture_json["polygon"] = polygon_json;
       } else if (shape->GetType() == b2Shape::e_circle) {
-        b2CircleShape *circle = (b2CircleShape *)shape;
+        auto *circle = dynamic_cast<b2CircleShape *>(shape);
         nlohmann::json circle_json;
         circle_json["center"] = {circle->m_p.x, circle->m_p.y};
         circle_json["radius"] = circle->m_radius;
         fixture_json["circle"] = circle_json;
       } else if (shape->GetType() == b2Shape::e_edge) {
-        b2EdgeShape *edge = (b2EdgeShape *)shape;
+        auto *edge = dynamic_cast<b2EdgeShape *>(shape);
         nlohmann::json edge_json;
         edge_json["start"] = {edge->m_vertex1.x, edge->m_vertex1.y};
         edge_json["end"] = {edge->m_vertex2.x, edge->m_vertex2.y};

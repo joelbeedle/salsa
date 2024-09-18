@@ -1,3 +1,5 @@
+#include <utility>
+
 #include "salsa/core/logger.h"
 
 using namespace salsa;
@@ -8,7 +10,7 @@ std::shared_ptr<spdlog::logger>& logger::get() {
 }
 
 void logger::set(std::shared_ptr<spdlog::logger> custom_logger) {
-  logger::get() = custom_logger;
+  logger::get() = std::move(custom_logger);
 }
 
 void logger::log_info(const std::string& message) {

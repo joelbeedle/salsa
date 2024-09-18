@@ -26,7 +26,7 @@ class Drone : public Entity {
  private:
   std::vector<Target *>
       targets_found_;       ///< List of targets detected by the drone
-  b2Fixture *view_sensor_;  ///< Sensor fixture for target detection
+  b2Fixture *view_sensor_{};  ///< Sensor fixture for target detection
   Behaviour *behaviour_;    ///< Current behavior governing the drone's actions
 
   /// @name Phsyical and Sensor attributes

@@ -47,7 +47,7 @@ class Behaviour {
   std::unordered_map<std::string, float> getParameterValues();
 
   static std::unordered_map<std::string, float> convertParametersToFloat(
-      std::unordered_map<std::string, behaviour::Parameter *> parameters);
+      const std::unordered_map<std::string, behaviour::Parameter*> &parameters);
 
   static std::unordered_map<std::string, float> convertParametersToFloat(
       std::unordered_map<std::string, float> parameters);
@@ -69,35 +69,35 @@ class Behaviour {
   ///
   /// @param vector The vector to clamp.
   /// @param maxMagnitude The maximum magnitude allowed for the vector.
-  void clampMagnitude(b2Vec2 &vector, const float maxMagnitude);
+  static void clampMagnitude(b2Vec2 &vector, const float maxMagnitude);
 
   /// @brief Calculates a vector to avoid drones in the vicinity.
   ///
   /// @param neighbours List of neighboring drone bodies.
   /// @param currentDrone Reference to the current drone.
   /// @return A vector indicating the direction to steer to avoid the drones.
-  b2Vec2 avoidDrones(std::vector<b2Body *> &neighbours, Drone &currentDrone);
+  static b2Vec2 avoidDrones(const std::vector<b2Body *> &neighbours, const Drone &currentDrone);
 
   /// @brief Calculates a vector to avoid nearby obstacles.
   ///
   /// @param obstaclePoints List of points representing obstacles.
   /// @param currentDrone Reference to the current drone.
   /// @return A vector indicating the direction to steer to avoid the obstacles.
-  b2Vec2 avoidObstacles(std::vector<b2Vec2> &obstaclePoints,
-                        Drone &currentDrone);
+  static b2Vec2 avoidObstacles(const std::vector<b2Vec2> &obstaclePoints,
+                        const Drone &currentDrone);
 
   /// @brief Calculates a steering direction towards a specified target.
   ///
   /// @param target The target point to steer towards.
   /// @param currentDrone Reference to the current drone.
   /// @return A vector indicating the steering direction towards the target.
-  b2Vec2 steerTo(b2Vec2 target, Drone &currentDrone);
+  static b2Vec2 steerTo(b2Vec2 target, const Drone &currentDrone);
 
   /// @brief Executes ray casting to detect obstacles or other elements.
   ///
   /// @param currentDrone Reference to the current drone.
   /// @param callback Raycast callback to handle detection results.
-  void performRayCasting(Drone &currentDrone, RayCastCallback &callback);
+  static void performRayCasting(const Drone &currentDrone, RayCastCallback &callback);
 };
 
 // }  // namespace behaviours
