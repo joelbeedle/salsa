@@ -69,7 +69,7 @@ protected:
         parameter_names.clear();
         selections.clear();
         range_storage.clear();
-        for (const auto& key : chosen_params | std::views::keys) {
+        for (const auto& [key, value] : chosen_params) {
           parameter_names.push_back(key);
           input_storage[key] =
               std::string(128, '\0');  // Initialize with null characters
