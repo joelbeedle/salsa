@@ -1,7 +1,9 @@
 #ifndef TESTBED_PLOT_H
 #define TESTBED_PLOT_H
 
+#ifndef __EMSCRIPTEN__
 #include <Python.h>
+#endif
 #include <salsa/core/map.h>
 
 #include <filesystem>

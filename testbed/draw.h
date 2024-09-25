@@ -24,11 +24,19 @@
 #define DRAW_H
 
 #define GLFW_INCLUDE_NONE
-#include <vector>
 
+#include <vector>
+#ifdef __EMSCRIPTEN__
+// Emscripten will automatically handle WebGL, no need for GLAD/GLFW includes
+#include <GLES3/gl3.h>   // OpenGL ES 3.0 header
+#include <emscripten.h>  // Optional: Emscripten specific APIs
+#else
+// Include GLFW and GLAD for desktop OpenGL
 #include "GLFW/glfw3.h"
-#include "box2d/box2d.h"
 #include "glad/gl.h"
+#endif
+
+#include "box2d/box2d.h"
 
 struct b2AABB;
 struct GLRenderPoints;

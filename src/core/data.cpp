@@ -27,8 +27,18 @@ Logger& Logger::getInstance() {
 }
 
 void Logger::init_logger(const std::string& log_file) {
-  const std::filesystem::path log_path = salsa::map::getExecutablePath() / ".." /
-                                   ".." / "testbed" / "results" / log_file;
+#ifdef __EMSCRIPTEN__
+  std::cout << "EMSCRIPTEN environment detected" << std::endl;
+
+  spdlog::drop("async_logger");
+  logger_ = spdlog::stdout_color_mt("async_logger");
+  logger_->set_pattern("%v");  // Set the logging format
+#else
+  std::cout << "Desktop environment detected" << std::endl;
+
+  const std::filesystem::path log_path = salsa::map::getExecutablePath() /
+                                         ".." / ".." / "testbed" / "results" /
+                                         log_file;
   spdlog::drop("async_logger");
   spdlog::init_thread_pool(8192,
                            1);  // Queue with 8192 slots and 1 background thread
@@ -37,6 +47,8 @@ void Logger::init_logger(const std::string& log_file) {
   logger_->set_pattern("%v");
   spdlog::set_level(spdlog::level::info);
   spdlog::flush_every(std::chrono::seconds(3));
+
+#endif
 }
 
 void Logger::switch_log_file(const std::string& new_log_file) {

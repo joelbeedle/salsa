@@ -125,11 +125,14 @@ void Camera::BuildProjectionMatrix(float *m, float zBias) {
 
 //
 static void sCheckGLError() {
+#ifdef __EMSCRIPTEN__
+// Emscripten will automatically map OpenGL ES functions to WebGL
+#else
   GLenum errCode = glGetError();
   if (errCode != GL_NO_ERROR) {
     fprintf(stderr, "OpenGL error = %d\n", errCode);
-    assert(false);
   }
+#endif
 }
 
 // Prints shader compilation errors
@@ -151,22 +154,31 @@ static void sPrintLog(GLuint object) {
   else if (glIsProgram(object))
     glGetProgramInfoLog(object, log_length, NULL, log);
 
-  fprintf(stderr, "%s", log);
+  fprintf(stderr, "Shader log: %s", log);
   free(log);
 }
 
 //
 static GLuint sCreateShaderFromString(const char *source, GLenum type) {
+  // Create the shader object
   GLuint res = glCreateShader(type);
+
+  // Set the source and compile the shader
   const char *sources[] = {source};
   glShaderSource(res, 1, sources, NULL);
   glCompileShader(res);
+
+  // Check for compilation errors
   GLint compile_ok = GL_FALSE;
   glGetShaderiv(res, GL_COMPILE_STATUS, &compile_ok);
   if (compile_ok == GL_FALSE) {
-    fprintf(stderr, "Error compiling shader of type %d!\n", type);
-    sPrintLog(res);
-    glDeleteShader(res);
+    // Print the shader type (vertex or fragment) and the source code
+    const char *shaderType = (type == GL_VERTEX_SHADER) ? "vertex" : "fragment";
+    fprintf(stderr, "Error compiling %s shader of type %d!\n", shaderType,
+            type);
+    fprintf(stderr, "Shader source:\n%s\n", source);  // Print the shader source
+    sPrintLog(res);       // Print the shader compilation log
+    glDeleteShader(res);  // Delete the shader object on failure
     return 0;
   }
 
@@ -182,7 +194,11 @@ static GLuint sCreateShaderProgram(const char *vs, const char *fs) {
   GLuint programId = glCreateProgram();
   glAttachShader(programId, vsId);
   glAttachShader(programId, fsId);
+#ifdef __EMSCRIPTEN__
+// WebGL doesn't support glBindFragDataLocation
+#else
   glBindFragDataLocation(programId, 0, "color");
+#endif
   glLinkProgram(programId);
 
   glDeleteShader(vsId);
@@ -199,7 +215,7 @@ static GLuint sCreateShaderProgram(const char *vs, const char *fs) {
 struct GLRenderPoints {
   void Create() {
     const char *vs =
-        "#version 330\n"
+        "#version 300 es\n"
         "uniform mat4 projectionMatrix;\n"
         "layout(location = 0) in vec2 v_position;\n"
         "layout(location = 1) in vec4 v_color;\n"
@@ -214,7 +230,8 @@ struct GLRenderPoints {
         "}\n";
 
     const char *fs =
-        "#version 330\n"
+        "#version 300 es\n"
+        "precision highp float;\n"
         "in vec4 f_color;\n"
         "out vec4 color;\n"
         "void main(void)\n"
@@ -305,10 +322,15 @@ struct GLRenderPoints {
 
     glBindBuffer(GL_ARRAY_BUFFER, m_vboIds[2]);
     glBufferSubData(GL_ARRAY_BUFFER, 0, m_count * sizeof(float), m_sizes);
-
+#ifdef __EMSCRIPTEN__
+    // WebGL automatically handles point size in shaders; no need to enable
+    glDrawArrays(GL_POINTS, 0, m_count);
+#else
     glEnable(GL_PROGRAM_POINT_SIZE);
     glDrawArrays(GL_POINTS, 0, m_count);
+
     glDisable(GL_PROGRAM_POINT_SIZE);
+#endif
 
     // sCheckGLError();
 
@@ -339,7 +361,7 @@ struct GLRenderPoints {
 struct GLRenderLines {
   void Create() {
     const char *vs =
-        "#version 330\n"
+        "#version 300 es\n"
         "uniform mat4 projectionMatrix;\n"
         "layout(location = 0) in vec2 v_position;\n"
         "layout(location = 1) in vec4 v_color;\n"
@@ -352,7 +374,8 @@ struct GLRenderLines {
         "}\n";
 
     const char *fs =
-        "#version 330\n"
+        "#version 300 es\n"
+        "precision highp float;\n"
         "in vec4 f_color;\n"
         "out vec4 color;\n"
         "void main(void)\n"
@@ -462,7 +485,7 @@ struct GLRenderLines {
 struct GLRenderTriangles {
   void Create() {
     const char *vs =
-        "#version 330\n"
+        "#version 300 es\n"
         "uniform mat4 projectionMatrix;\n"
         "layout(location = 0) in vec2 v_position;\n"
         "layout(location = 1) in vec4 v_color;\n"
@@ -475,7 +498,8 @@ struct GLRenderTriangles {
         "}\n";
 
     const char *fs =
-        "#version 330\n"
+        "#version 300 es\n"
+        "precision highp float;\n"
         "in vec4 f_color;\n"
         "out vec4 color;\n"
         "void main(void)\n"
@@ -604,8 +628,7 @@ struct GLRenderTargets {
   GLint m_instanceColorAttribute;
 
   void Create() {
-    const char *vs = R"(
-            #version 330 core
+    const char *vs = R"(#version 300 es
             uniform mat4 projectionMatrix;
             layout(location = 0) in vec2 v_position; // Base circle vertex position
             layout(location = 1) in vec2 instancePosition; // Center position of each tree
@@ -621,8 +644,8 @@ struct GLRenderTargets {
             }
         )";
 
-    const char *fs = R"(
-            #version 330 core
+    const char *fs = R"(#version 300 es
+            precision highp float;
             in vec4 f_color;
             out vec4 color;
 
@@ -677,8 +700,7 @@ struct GLRenderTargets {
   }
 
   void Update(float new_radius) {
-    const char *vs = R"(
-            #version 330 core
+    const char *vs = R"(#version 300 es
             uniform mat4 projectionMatrix;
             layout(location = 0) in vec2 v_position; // Base circle vertex position
             layout(location = 1) in vec2 instancePosition; // Center position of each tree
@@ -694,8 +716,8 @@ struct GLRenderTargets {
             }
         )";
 
-    const char *fs = R"(
-            #version 330 core
+    const char *fs = R"(#version 300 es
+            precision highp float;
             in vec4 f_color;
             out vec4 color;
 
@@ -807,11 +829,11 @@ struct GLRenderTargets {
 };
 
 struct GLRenderGrid {
-    GLuint VAO, VBO, EBO;
-    GLuint m_programId;
-    GLint m_cameraPosUniform;
-    GLint m_zoomUniform;
-    std::vector<float> gridVertices;
+  GLuint VAO, VBO, EBO;
+  GLuint m_programId;
+  GLint m_cameraPosUniform;
+  GLint m_zoomUniform;
+  std::vector<float> gridVertices;
 
   float GetDynamicGridSize(float zoomLevel) {
     // Calculate the base grid size based on zoom level
@@ -821,12 +843,14 @@ struct GLRenderGrid {
     float unroundedGridSize = baseGridSize * pow(2.0f, ceil(log2(zoomLevel)));
 
     // Define the allowed grid sizes
-    const std::vector<float> allowedGridSizes = {1.0f, 10.0f, 100.0f, 500.0f, 1000.0f, 10000.0f, 50000.0f, 100000.0f};
+    const std::vector<float> allowedGridSizes = {
+        1.0f, 10.0f, 100.0f, 500.0f, 1000.0f, 10000.0f, 50000.0f, 100000.0f};
 
     // Find the nearest grid size from the allowed sizes
     float nearestGridSize = allowedGridSizes[0];
     for (float gridSize : allowedGridSizes) {
-      if (fabs(unroundedGridSize - gridSize) < fabs(unroundedGridSize - nearestGridSize)) {
+      if (fabs(unroundedGridSize - gridSize) <
+          fabs(unroundedGridSize - nearestGridSize)) {
         nearestGridSize = gridSize;
       }
     }
@@ -834,7 +858,9 @@ struct GLRenderGrid {
     return nearestGridSize;
   }
 
-  std::vector<float> GenerateGridVertices(float gridSize, float gridStartX, float gridStartY, float gridExtentX, float gridExtentY) {
+  std::vector<float> GenerateGridVertices(float gridSize, float gridStartX,
+                                          float gridStartY, float gridExtentX,
+                                          float gridExtentY) {
     std::vector<float> gridVertices;
 
     // Generate vertical lines
@@ -858,22 +884,20 @@ struct GLRenderGrid {
     return gridVertices;
   }
 
-  void UpdateGridBuffer(const std::vector<float>& gridVertices) {
+  void UpdateGridBuffer(const std::vector<float> &gridVertices) {
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, gridVertices.size() * sizeof(float), gridVertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, gridVertices.size() * sizeof(float),
+                 gridVertices.data(), GL_STATIC_DRAW);
 
     glBindVertexArray(0);
   }
 
+  void Create() {
+    // Vertex shader for the grid
+    const char *vs = R"(#version 300 es
 
-
-
-    void Create() {
-        // Vertex shader for the grid
-        const char *vs = R"(
-#version 330 core
 layout(location = 0) in vec2 v_position;  // The grid vertex positions in world coordinates
 
 uniform mat4 projectionMatrix;  // The projection matrix for transforming the grid
@@ -886,9 +910,10 @@ void main()
 }
         )";
 
-        // Fragment shader for the grid
-        const char *fs = R"(
-#version 330 core
+    // Fragment shader for the grid
+    const char *fs = R"(#version 300 es
+            precision highp float;
+
 out vec4 FragColor;
 
       const vec3 gridColor = vec3(0.5, 0.5, 0.5);  // Light gray for grid lines
@@ -900,42 +925,43 @@ void main()
 }
         )";
 
-        // Create shader program
-        m_programId = sCreateShaderProgram(vs, fs);
+    // Create shader program
+    m_programId = sCreateShaderProgram(vs, fs);
 
-        // Get uniform locations
-        glGenVertexArrays(1, &VAO);
-        glGenBuffers(1, &VBO);
+    // Get uniform locations
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
 
-        glBindVertexArray(VAO);
+    glBindVertexArray(VAO);
 
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, gridVertices.size() * sizeof(float), gridVertices.data(), GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, gridVertices.size() * sizeof(float),
+                 gridVertices.data(), GL_STATIC_DRAW);
 
-        // Enable vertex attribute 0 for the vertex positions
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(0);
+    // Enable vertex attribute 0 for the vertex positions
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float),
+                          (void *)0);
+    glEnableVertexAttribArray(0);
 
-        glBindVertexArray(0);
+    glBindVertexArray(0);
   }
 
-    void Destroy() {
-        if (VAO) {
-            glDeleteVertexArrays(1, &VAO);
-            glDeleteBuffers(1, &VBO);
-            VAO = 0;
-        }
-
-        if (m_programId) {
-            glDeleteProgram(m_programId);
-            m_programId = 0;
-        }
+  void Destroy() {
+    if (VAO) {
+      glDeleteVertexArrays(1, &VAO);
+      glDeleteBuffers(1, &VBO);
+      VAO = 0;
     }
 
-    float Render(float zoom, const b2Vec2& cameraPos) {
+    if (m_programId) {
+      glDeleteProgram(m_programId);
+      m_programId = 0;
+    }
+  }
+
+  float Render(float zoom, const b2Vec2 &cameraPos) {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 
     float halfWidthInWorld = (g_camera.m_width / 2.0f) * zoom;
     float halfHeightInWorld = (g_camera.m_height / 2.0f) * zoom;
@@ -951,8 +977,10 @@ void main()
     float gridExtentY = ceil(topRight.y / gridSize) * gridSize;
 
     // Generate the grid vertices based on the new grid size
-    float gridExtent = 100.0f;  // Set the extent of the grid (can be larger or smaller)
-    std::vector<float> gridVertices = GenerateGridVertices(gridSize, gridStartX, gridStartY, gridExtentX, gridExtentY);
+    float gridExtent =
+        100.0f;  // Set the extent of the grid (can be larger or smaller)
+    std::vector<float> gridVertices = GenerateGridVertices(
+        gridSize, gridStartX, gridStartY, gridExtentX, gridExtentY);
 
     // Update the grid buffer with the new vertices
     UpdateGridBuffer(gridVertices);
@@ -963,7 +991,8 @@ void main()
     // Set the projection matrix uniform
     float proj[16] = {0.0f};
     g_camera.BuildProjectionMatrix(proj, 0.1f);
-    glUniformMatrix4fv(glGetUniformLocation(m_programId, "projectionMatrix"), 1, GL_FALSE, proj);
+    glUniformMatrix4fv(glGetUniformLocation(m_programId, "projectionMatrix"), 1,
+                       GL_FALSE, proj);
 
     // Set the grid color
     glUniform3f(glGetUniformLocation(m_programId, "gridColor"), 0.2, 0.2, 0.2);
@@ -980,7 +1009,6 @@ void main()
     return gridSize;
   }
 };
-
 
 //
 DebugDraw::DebugDraw() {
@@ -1251,7 +1279,7 @@ void DebugDraw::Flush() {
   // m_targets->Flush();
 }
 
-float DebugDraw::DrawStaticGrid(const b2Color& color) {
+float DebugDraw::DrawStaticGrid(const b2Color &color) {
   float gridSize = m_grid->Render(g_camera.m_zoom, g_camera.m_center);
   return gridSize;
 }

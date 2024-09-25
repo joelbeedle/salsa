@@ -9,6 +9,7 @@ bool plot_drone_heatmap = false;
 bool plot_drone_distances = false;
 
 void init_python() {
+#ifndef __EMSCRIPTEN__
   Py_Initialize();
   std::filesystem::path python_path =
       exec_path / ".." / ".." / "testbed" / "plot";
@@ -16,12 +17,18 @@ void init_python() {
   std::string complete_string = "sys.path.append(\"" + python_path_str + "\")";
   PyRun_SimpleString("import sys");
   PyRun_SimpleString(complete_string.c_str());
+#endif
 }
 
-void finalize_python() { Py_Finalize(); }
+void finalize_python() {
+#ifndef __EMSCRIPTEN__
+  Py_Finalize();
+#endif
+}
 
 bool call_function(const char *module_name, const char *function_name,
                    const char *argument = nullptr) {
+#ifndef __EMSCRIPTEN__
   PyObject *pName, *pModule, *pFunc;
   PyObject *pArgs, *pValue = nullptr;
 
@@ -59,9 +66,12 @@ bool call_function(const char *module_name, const char *function_name,
     return false;
   }
   return true;
+#endif
+  return false;
 }
 
 void plot(std::string log_file_path) {
+#ifndef __EMSCRIPTEN__
   std::filesystem::path results_dir =
       exec_path / ".." / ".." / "testbed" / "results";
   std::filesystem::path file_path = results_dir / (log_file_path);
@@ -113,7 +123,8 @@ void plot(std::string log_file_path) {
       return;
     }
   }
-  // Finalize Python
+// Finalize Python
+#endif
   return;
 }
 

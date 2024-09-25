@@ -1,9 +1,9 @@
 #include <box2d/box2d.h>
 #include <plot/plot.h>
 #include <salsa/salsa.h>
-#include <cstdio>
 
 #include <chrono>
+#include <cstdio>
 #include <fstream>
 #include <iostream>
 #include <memory>
@@ -14,14 +14,14 @@
 #include "imgui.h"
 #include "settings.h"
 #include "test.h"
-#include "ui/ui_builder.h"
-#include "ui/components/behaviour_settings_component.h"
 #include "ui/components/add_test_modal.h"
 #include "ui/components/add_test_permutation_modal.h"
+#include "ui/components/behaviour_settings_component.h"
 #include "ui/components/drone_configuration_component.h"
 #include "ui/components/graph_plotting_settings_compoment.h"
 #include "ui/components/test_queue_component.h"
 #include "ui/components/visual_settings_component.h"
+#include "ui/ui_builder.h"
 #define MAX_TIME 1200.0f
 
 struct DroneParameters {
@@ -79,7 +79,7 @@ class QueueSimulator final : public Test {
 
   static void Build() { sim_builder->build(); }
 
-  void SetBuilder(salsa::SimBuilder *builder)const {
+  void SetBuilder(salsa::SimBuilder *builder) const {
     sim_builder = builder;
     builder->setWorld(m_world);
   }
@@ -94,7 +94,8 @@ class QueueSimulator final : public Test {
     const auto temp_sim = new salsa::Sim(config);
     const auto old_sim = sim;
     sim = temp_sim;
-    if (const std::string current_log_file = old_sim->getCurrentLogFile(); !current_log_file.empty() && !skipped_test)
+    if (const std::string current_log_file = old_sim->getCurrentLogFile();
+        !current_log_file.empty() && !skipped_test)
       testbed::plot(current_log_file);
     delete old_sim;
     sim->setCurrentBehaviour(sim->current_behaviour_name());
@@ -126,13 +127,13 @@ class QueueSimulator final : public Test {
   static void SetWorld(b2World *world) { sim_builder->setWorld(world); }
   static void SetHeight(float height) { sim_builder->setWorldHeight(height); }
   static void SetWidth(float width) { sim_builder->setWorldWidth(width); }
-  [[nodiscard]] float GetHeight()const { return sim->world_height(); }
-  [[nodiscard]] float GetWidth()const { return sim->world_width(); }
+  [[nodiscard]] float GetHeight() const { return sim->world_height(); }
+  [[nodiscard]] float GetWidth() const { return sim->world_width(); }
   static void SetContactListener(salsa::BaseContactListener &listener) {
     sim_builder->setContactListener(listener);
   }
   static void AddBehaviour(const std::string &name,
-                    std::unique_ptr<salsa::Behaviour> behaviour) {
+                           std::unique_ptr<salsa::Behaviour> behaviour) {
     salsa::behaviour::Registry::get().add(name, std::move(behaviour));
   }
 
@@ -140,11 +141,13 @@ class QueueSimulator final : public Test {
     sim_builder->setDroneConfiguration(configuration);
   }
 
-  [[nodiscard]] salsa::DroneConfiguration *GetConfiguration()const {
+  [[nodiscard]] salsa::DroneConfiguration *GetConfiguration() const {
     return sim->getDroneConfiguration();
   }
 
-  static void SetDroneCount(const int count) { sim_builder->setDroneCount(count); }
+  static void SetDroneCount(const int count) {
+    sim_builder->setDroneCount(count);
+  }
 
   void generatePermutations(std::vector<std::vector<float>> &results,
                             const std::vector<std::vector<float>> &lists,
@@ -177,7 +180,8 @@ class QueueSimulator final : public Test {
   }
 
   // Function to generate a list of values from a range
-  static std::vector<float> generateRange(const float min, const float max, const float step) {
+  static std::vector<float> generateRange(const float min, const float max,
+                                          const float step) {
     std::vector<float> range;
     for (float value = min; value <= max + step / 2; value += step) {
       value = std::round(value * 1e6) / 1e6;  // Reduce precision issues
@@ -235,22 +239,30 @@ class QueueSimulator final : public Test {
     UIBuilder builder;
 
     // Set window title and position
-    builder.setTitle("Swarm Controls")
-           .setPosition(ImVec2(10.0f, 50.0f));
+    builder.setTitle("Swarm Controls").setPosition(ImVec2(10.0f, 50.0f));
 
-    builder.addComponent(std::make_unique<BehaviorSettingsComponent>(sim))   // Behaviour settings
-       .addComponent(std::make_unique<VisualSettingsComponent>(draw_visual_range_, draw_targets_, sim))   // Visual settings
-       .addComponent(std::make_unique<TestQueueComponent>(sim, pause, next_frame, skipped_test, add_new_test_, add_test_permutation_))   // Test queue
-       .addComponent(std::make_unique<GraphPlottingSettingsComponent>())   // Graph plotting settings
-       .addComponent(std::make_unique<DroneSettingsComponent>(sim));   // Drone settings
+    builder
+        .addComponent(std::make_unique<BehaviorSettingsComponent>(
+            sim))  // Behaviour settings
+        .addComponent(std::make_unique<VisualSettingsComponent>(
+            draw_visual_range_, draw_targets_, sim))  // Visual settings
+        .addComponent(std::make_unique<TestQueueComponent>(
+            sim, pause, next_frame, skipped_test, add_new_test_,
+            add_test_permutation_))  // Test queue
+        .addComponent(
+            std::make_unique<
+                GraphPlottingSettingsComponent>())  // Graph plotting settings
+        .addComponent(
+            std::make_unique<DroneSettingsComponent>(sim));  // Drone settings
     // Render the UI
     builder.render();
-    if (testbed::imgui_logger_sink->is_open) testbed::imgui_logger_sink->render();
+    if (testbed::imgui_logger_sink->is_open)
+      testbed::imgui_logger_sink->render();
     ImGui::End();
   }
 
   void Draw(b2World *world, DebugDraw *debugDraw,
-            const std::vector<int>& foundTreeIDs) {
+            const std::vector<int> &foundTreeIDs) {
     if (draw_targets_) {
       if (first_run_) {
         debugDraw->DrawAllTargets(target_positions_, target_colors_,
@@ -312,7 +324,7 @@ class QueueSimulator final : public Test {
         // Draw everything else that's not anything above with default values
         switch (fixture->GetType()) {
           case b2Shape::e_circle: {
-             const auto  circleShape =
+            const auto circleShape =
                 dynamic_cast<const b2CircleShape *>(fixture->GetShape());
             b2Vec2 position =
                 transform.p + b2Mul(transform.q, circleShape->m_p);
@@ -362,5 +374,3 @@ class QueueSimulator final : public Test {
     }
   }
 };
-static int testIndex =
-    RegisterTest("Simulator", "Queue Mode", QueueSimulator::Create);

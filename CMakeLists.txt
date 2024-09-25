@@ -22,6 +22,14 @@ endif()
 
 include(FetchContent)
 
+if("${CMAKE_CXX_COMPILER}" MATCHES "em\\+\\+")
+    message(STATUS "Building with Emscripten (WebGL target)")
+    set(USING_EMSCRIPTEN TRUE)
+else()
+    set(USING_EMSCRIPTEN FALSE)
+endif()
+
+
 FetchContent_Declare(
   googletest
   URL https://github.com/google/googletest/archive/refs/tags/v1.15.0.zip
@@ -37,10 +45,11 @@ add_compile_definitions(_USE_MATH_DEFINES)
 set(BOX2D_BUILD_TESTBED OFF CACHE BOOL "Turn off Box2D testbed" FORCE)
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "Turn off GLFW docs" FORCE)
 # Add GLFW submodule
-add_subdirectory(extern/glfw)
 
-add_subdirectory(extern/glad)
-
+if(NOT USING_EMSCRIPTEN)
+    add_subdirectory(extern/glfw)
+    add_subdirectory(extern/glad)
+endif()
 add_subdirectory(extern/imgui)
 
 # Add Box2D submodule, and include it

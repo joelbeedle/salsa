@@ -3,7 +3,12 @@
 
 #include <fstream>
 #include <iostream>
-
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#define GL_GLEXT_PROTOTYPES
+#define EGL_EGLEXT_PROTOTYPES
+#include <GLES3/gl3.h>  // OpenGL ES 3.0 header
+#endif
 #include "box2d/b2_body.h"
 #include "box2d/b2_math.h"
 #include "imgui.h"
@@ -105,7 +110,7 @@ class MapCreator final : public Test {
     line_drawing = false;
   }
 
-  void CreateEdge(const b2Vec2 &start, const b2Vec2 &end)const {
+  void CreateEdge(const b2Vec2 &start, const b2Vec2 &end) const {
     b2BodyDef bd;
     bd.type = b2_staticBody;
     b2Body *body = m_world->CreateBody(&bd);
@@ -165,7 +170,7 @@ class MapCreator final : public Test {
     std::cout << "CompleteLine\n";
 
     const b2Vec2 diff = worldPt - line_spawn_point;
-    if (const float length = diff.Length();length < 0.1f) {
+    if (const float length = diff.Length(); length < 0.1f) {
       return;
     }
     const b2BodyDef bd;
@@ -259,6 +264,7 @@ class MapCreator final : public Test {
   }
 
   void Keyboard(const int key) override {
+#ifndef __EMSCRIPTEN__
     switch (key) {
       case GLFW_KEY_Q:
         if (line_drawing) {
@@ -271,17 +277,19 @@ class MapCreator final : public Test {
       default:
         break;
     }
+#endif
   }
 
   void SaveMap() {
-    const map::Map new_map = {map_name, boundary_side_length, boundary_side_length,
-                        drone_spawn_point, m_world};
+    const map::Map new_map = {map_name, boundary_side_length,
+                              boundary_side_length, drone_spawn_point, m_world};
     map::save(new_map);
     pause = false;
   }
 
   void LoadMap(const char *new_map_name) {
-    auto [name, width, height, drone_spawn_point, world] = map::load(new_map_name);
+    auto [name, width, height, drone_spawn_point, world] =
+        map::load(new_map_name);
     std::copy_n(new_map_name, 128, map_name);
 
     m_world->SetDebugDraw(nullptr);     // Detach from the old world
@@ -533,5 +541,3 @@ class MapCreator final : public Test {
     ImGui::End();
   }
 };
-static int testIndex =
-    RegisterTest("Map Creator", "Map Creator", MapCreator::Create);

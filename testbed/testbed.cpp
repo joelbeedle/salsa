@@ -45,8 +45,8 @@
 #if defined(_WIN32)
 #include <crtdbg.h>
 #endif
-#include "plot/plot.h"
 #include "logger.h"
+#include "plot/plot.h"
 
 namespace testbed {
 
@@ -128,7 +128,6 @@ static void KeyCallback(GLFWwindow *window, int key, int scancode, int action,
   if (ImGui::GetIO().WantCaptureKeyboard) {
     return;
   }
-
   if (action == GLFW_PRESS) {
     switch (key) {
       case GLFW_KEY_ESCAPE:
@@ -252,7 +251,6 @@ static void MouseButtonCallback(GLFWwindow *window, int32 button, int32 action,
   if (ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow)) {
     return;
   }
-
   double xd, yd;
   glfwGetCursorPos(g_mainWindow, &xd, &yd);
   b2Vec2 ps((float)xd, (float)yd);
@@ -350,7 +348,11 @@ static void UpdateUI() {
     }
 
     if (ImGui::Button("Exit", ImVec2(-1, 0))) {
+#ifdef __EMSCRIPTEN__
+
+#else
       glfwSetWindowShouldClose(g_mainWindow, GL_TRUE);
+#endif
     }
     ImGui::EndPopup();
   }
@@ -405,7 +407,10 @@ static void UpdateUI() {
         }
 
         if (ImGui::Button("Quit", button_sz)) {
+#ifdef __EMSCRIPTEN__
+#else
           glfwSetWindowShouldClose(g_mainWindow, GL_TRUE);
+#endif
         }
 
         ImGui::EndTabItem();
@@ -571,6 +576,70 @@ int run_headless(bool verbose, std::string queue_path) {
   return 0;
 }
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+
+void main_loop() {
+  char buffer[128];
+
+  double currentTime = emscripten_get_now();
+  double lastTime = emscripten_get_now();
+
+  int bufferWidth, bufferHeight;
+  glViewport(0, 0, bufferWidth, bufferHeight);
+
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  ImGui_ImplOpenGL3_NewFrame();
+  ImGui_ImplGlfw_NewFrame();
+  ImGui::NewFrame();
+
+  if (g_debugDraw.m_showUI) {
+    ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f));
+    ImGui::SetNextWindowSize(
+        ImVec2(float(g_camera.m_width), float(g_camera.m_height)));
+    ImGui::SetNextWindowBgAlpha(0.0f);
+    ImGui::Begin("Overlay", nullptr,
+                 ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoInputs |
+                     ImGuiWindowFlags_AlwaysAutoResize |
+                     ImGuiWindowFlags_NoScrollbar);
+    ImGui::End();
+
+    const TestEntry &entry = g_testEntries[s_settings.m_testIndex];
+    snprintf(buffer, sizeof(buffer), "%s : %s", entry.category, entry.name);
+    s_test->DrawTitle(buffer);
+  }
+
+  float gridSize = g_debugDraw.DrawStaticGrid(b2Color(0.5f, 0.5f, 0.5f));
+  snprintf(buffer, sizeof(buffer), "Grid size: %.1f m", gridSize);
+  g_debugDraw.DrawString(5, g_camera.m_height - 40, buffer);
+
+  snprintf(buffer, sizeof(buffer), "Camera zoom: %.3f", g_camera.m_zoom);
+  g_debugDraw.DrawString(5, g_camera.m_height - 60, buffer);
+
+  s_test->Step(s_settings);
+
+  if (start_menu) {
+    ImGui::OpenPopup("Menu");
+    s_settings.m_pause = true;
+  }
+  UpdateUI();
+
+  if (g_debugDraw.m_showUI) {
+    snprintf(buffer, sizeof(buffer), "%.1f ms", 1000.0 * 1.0);
+    g_debugDraw.DrawString(5, g_camera.m_height - 20, buffer);
+  }
+
+  ImGui::Render();
+  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+  glfwPollEvents();
+
+  double frameTime = currentTime - lastTime;
+  lastTime = currentTime;
+}
+#endif
+
 //
 int run() {
 #if defined(_WIN32)
@@ -598,13 +667,23 @@ int run() {
   const char *glslVersion = NULL;
 #endif
 
+#ifdef __EMSCRIPTEN__
+  // Request WebGL-compatible context
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,
+                 0);  // OpenGL ES 3.0 is compatible with WebGL 2.0
+  glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);  // Request OpenGL ES
+
+#else
+  // Desktop OpenGL
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#endif
 
-  snprintf(buffer, sizeof(buffer), "Box2D Testbed Version %d.%d.%d", b2_version.major,
-          b2_version.minor, b2_version.revision);
+  snprintf(buffer, sizeof(buffer), "Box2D Testbed Version %d.%d.%d",
+           b2_version.major, b2_version.minor, b2_version.revision);
 
   bool fullscreen = false;
   if (fullscreen) {
@@ -624,12 +703,16 @@ int run() {
   glfwGetWindowContentScale(g_mainWindow, &s_displayScale, &s_displayScale);
 
   glfwMakeContextCurrent(g_mainWindow);
-
-  // Load OpenGL functions using glad
+#ifndef __EMSCRIPTEN__
+  // Load OpenGL functions using glad (for desktop)
   int version = gladLoadGL(glfwGetProcAddress);
-  LOG_INFO("GL {}.{}", GLAD_VERSION_MAJOR(version), GLAD_VERSION_MINOR(version));
-  LOG_INFO("OpenGL {}, GLSL {}", reinterpret_cast<const char*>(glGetString(GL_VERSION)),
-            reinterpret_cast<const char*>(glGetString(GL_SHADING_LANGUAGE_VERSION)));
+  LOG_INFO("GL {}.{}", GLAD_VERSION_MAJOR(version),
+           GLAD_VERSION_MINOR(version));
+  LOG_INFO(
+      "OpenGL {}, GLSL {}",
+      reinterpret_cast<const char *>(glGetString(GL_VERSION)),
+      reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION)));
+#endif
 
   glfwSetWindowSizeCallback(g_mainWindow, ResizeWindowCallback);
   glfwSetKeyCallback(g_mainWindow, KeyCallback);
@@ -651,6 +734,9 @@ int run() {
 
   glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 
+#ifdef __EMSCRIPTEN__
+  emscripten_set_main_loop(main_loop, 0, 1);
+#else
   std::chrono::duration<double> frameTime(0.0);
   std::chrono::duration<double> sleepAdjust(0.0);
 
@@ -685,7 +771,8 @@ int run() {
       snprintf(buffer, sizeof(buffer), "%s : %s", entry.category, entry.name);
       s_test->DrawTitle(buffer);
     }
-    float gridSize = g_debugDraw.DrawStaticGrid(b2Color(0.5f, 0.5f, 0.5f));  // Light gray grid
+    float gridSize = g_debugDraw.DrawStaticGrid(
+        b2Color(0.5f, 0.5f, 0.5f));  // Light gray grid
     snprintf(buffer, sizeof(buffer), "Grid size: %.1f m", gridSize);
     // Draw the current grid size to screen
     g_debugDraw.DrawString(5, g_camera.m_height - 40, buffer);
@@ -734,6 +821,7 @@ int run() {
     // Compute the sleep adjustment using a low pass filter
     sleepAdjust = 0.9 * sleepAdjust + 0.1 * (target - frameTime);
   }
+#endif
 
   s_test = nullptr;
 

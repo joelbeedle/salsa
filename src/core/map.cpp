@@ -34,11 +34,18 @@ fs::path salsa::map::getExecutablePath() {
   }
   return std::filesystem::path(path).parent_path();
 #else
-  throw std::runtime_error("Unsupported platform.");
+  return std::string("/maps/");
 #endif
 }
 
 Map map::load(const char *new_map_name) {
+#ifdef __EMSCRIPTEN__
+  // In Emscripten, the maps are preloaded into the virtual file system under
+  // /maps
+  std::string file_path = std::string("/maps/") + new_map_name + ".json";
+  salsa::logger::get()->info("Loading map from: {}", file_path);
+
+#else
   std::filesystem::path exec_path = getExecutablePath();
   salsa::logger::get()->info("Executable path: {}", exec_path.string());
   std::filesystem::path file_path = exec_path / ".." / ".." / "testbed" /
@@ -46,11 +53,13 @@ Map map::load(const char *new_map_name) {
                                     (std::string(new_map_name) + ".json");
   salsa::logger::get()->info("Loading map from: {}", file_path.string());
 
+#endif
+
   auto *world = new b2World(b2Vec2(0.0f, 0.0f));
   Map new_map;
   std::ifstream file(file_path);
   if (!file.is_open()) {
-    throw std::runtime_error("Could not open file at: " + file_path.string());
+    throw std::runtime_error("Could not open file");
   }
 
   nlohmann::json map;
@@ -90,8 +99,9 @@ Map map::load(const char *new_map_name) {
         for (auto &vertex : fixture_json["polygon"]) {
           vertices.emplace_back(vertex[0], vertex[1]);
         }
-        shape.Set(&vertices[0],
-                  static_cast<int32>(vertices.size()));  // Properly set the vertices
+        shape.Set(
+            &vertices[0],
+            static_cast<int32>(vertices.size()));  // Properly set the vertices
         fixture_def.shape = &shape;
       } else if (fixture_json.find("circle") != fixture_json.end()) {
         b2CircleShape shape;
@@ -116,14 +126,20 @@ Map map::load(const char *new_map_name) {
 }
 
 void setNames() {
-  for (auto & [name, width, height, drone_spawn_point, world] : registry) {
+  for (auto &[name, width, height, drone_spawn_point, world] : registry) {
     name = "Map";
   }
 }
 
 void map::loadAll() {
+#ifdef __EMSCRIPTEN__
+  // In Emscripten, the maps are preloaded into the virtual file system under
+  // /maps
+  const fs::path directory = "/maps/";
+#else
   const fs::path exec_path = getExecutablePath();
   const fs::path directory = exec_path / ".." / ".." / "testbed" / "maps";
+#endif
   if (!fs::exists(directory)) {
     throw std::runtime_error("Directory does not exist: " + directory.string());
   }
@@ -143,8 +159,14 @@ void map::loadAll() {
 
 std::vector<std::string> map::getMapNames() {
   std::vector<std::string> names;
+#ifdef __EMSCRIPTEN__
+  // In Emscripten, the maps are preloaded into the virtual file system under
+  // /maps
+  const fs::path directory = "/maps/";
+#else
   const fs::path exec_path = getExecutablePath();
   const fs::path directory = exec_path / ".." / ".." / "testbed" / "maps";
+#endif
   if (!fs::exists(directory)) {
     throw std::runtime_error("Directory does not exist: " + directory.string());
   }
