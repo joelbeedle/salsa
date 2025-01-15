@@ -1,4 +1,4 @@
-[![DOI](https://zenodo.org/badge/721758864.svg)](https://zenodo.org/doi/10.5281/zenodo.13151118)
+[![DOI](https://zenodo.org/badge/721758864.svg)](https://zenodo.org/doi/10.5281/zenodo.13151118) [![SALSA Paper](https://img.shields.io/badge/IEEE-Xplore-orange)](https://ieeexplore.ieee.org/document/10766106)
 
 # SALSA - Swarm Algorithm Simulator
 
@@ -490,6 +490,13 @@ This code will not compile. For an example that sets up a test queue, check the 
 
 ## Contributions
 Contributions are welcome for SALSA! Please see the [Contributing to SALSA guide](https://github.com/joelbeedle/salsa/blob/master/.github/CONTRIBUTING.md) for more information.
+
+## Publications
+
+- [SALSA: Swarm Algorithm Simulator](https://ieeexplore.ieee.org/document/10766106)
+  ```
+  J. Beedle, C. Imrie and R. Calinescu, "SALSA: Swarm Algorithm Simulator," 2024 IEEE International Conference on Autonomic Computing and Self-Organizing Systems Companion (ACSOS-C), Aarhus, Denmark, 2024, pp. 140-145, doi: 10.1109/ACSOS-C63493.2024.00045.
+  ```
 
 ## License
 SALSA is licensed under the [zlib License](https://www.zlib.net/zlib_license.html)
